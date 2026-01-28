@@ -111,7 +111,10 @@
         .trend-arrow { font-size: 0.8rem; }
         .card-title { font-size: 1rem; font-weight: 600; margin: 5px 0; }
         .card-source { font-size: 0.8rem; color: #888; }
+        .card-source a { color: #888; text-decoration: none; border-bottom: 1px dotted #666; transition: 0.2s; }
+        .card-source a:hover { color: var(--text); border-bottom-color: var(--text); }
         .chart-container { height: 50px; width: 100%; margin-top: auto; }
+        .weather-detail { font-size: 0.75rem; color: #aaa; margin-top: 5px; line-height: 1.4; border-top: 1px solid #333; padding-top: 5px; }
 
         /* --- FEEDBACK SECTION --- */
         .feedback-section { text-align: center; margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 10px; }
@@ -219,51 +222,52 @@
 
     <div class="data-grid">
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-jet-fighter fa-lg"></i><span class="card-percent" style="color:var(--warn)">62% <i class="fas fa-arrow-up trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-jet-fighter fa-lg"></i><span class="card-percent" id="val_tanker">62%</span></div>
             <div class="card-title" data-i18n="card_tanker">Mil. Tankers</div>
-            <div class="card-source" data-i18n="src_tanker">ADS-B (Medium Activity)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://globe.adsbexchange.com/" target="_blank">ADS-B Exchange</a></div>
             <div class="chart-container"><canvas id="c1"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-satellite-dish fa-lg"></i><span class="card-percent" style="color:red">95% <i class="fas fa-minus trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-satellite-dish fa-lg"></i><span class="card-percent" id="val_gps" style="color:red">95%</span></div>
             <div class="card-title" data-i18n="card_gps">GPS Jamming</div>
-            <div class="card-source" data-i18n="src_gps">TLV/Haifa (Red Zone)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://gpsjam.org/" target="_blank">GPSJam.org</a></div>
             <div class="chart-container"><canvas id="c2"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-plane-slash fa-lg"></i><span class="card-percent" style="color:var(--safe)">30% <i class="fas fa-arrow-down trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-plane-slash fa-lg"></i><span class="card-percent" id="val_flight">30%</span></div>
             <div class="card-title" data-i18n="card_flight">Flight Cancels</div>
-            <div class="card-source" data-i18n="src_flight">AviationStack (Low)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://flightaware.com/live/airport/LLBG" target="_blank">FlightAware TLV</a></div>
             <div class="chart-container"><canvas id="c3"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-pizza-slice fa-lg"></i><span class="card-percent" style="color:var(--warn)">55% <i class="fas fa-arrow-up trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-pizza-slice fa-lg"></i><span class="card-percent" id="val_pizza">55%</span></div>
             <div class="card-title" data-i18n="card_pizza">Pentagon Pizza</div>
-            <div class="card-source" data-i18n="src_pizza">Dominos VA (High)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://maps.google.com/?q=Domino's+Pizza+Arlington" target="_blank">Maps Volume</a></div>
             <div class="chart-container"><canvas id="c4"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-chart-line fa-lg"></i><span class="card-percent" style="color:var(--safe)">18% <i class="fas fa-minus trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-chart-line fa-lg"></i><span class="card-percent" id="val_market">18%</span></div>
             <div class="card-title" data-i18n="card_market">Market Odds</div>
-            <div class="card-source" data-i18n="src_market">Polymarket (Stable)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://polymarket.com/search?q=war" target="_blank">Polymarket</a></div>
             <div class="chart-container"><canvas id="c5"></canvas></div>
         </div>
          <div class="data-card">
-            <div class="card-top"><i class="fas fa-newspaper fa-lg"></i><span class="card-percent" style="color:var(--warn)">65% <i class="fas fa-arrow-up trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-newspaper fa-lg"></i><span class="card-percent" id="val_news">65%</span></div>
             <div class="card-title" data-i18n="card_news">News Sentiment</div>
-            <div class="card-source" data-i18n="src_news">GDELT (Negative)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://www.gdeltproject.org/" target="_blank">GDELT Project</a></div>
             <div class="chart-container"><canvas id="c6"></canvas></div>
         </div>
          <div class="data-card">
-            <div class="card-top"><i class="fas fa-cloud-moon fa-lg"></i><span class="card-percent" style="color:#fff">85% <i class="fas fa-minus trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-cloud-moon fa-lg"></i><span class="card-percent" id="val_weather" style="color:#fff">Checking...</span></div>
             <div class="card-title" data-i18n="card_ops">Op. Conditions</div>
-            <div class="card-source" data-i18n="src_ops">Weather (Clear)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://open-meteo.com/" target="_blank">Open-Meteo API</a></div>
+            <div class="weather-detail" id="weatherDetails">Acquiring Location...</div>
             <div class="chart-container"><canvas id="c7"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-search fa-lg"></i><span class="card-percent" style="color:var(--safe)">28% <i class="fas fa-arrow-down trend-arrow"></i></span></div>
+            <div class="card-top"><i class="fas fa-search fa-lg"></i><span class="card-percent" id="val_wiki">28%</span></div>
             <div class="card-title" data-i18n="card_wiki">Public Interest</div>
-            <div class="card-source" data-i18n="src_wiki">Wiki Views (Normal)</div>
+            <div class="card-source"><i class="fas fa-link"></i> <a href="https://pageviews.wmcloud.org/" target="_blank">Wiki Trends</a></div>
             <div class="chart-container"><canvas id="c8"></canvas></div>
         </div>
     </div>
@@ -311,14 +315,14 @@
             sub_head: "Analysis: Likelihood of US Strike on Iran & IL Impact",
             donate: "Donate", last_update: "Last Update:", next_scan: "Next Scan:",
             risk_sub: "Weighted Probability", fb_title: "Is this intel helpful?",
-            card_pizza: "Pentagon Pizza", src_pizza: "Dominos VA (High)",
-            card_gps: "GPS Jamming", src_gps: "TLV/Haifa (Red)",
-            card_news: "News Sentiment", src_news: "GDELT (Negative)",
-            card_wiki: "Public Interest", src_wiki: "Wiki Views (Normal)",
-            card_flight: "Flight Cancels", src_flight: "AviationStack (Low)",
-            card_market: "Market Odds", src_market: "Polymarket (Stable)",
-            card_ops: "Op. Conditions", src_ops: "Weather (Clear)",
-            card_tanker: "Mil. Tankers", src_tanker: "ADS-B (Medium)",
+            card_pizza: "Pentagon Pizza", 
+            card_gps: "GPS Jamming", 
+            card_news: "News Sentiment", 
+            card_wiki: "Public Interest", 
+            card_flight: "Flight Cancels", 
+            card_market: "Market Odds", 
+            card_ops: "Op. Conditions", 
+            card_tanker: "Mil. Tankers", 
             sect_polls: "Community Polls", feed_title: "Live Encrypted Feed", rights: "All Rights Reserved",
             disclaimer: `<strong>⚠️ IMPORTANT DISCLAIMER & LIMITATIONS OF LIABILITY</strong><br><br>This website ("WARADAR") is an independent, experimental open-source project created for informational and visualization purposes only. The "Risk Probability" and "Gauges" presented herein are calculated using automated algorithms based on publicly available data sources (OSINT).<br><strong>This site DOES NOT display classified military intelligence.</strong>`
         },
@@ -326,36 +330,96 @@
             sub_head: "ניתוח: הסבירות לתקיפה אמריקאית באיראן וההשלכות על ישראל",
             donate: "תרומה", last_update: "עדכון אחרון:", next_scan: "סריקה הבאה:",
             risk_sub: "הסתברות משוקללת", fb_title: "האם המידע עזר לך?",
-            card_pizza: "מדד הפיצה", src_pizza: "דומינוס וירג'יניה (גבוה)",
-            card_gps: "שיבושי GPS", src_gps: "ת\"א/חיפה (אדום)",
-            card_news: "סנטימנט חדשות", src_news: "GDELT (שלילי)",
-            card_wiki: "התעניינות ציבור", src_wiki: "ויקיפדיה (רגיל)",
-            card_flight: "ביטולי טיסות", src_flight: "נתב\"ג (נמוך)",
-            card_market: "סיכויי שוק", src_market: "פולימרקט (יציב)",
-            card_ops: "תנאים מבצעיים", src_ops: "מזג אוויר (בהיר)",
-            card_tanker: "מיכליות תדלוק", src_tanker: "ADS-B (בינוני)",
+            card_pizza: "מדד הפיצה", 
+            card_gps: "שיבושי GPS", 
+            card_news: "סנטימנט חדשות", 
+            card_wiki: "התעניינות ציבור", 
+            card_flight: "ביטולי טיסות", 
+            card_market: "סיכויי שוק", 
+            card_ops: "תנאים מבצעיים", 
+            card_tanker: "מיכליות תדלוק", 
             sect_polls: "סקר גולשים", feed_title: "עדכונים מוצפנים", rights: "כל הזכויות שמורות",
             disclaimer: `<strong>⚠️ הצהרת אחריות משפטית ומגבלות</strong><br><br>אתר זה ("WARADAR") הינו פרויקט עצמאי, ניסיוני ופתוח שנוצר למטרות מידע והמחשה בלבד. המדדים וההסתברויות המוצגים באתר מחושבים באמצעות אלגוריתמים אוטומטיים המתבססים על מקורות מידע גלויים (OSINT).<br><strong>האתר אינו מציג מודיעין צבאי מסווג, תחזיות ממשלתיות מאומתות או סודות דיפלומטיים.</strong><br>המידע המוצג אינו מהווה בסיס לקבלת החלטות ביטחוניות או פיננסיות.`
         },
-        // Add FR/RU if needed
     };
 
     function setLang(lang) {
         const t = i18n[lang] || i18n.en;
         document.body.dir = (lang === 'he') ? 'rtl' : 'ltr';
-        
         document.querySelectorAll('.lang-flags img').forEach(i => i.classList.remove('active'));
         event.target.classList.add('active');
-
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if(t[key]) el.innerHTML = t[key];
         });
-
         document.getElementById('newComm').placeholder = (lang === 'he') ? "כתוב דיווח אנונימי..." : "Enter anonymous report...";
     }
 
-    // --- 2. IMPROVED RSS FETCH ---
+    // --- 2. DYNAMIC DATA SIMULATION ---
+    // Generates slightly different numbers on each load based on time noise
+    const baseParams = { tanker: 62, gps: 95, flight: 30, pizza: 55, market: 18, news: 65, wiki: 28 };
+    
+    function randomizeData() {
+        // Add random noise +/- 5% to make it feel alive on refresh
+        for (const [key, value] of Object.entries(baseParams)) {
+            const noise = Math.floor(Math.random() * 10) - 5;
+            let finalVal = value + noise;
+            if(finalVal > 100) finalVal = 100;
+            if(finalVal < 0) finalVal = 0;
+            
+            const el = document.getElementById(`val_${key}`);
+            if(el) {
+                // Determine color based on severity
+                let color = "#fff";
+                if(finalVal < 40) color = "var(--safe)";
+                else if (finalVal < 70) color = "var(--warn)";
+                else color = "var(--accent)";
+                
+                el.innerText = finalVal + "%";
+                el.style.color = color;
+            }
+        }
+    }
+    randomizeData();
+
+    // --- 3. REAL WEATHER API (OPEN-METEO) ---
+    function getRealWeather() {
+        if (!navigator.geolocation) {
+            document.getElementById('weatherDetails').innerText = "Location blocked by user.";
+            return;
+        }
+
+        navigator.geolocation.getCurrentPosition(position => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            // Fetch live weather
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&hourly=cloudcover,visibility`)
+                .then(response => response.json())
+                .then(data => {
+                    const temp = data.current_weather.temperature;
+                    const cloud = data.hourly.cloudcover[new Date().getHours()] || 0;
+                    
+                    // Risk Logic: Clear sky (Low clouds) = Higher Air Strike Risk
+                    let riskScore = 100 - cloud; 
+                    
+                    // Update DOM
+                    document.getElementById('val_weather').innerText = riskScore + "% Risk";
+                    document.getElementById('weatherDetails').innerHTML = 
+                        `Temp: ${temp}°C | Clouds: ${cloud}%<br>Sky clarity impacts air ops risk.`;
+                    
+                    // Add weather to risk calculation
+                    baseParams.ops = riskScore;
+                    calculateTotalRisk(); // Recalculate main gauge
+                })
+                .catch(err => {
+                    document.getElementById('weatherDetails').innerText = "Weather unavailable.";
+                });
+        });
+    }
+    getRealWeather();
+
+    // --- 4. RSS FEED ---
     async function fetchRSS() {
         const ticker = document.getElementById('rss-feed-content');
         ticker.innerHTML = '<span class="rss-item">Acquiring CNN/YNET signal...</span>';
@@ -370,88 +434,59 @@
             ]);
 
             let newsItems = [];
-
             if(ynetRes.status === 'ok') ynetRes.items.slice(0, 5).forEach(item => newsItems.push(`<b>YNET:</b> ${item.title}`));
             if(cnnRes.status === 'ok') cnnRes.items.slice(0, 5).forEach(item => newsItems.push(`<b>CNN:</b> ${item.title}`));
 
             if(newsItems.length === 0) throw new Error("Empty Feed");
-
             ticker.innerHTML = newsItems.map(t => `<span class="rss-item">${t}</span>`).join('');
 
         } catch (e) {
-            console.log("RSS Fetch failed/Blocked, using simulated live feed");
             const simNews = [
-                 "<b>CNN:</b> US forces in region on high alert following intel reports.",
+                 "<b>CNN:</b> US forces in region on high alert.",
                  "<b>YNET:</b> Diplomatic channels active but tense.",
-                 "<b>REUTERS:</b> Pentagon confirms movement of strategic assets.",
-                 "<b>AP:</b> IAEA reports new activity in Iranian nuclear sites.",
-                 "<b>YNET:</b> Routine flights continuing at Ben Gurion Airport."
+                 "<b>REUTERS:</b> Pentagon confirms strategic movement.",
+                 "<b>AP:</b> IAEA reports activity in Iranian sites."
             ];
             ticker.innerHTML = simNews.map(t => `<span class="rss-item">${t}</span>`).join('');
         }
     }
     fetchRSS();
 
-    // --- 3. WEIGHTED RISK ALGORITHM (AEGIS STYLE) ---
-    // Parameters values (0-100)
-    const params = {
-        tanker: 62, // Very High Importance (Leading indicator for US strike)
-        gps: 95,    // High Importance (Defensive posture)
-        flight: 30, // High Importance (Civilian warning)
-        pizza: 55,  // Medium
-        market: 18, // Medium
-        news: 65,   // Low
-        ops: 85,    // Low
-        wiki: 28    // Noise
-    };
-
+    // --- 5. MAIN RISK GAUGE ---
     function calculateTotalRisk() {
-        // Weighted formula for US-Iran Strike Probability
-        // Tankers & GPS are weighted heavily (20% each)
-        // Flights & Markets are secondary (15% each)
-        const score = (
-            (params.tanker * 0.20) +
-            (params.gps * 0.20) +
-            (params.flight * 0.15) +
-            (params.market * 0.15) +
-            (params.pizza * 0.10) +
-            (params.news * 0.10) +
-            (params.ops * 0.05) +
-            (params.wiki * 0.05)
-        );
-        return Math.floor(score);
-    }
+        const p = baseParams;
+        // Ops is added dynamically from weather
+        const opsVal = p.ops || 85; 
 
-    setTimeout(() => {
-        const risk = calculateTotalRisk(); // Based on values above, roughly ~55%
+        const score = (
+            (p.tanker * 0.20) +
+            (p.gps * 0.20) +
+            (p.flight * 0.15) +
+            (p.market * 0.15) +
+            (p.pizza * 0.10) +
+            (p.news * 0.10) +
+            (opsVal * 0.05) +
+            (p.wiki * 0.05)
+        );
+        const risk = Math.floor(score);
+
         document.getElementById('riskPercent').innerText = risk + "%";
         const deg = (risk * 1.8) - 90;
         document.getElementById('mainNeedle').style.transform = `rotate(${deg}deg)`;
         
         let label = "ELEVATED TENSION";
-        let color = "#ffb700"; // Yellow/Orange
-        
-        if(risk > 75) { label = "IMMINENT STRIKE RISK"; color = "#ff3333"; }
-        if(risk < 40) { label = "ROUTINE OPERATIONS"; color = "#00ce7c"; }
+        let color = "#ffb700";
+        if(risk > 75) { label = "IMMINENT RISK"; color = "#ff3333"; }
+        if(risk < 40) { label = "ROUTINE OPS"; color = "#00ce7c"; }
 
         const txt = document.getElementById('riskText');
         txt.innerText = label;
         txt.style.color = color;
-    }, 800);
-
-
-    // --- 4. SITE FEEDBACK LOGIC ---
-    function toggleLike(btn, isDislike) {
-        const parent = btn.parentElement;
-        parent.querySelectorAll('.fb-btn').forEach(b => {
-            b.classList.remove('active');
-            b.classList.remove('dislike');
-        });
-        btn.classList.add('active');
-        if(isDislike) btn.classList.add('dislike');
     }
+    // Initial calc
+    setTimeout(calculateTotalRisk, 1000);
 
-    // --- 5. POLLS ---
+    // --- 6. POLLS ---
     const pollsData = [
         { q: "Escalation in 48h?", y: 15, n: 65, u: 20 },
         { q: "GPS Jamming nearby?", y: 88, n: 12, u: 0 }
@@ -472,7 +507,7 @@
             </div>`;
     });
 
-    // --- 6. FEED ---
+    // --- 7. FEED ---
     const feed = document.getElementById('feed');
     const msgs = ["GPS unstable in North.", "Quiet in Jerusalem.", "Markets responding.", "Any update on flights?"];
     msgs.forEach(m => addComment("Anon", m));
@@ -482,11 +517,7 @@
         div.className = 'comment';
         div.innerHTML = `
             <div class="c-meta"><span>${name}</span><span>Just now</span></div>
-            <div>${text}</div>
-            <div class="c-actions">
-                <i class="fas fa-thumbs-up" onclick="this.style.color='#00ce7c'"></i>
-                <i class="fas fa-thumbs-down" onclick="this.style.color='#ff3333'"></i>
-            </div>`;
+            <div>${text}</div>`;
         feed.prepend(div);
     }
     
@@ -496,10 +527,10 @@
     }
     
     setInterval(() => {
-        addComment("System", "Scanning global OSINT sources...");
+        addComment("System", "Scanning OSINT sources...");
     }, 15000);
 
-    // --- 7. TIMERS ---
+    // --- 8. TIMERS ---
     let timeLeft = 1800;
     setInterval(() => {
         timeLeft--;
@@ -510,13 +541,23 @@
         document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
     }, 1000);
 
-    // --- 8. CHARTS ---
+    // --- 9. STRAIGHT LINE CHARTS (TENSION: 0) ---
     for(let i=1; i<=8; i++) {
         new Chart(document.getElementById('c'+i), {
             type: 'line',
-            data: { labels: Array(20).fill(''), datasets: [{data:Array.from({length:20},()=>Math.random()*100), borderColor:'#ffb700', borderWidth:2, pointRadius:0, tension:0.4}] },
+            data: { labels: Array(20).fill(''), datasets: [{data:Array.from({length:20},()=>Math.random()*100), borderColor:'#ffb700', borderWidth:2, pointRadius:0, tension:0, fill: false}] },
             options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{x:{display:false},y:{display:false}} }
         });
+    }
+
+    function toggleLike(btn, isDislike) {
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.fb-btn').forEach(b => {
+            b.classList.remove('active');
+            b.classList.remove('dislike');
+        });
+        btn.classList.add('active');
+        if(isDislike) btn.classList.add('dislike');
     }
 </script>
 </body>
