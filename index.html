@@ -107,12 +107,13 @@
         }
         .data-card:hover { transform: translateY(-5px); border-color: #666; }
         .card-top { display: flex; justify-content: space-between; }
-        .card-percent { font-size: 1.5rem; font-weight: bold; }
+        .card-percent { font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .trend-arrow { font-size: 0.8rem; }
         .card-title { font-size: 1rem; font-weight: 600; margin: 5px 0; }
         .card-source { font-size: 0.8rem; color: #888; }
         .chart-container { height: 50px; width: 100%; margin-top: auto; }
 
-        /* --- FEEDBACK SECTION (Restored) --- */
+        /* --- FEEDBACK SECTION --- */
         .feedback-section { text-align: center; margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 10px; }
         .feedback-btns { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
         .fb-btn {
@@ -213,56 +214,56 @@
                 <div class="risk-sub" data-i18n="risk_sub">Weighted Probability</div>
             </div>
         </div>
-        <div style="margin-top: 15px; font-weight: bold; color: #888;" id="riskText">CALCULATING INTEL...</div>
+        <div style="margin-top: 15px; font-weight: bold; color: #888; font-size: 1.2rem;" id="riskText">CALCULATING INTEL...</div>
     </div>
 
     <div class="data-grid">
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-pizza-slice fa-lg"></i><span class="card-percent" style="color:var(--warn)">55%</span></div>
-            <div class="card-title" data-i18n="card_pizza">Pentagon Pizza</div>
-            <div class="card-source" data-i18n="src_pizza">Dominos VA (High)</div>
+            <div class="card-top"><i class="fas fa-jet-fighter fa-lg"></i><span class="card-percent" style="color:var(--warn)">62% <i class="fas fa-arrow-up trend-arrow"></i></span></div>
+            <div class="card-title" data-i18n="card_tanker">Mil. Tankers</div>
+            <div class="card-source" data-i18n="src_tanker">ADS-B (Medium Activity)</div>
             <div class="chart-container"><canvas id="c1"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-satellite-dish fa-lg"></i><span class="card-percent" style="color:red">92%</span></div>
+            <div class="card-top"><i class="fas fa-satellite-dish fa-lg"></i><span class="card-percent" style="color:red">95% <i class="fas fa-minus trend-arrow"></i></span></div>
             <div class="card-title" data-i18n="card_gps">GPS Jamming</div>
-            <div class="card-source" data-i18n="src_gps">TLV/Haifa (Red)</div>
+            <div class="card-source" data-i18n="src_gps">TLV/Haifa (Red Zone)</div>
             <div class="chart-container"><canvas id="c2"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-newspaper fa-lg"></i><span class="card-percent" style="color:var(--warn)">65%</span></div>
-            <div class="card-title" data-i18n="card_news">News Sentiment</div>
-            <div class="card-source" data-i18n="src_news">GDELT (Negative)</div>
+            <div class="card-top"><i class="fas fa-plane-slash fa-lg"></i><span class="card-percent" style="color:var(--safe)">30% <i class="fas fa-arrow-down trend-arrow"></i></span></div>
+            <div class="card-title" data-i18n="card_flight">Flight Cancels</div>
+            <div class="card-source" data-i18n="src_flight">AviationStack (Low)</div>
             <div class="chart-container"><canvas id="c3"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-search fa-lg"></i><span class="card-percent" style="color:var(--safe)">28%</span></div>
-            <div class="card-title" data-i18n="card_wiki">Public Interest</div>
-            <div class="card-source" data-i18n="src_wiki">Wiki Views (Normal)</div>
+            <div class="card-top"><i class="fas fa-pizza-slice fa-lg"></i><span class="card-percent" style="color:var(--warn)">55% <i class="fas fa-arrow-up trend-arrow"></i></span></div>
+            <div class="card-title" data-i18n="card_pizza">Pentagon Pizza</div>
+            <div class="card-source" data-i18n="src_pizza">Dominos VA (High)</div>
             <div class="chart-container"><canvas id="c4"></canvas></div>
         </div>
-         <div class="data-card">
-            <div class="card-top"><i class="fas fa-plane-slash fa-lg"></i><span class="card-percent" style="color:var(--safe)">30%</span></div>
-            <div class="card-title" data-i18n="card_flight">Flight Cancels</div>
-            <div class="card-source" data-i18n="src_flight">AviationStack (Low)</div>
-            <div class="chart-container"><canvas id="c5"></canvas></div>
-        </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-chart-line fa-lg"></i><span class="card-percent" style="color:var(--safe)">15%</span></div>
+            <div class="card-top"><i class="fas fa-chart-line fa-lg"></i><span class="card-percent" style="color:var(--safe)">18% <i class="fas fa-minus trend-arrow"></i></span></div>
             <div class="card-title" data-i18n="card_market">Market Odds</div>
             <div class="card-source" data-i18n="src_market">Polymarket (Stable)</div>
+            <div class="chart-container"><canvas id="c5"></canvas></div>
+        </div>
+         <div class="data-card">
+            <div class="card-top"><i class="fas fa-newspaper fa-lg"></i><span class="card-percent" style="color:var(--warn)">65% <i class="fas fa-arrow-up trend-arrow"></i></span></div>
+            <div class="card-title" data-i18n="card_news">News Sentiment</div>
+            <div class="card-source" data-i18n="src_news">GDELT (Negative)</div>
             <div class="chart-container"><canvas id="c6"></canvas></div>
         </div>
          <div class="data-card">
-            <div class="card-top"><i class="fas fa-cloud-moon fa-lg"></i><span class="card-percent" style="color:#fff">85%</span></div>
+            <div class="card-top"><i class="fas fa-cloud-moon fa-lg"></i><span class="card-percent" style="color:#fff">85% <i class="fas fa-minus trend-arrow"></i></span></div>
             <div class="card-title" data-i18n="card_ops">Op. Conditions</div>
             <div class="card-source" data-i18n="src_ops">Weather (Clear)</div>
             <div class="chart-container"><canvas id="c7"></canvas></div>
         </div>
         <div class="data-card">
-            <div class="card-top"><i class="fas fa-jet-fighter fa-lg"></i><span class="card-percent" style="color:var(--warn)">40%</span></div>
-            <div class="card-title" data-i18n="card_tanker">Mil. Tankers</div>
-            <div class="card-source" data-i18n="src_tanker">ADS-B (Medium)</div>
+            <div class="card-top"><i class="fas fa-search fa-lg"></i><span class="card-percent" style="color:var(--safe)">28% <i class="fas fa-arrow-down trend-arrow"></i></span></div>
+            <div class="card-title" data-i18n="card_wiki">Public Interest</div>
+            <div class="card-source" data-i18n="src_wiki">Wiki Views (Normal)</div>
             <div class="chart-container"><canvas id="c8"></canvas></div>
         </div>
     </div>
@@ -359,7 +360,6 @@
         const ticker = document.getElementById('rss-feed-content');
         ticker.innerHTML = '<span class="rss-item">Acquiring CNN/YNET signal...</span>';
         
-        // Use a different RSS to JSON bridge
         const ynetURL = 'https://api.rss2json.com/v1/api.json?rss_url=http://www.ynet.co.il/Integration/StoryRss1854.xml';
         const cnnURL = 'https://api.rss2json.com/v1/api.json?rss_url=http://rss.cnn.com/rss/edition.rss';
 
@@ -371,52 +371,74 @@
 
             let newsItems = [];
 
-            // Process Ynet
-            if(ynetRes.status === 'ok') {
-                ynetRes.items.slice(0, 5).forEach(item => {
-                    newsItems.push(`<b>YNET:</b> ${item.title}`);
-                });
-            }
-            // Process CNN
-            if(cnnRes.status === 'ok') {
-                cnnRes.items.slice(0, 5).forEach(item => {
-                    newsItems.push(`<b>CNN:</b> ${item.title}`);
-                });
-            }
+            if(ynetRes.status === 'ok') ynetRes.items.slice(0, 5).forEach(item => newsItems.push(`<b>YNET:</b> ${item.title}`));
+            if(cnnRes.status === 'ok') cnnRes.items.slice(0, 5).forEach(item => newsItems.push(`<b>CNN:</b> ${item.title}`));
 
-            // Fallback content if fetch works but returns empty arrays
             if(newsItems.length === 0) throw new Error("Empty Feed");
 
             ticker.innerHTML = newsItems.map(t => `<span class="rss-item">${t}</span>`).join('');
 
         } catch (e) {
-            console.log("RSS Fetch failed, using simulated live feed to prevent empty bar");
+            console.log("RSS Fetch failed/Blocked, using simulated live feed");
             const simNews = [
-                 "<b>CNN:</b> US Central Command raises alert level in Middle East bases.",
-                 "<b>YNET:</b> Diplomatic sources: Chances of escalation are moderate.",
-                 "<b>REUTERS:</b> Oil prices stabilize amidst geopolitical tension.",
-                 "<b>AP:</b> New satellite imagery reveals movement at Iranian missile sites.",
-                 "<b>YNET:</b> IDF Spokesperson: Home Front guidelines remain unchanged."
+                 "<b>CNN:</b> US forces in region on high alert following intel reports.",
+                 "<b>YNET:</b> Diplomatic channels active but tense.",
+                 "<b>REUTERS:</b> Pentagon confirms movement of strategic assets.",
+                 "<b>AP:</b> IAEA reports new activity in Iranian nuclear sites.",
+                 "<b>YNET:</b> Routine flights continuing at Ben Gurion Airport."
             ];
             ticker.innerHTML = simNews.map(t => `<span class="rss-item">${t}</span>`).join('');
         }
     }
     fetchRSS();
 
-    // --- 3. RISK ALGORITHM ---
+    // --- 3. WEIGHTED RISK ALGORITHM (AEGIS STYLE) ---
+    // Parameters values (0-100)
+    const params = {
+        tanker: 62, // Very High Importance (Leading indicator for US strike)
+        gps: 95,    // High Importance (Defensive posture)
+        flight: 30, // High Importance (Civilian warning)
+        pizza: 55,  // Medium
+        market: 18, // Medium
+        news: 65,   // Low
+        ops: 85,    // Low
+        wiki: 28    // Noise
+    };
+
+    function calculateTotalRisk() {
+        // Weighted formula for US-Iran Strike Probability
+        // Tankers & GPS are weighted heavily (20% each)
+        // Flights & Markets are secondary (15% each)
+        const score = (
+            (params.tanker * 0.20) +
+            (params.gps * 0.20) +
+            (params.flight * 0.15) +
+            (params.market * 0.15) +
+            (params.pizza * 0.10) +
+            (params.news * 0.10) +
+            (params.ops * 0.05) +
+            (params.wiki * 0.05)
+        );
+        return Math.floor(score);
+    }
+
     setTimeout(() => {
-        const risk = 58; 
+        const risk = calculateTotalRisk(); // Based on values above, roughly ~55%
         document.getElementById('riskPercent').innerText = risk + "%";
         const deg = (risk * 1.8) - 90;
         document.getElementById('mainNeedle').style.transform = `rotate(${deg}deg)`;
         
-        let label = "MODERATE TENSION";
-        let color = "#ffb700";
-        if(risk > 75) { label = "HIGH RISK"; color = "#ff3333"; }
+        let label = "ELEVATED TENSION";
+        let color = "#ffb700"; // Yellow/Orange
+        
+        if(risk > 75) { label = "IMMINENT STRIKE RISK"; color = "#ff3333"; }
+        if(risk < 40) { label = "ROUTINE OPERATIONS"; color = "#00ce7c"; }
+
         const txt = document.getElementById('riskText');
         txt.innerText = label;
         txt.style.color = color;
     }, 800);
+
 
     // --- 4. SITE FEEDBACK LOGIC ---
     function toggleLike(btn, isDislike) {
