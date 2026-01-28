@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WAR INDEX | Geopolitical Status</title>
+    <title>WARADAR | Geopolitical Status</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
             --bg: #0b0e14;
             --card-bg: #151a23;
             --text: #e0e6ed;
-            --accent: #ff3333; /* Red for War/Alert */
-            --safe: #00ce7c;
-            --neutral: #888;
-            --glow: 0 0 10px rgba(255, 51, 51, 0.5);
+            --accent: #ff3333; /* Red */
+            --safe: #00ce7c;   /* Green */
+            --warn: #ffb700;   /* Orange/Yellow */
+            --grid-line: #2d3748;
         }
 
         body {
@@ -26,7 +26,7 @@
             overflow-x: hidden;
         }
 
-        /* Header & Nav */
+        /* --- 1. Header & Live Logo --- */
         header {
             display: flex;
             justify-content: space-between;
@@ -45,40 +45,38 @@
             gap: 15px;
         }
 
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 2px;
+            background: linear-gradient(90deg, #fff, #aaa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 10px;
+        }
+
+        /* LIVE BLINKING EFFECT (More Aggressive) */
         .live-badge {
-            background: rgba(255, 0, 0, 0.2);
-            color: red;
-            border: 1px solid red;
-            padding: 2px 8px;
+            background: #ff0000;
+            color: white;
+            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: bold;
             display: flex;
             align-items: center;
             gap: 5px;
-            animation: pulse 2s infinite;
+            box-shadow: 0 0 15px #ff0000;
+            animation: aggressive-blink 1s infinite alternate;
         }
         
-        .live-dot {
-            width: 8px; height: 8px;
-            background: red;
-            border-radius: 50%;
+        @keyframes aggressive-blink {
+            0% { opacity: 1; box-shadow: 0 0 20px red; transform: scale(1); }
+            100% { opacity: 0.6; box-shadow: 0 0 5px red; transform: scale(0.95); }
         }
-
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-
-        .lang-switch img {
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            cursor: pointer;
-            margin-left: 5px;
-            opacity: 0.6;
-            transition: 0.3s;
-        }
-        .lang-switch img:hover, .lang-switch img.active { opacity: 1; border: 2px solid var(--text); }
 
         .donate-btn {
-            background: linear-gradient(45deg, #ffb700, #ff8800);
+            background: #FFDD00;
             color: #000;
             padding: 8px 15px;
             border-radius: 20px;
@@ -86,398 +84,430 @@
             font-weight: bold;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            transition: transform 0.2s;
         }
+        .donate-btn:hover { transform: scale(1.05); }
 
-        /* Main Layout */
+        /* --- 2. Time Bar --- */
+        .time-bar {
+            background: #1a202c;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #a0aec0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            border-bottom: 1px solid #333;
+        }
+        .time-value { color: var(--warn); font-weight: bold; font-family: monospace; }
+
         .container {
             max-width: 1200px;
             margin: 20px auto;
             padding: 0 15px;
         }
 
-        h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+        /* --- 3. Main Rainbow Gauge --- */
+        .gauge-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
 
-        /* KPI Cards */
-        .metrics-grid {
+        .gauge-outer {
+            width: 300px;
+            height: 150px; /* Half circle */
+            background: conic-gradient(from 180deg at 50% 100%, 
+                #00ce7c 0deg 60deg,  /* Low Risk */
+                #ffb700 60deg 120deg, /* Medium Risk */
+                #ff3333 120deg 180deg /* High Risk */
+            );
+            border-top-left-radius: 150px;
+            border-top-right-radius: 150px;
+            position: relative;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+        }
+
+        .gauge-inner {
+            width: 240px;
+            height: 120px;
+            background: var(--bg);
+            border-top-left-radius: 120px;
+            border-top-right-radius: 120px;
+            position: absolute;
+            bottom: 0;
+            left: 30px; /* (300-240)/2 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding-bottom: 10px;
+        }
+
+        .risk-label { font-size: 2.5rem; font-weight: bold; color: var(--text); }
+        .risk-sub { font-size: 1rem; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        
+        /* Needle */
+        .needle {
+            width: 4px;
+            height: 130px;
+            background: #fff;
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform-origin: bottom center;
+            transform: rotate(-45deg); /* Default start */
+            transition: transform 1.5s cubic-bezier(0.1, 1.7, 0.5, 1);
+            z-index: 10;
+            border-radius: 2px;
+            box-shadow: 0 0 5px rgba(255,255,255,0.8);
+        }
+        .needle-pivot {
+            width: 16px; height: 16px;
+            background: #fff;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -8px; left: calc(50% - 8px);
+            z-index: 11;
+        }
+
+        /* --- 4. Data Grid (8 Squares) --- */
+        .data-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
             margin-bottom: 40px;
         }
 
-        .card {
+        .data-card {
             background: var(--card-bg);
-            border-radius: 10px;
-            padding: 20px;
-            border: 1px solid #2d3748;
-            transition: transform 0.2s;
-        }
-
-        .card:hover { transform: translateY(-2px); border-color: var(--accent); }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 15px;
-            align-items: center;
-        }
-
-        .param-icon {
-            font-size: 1.5rem;
-            color: var(--accent);
-            width: 40px; height: 40px;
-            background: rgba(255, 51, 51, 0.1);
+            border: 1px solid var(--grid-line);
             border-radius: 8px;
-            display: flex; justify-content: center; align-items: center;
-        }
-
-        .metric-value { font-size: 1.8rem; font-weight: bold; }
-        .metric-label { color: #888; font-size: 0.9rem; }
-
-        .sparkline-container {
-            height: 60px;
-            width: 100%;
-            margin-top: 10px;
-        }
-
-        /* Disclaimer */
-        .disclaimer-box {
-            background: rgba(255, 165, 0, 0.1);
-            border-left: 4px solid orange;
             padding: 15px;
-            margin: 20px 0;
-            font-size: 0.9rem;
-            color: #ddd;
-        }
-
-        /* Polls */
-        .polls-section { margin-top: 40px; }
-        .poll-item {
-            background: var(--card-bg);
-            margin-bottom: 15px;
-            padding: 15px;
-            border-radius: 8px;
-        }
-        .poll-question { font-weight: bold; margin-bottom: 10px; display: block; }
-        .poll-options { display: flex; gap: 10px; }
-        .poll-btn {
-            flex: 1;
-            padding: 8px;
-            background: #2d3748;
-            border: none;
-            color: white;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .poll-btn:hover { background: #4a5568; }
-        .poll-stats {
-            height: 6px;
-            background: #333;
-            margin-top: 10px;
-            border-radius: 3px;
+            position: relative;
             overflow: hidden;
-            display: flex;
+            transition: 0.3s;
         }
-        .stat-bar { height: 100%; }
+        .data-card:hover { border-color: #555; transform: translateY(-3px); }
 
-        /* Comments */
-        .comments-section {
-            background: var(--card-bg);
+        .card-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        .card-icon { font-size: 1.5rem; color: var(--text); opacity: 0.7; }
+        .card-percent { font-size: 1.8rem; font-weight: bold; color: var(--accent); }
+        
+        .card-title { font-size: 1rem; font-weight: 600; margin-bottom: 5px; }
+        .card-source { font-size: 0.8rem; color: #888; display: flex; align-items: center; gap: 5px; }
+        .source-tag { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; }
+
+        /* --- 5. Feedback --- */
+        .feedback-section { text-align: center; margin: 30px 0; padding: 20px; background: rgba(255,255,255,0.03); border-radius: 10px; }
+        .feedback-btns { display: flex; justify-content: center; gap: 20px; margin-top: 15px; }
+        .fb-btn {
+            background: transparent; border: 1px solid #444; color: #fff;
+            padding: 10px 20px; border-radius: 50px; cursor: pointer;
+            display: flex; align-items: center; gap: 10px; transition: 0.2s;
+        }
+        .fb-btn:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+        .fb-btn.active { background: var(--safe); border-color: var(--safe); color: #000; }
+        .fb-btn.active.dislike { background: var(--accent); border-color: var(--accent); }
+
+        /* --- 6. Polls --- */
+        .polls-grid { margin-top: 20px; }
+        .poll-item { background: var(--card-bg); padding: 20px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--grid-line); }
+        .poll-question { font-size: 1.1rem; font-weight: bold; margin-bottom: 15px; display: block; }
+        .poll-actions { display: flex; gap: 10px; }
+        .p-btn { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.2s; color: white; }
+        .p-yes { background: #2d3748; } .p-yes:hover { background: var(--safe); }
+        .p-no { background: #2d3748; } .p-no:hover { background: var(--accent); }
+        .p-idk { background: #2d3748; } .p-idk:hover { background: #888; }
+        
+        .poll-results { display: none; height: 10px; background: #333; border-radius: 5px; overflow: hidden; margin-top: 10px; }
+        .bar { height: 100%; }
+
+        /* --- 7. Footer & Disclaimer --- */
+        footer {
+            margin-top: 50px;
+            padding: 40px 20px;
+            background: #080a0f;
+            border-top: 1px solid #222;
+            text-align: center;
+        }
+        .disclaimer-box {
+            font-size: 0.8rem;
+            color: #666;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.5;
+            border: 1px dashed #333;
             padding: 20px;
             border-radius: 10px;
-            margin-top: 40px;
         }
-        .comments-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;}
-        .comment-scroll {
-            height: 300px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .comment {
-            background: rgba(0,0,0,0.2);
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 0.9rem;
-        }
-        .comment-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-bottom: 5px; }
-        .like-dislike { cursor: pointer; margin-left: 10px; }
 
-        /* Footer */
-        footer {
-            text-align: center;
-            padding: 40px 0;
-            color: #666;
-            font-size: 0.8rem;
-            border-top: 1px solid #333;
-            margin-top: 40px;
+        /* Responsive */
+        @media (max-width: 600px) {
+            .logo-text { font-size: 1.4rem; }
+            .gauge-outer { width: 260px; height: 130px; border-radius: 130px 130px 0 0; }
+            .gauge-inner { width: 200px; height: 100px; border-radius: 100px 100px 0 0; left: 30px; }
+            .needle { height: 110px; }
         }
-        .creator-link { color: var(--accent); text-decoration: none; font-weight: bold; }
-
-        /* RTL Handling for Hebrew */
-        body[dir="rtl"] { direction: rtl; }
-        body[dir="rtl"] .card-header { flex-direction: row-reverse; }
     </style>
 </head>
-<body dir="ltr">
+<body>
 
 <header>
     <div class="logo-section">
-        <div class="live-badge"><div class="live-dot"></div> LIVE</div>
-        <h1 id="pageTitle">WAR INDEX</h1>
+        <div class="live-badge"><i class="fas fa-circle"></i> LIVE</div>
+        <div class="logo-text"><i class="fas fa-satellite"></i> WARADAR</div>
     </div>
     
-    <div style="display: flex; align-items: center; gap: 20px;">
-        <div class="lang-switch">
-            <img src="https://flagcdn.com/w40/us.png" onclick="setLang('en')" class="active" title="English">
-            <img src="https://flagcdn.com/w40/il.png" onclick="setLang('he')" title="עברית">
-            <img src="https://flagcdn.com/w40/fr.png" onclick="setLang('fr')" title="Français">
-            <img src="https://flagcdn.com/w40/ru.png" onclick="setLang('ru')" title="Русский">
-        </div>
-        <a href="#" class="donate-btn"><i class="fas fa-coffee"></i> <span id="donateText">Donate</span></a>
+    <div>
+        <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-btn">
+            <i class="fas fa-mug-hot"></i> Donate
+        </a>
     </div>
 </header>
 
+<div class="time-bar">
+    <div>Last Update: <span class="time-value" id="lastUpdate">--:--</span></div>
+    <div>Next Scan: <span class="time-value" id="nextScan">30:00</span></div>
+</div>
+
 <div class="container">
 
-    <div class="disclaimer-box">
-        <strong id="disclaimerTitle">⚠️ DISCLAIMER:</strong>
-        <p id="disclaimerText">
-            This project is experimental and for informational purposes only. It is NOT official intelligence, verified forecasts, or a basis for decision-making. 
-            <strong>Data Sources:</strong> NewsData.io, GDELT Project, Wikipedia, Aviationstack, OpenWeatherMap.
-            <br><em>Limitations: No classified intelligence or diplomatic activities are displayed.</em>
-        </p>
+    <div class="gauge-section">
+        <div class="gauge-outer">
+            <div class="needle" id="mainNeedle"></div>
+            <div class="needle-pivot"></div>
+            <div class="gauge-inner">
+                <div class="risk-label" id="riskPercent">0%</div>
+                <div class="risk-sub">Avg. Risk Probability</div>
+            </div>
+        </div>
+        <div style="margin-top: 20px; font-size: 1.2rem; font-weight: bold; color: var(--warn);" id="riskText">CALCULATING...</div>
     </div>
 
-    <div class="metrics-grid">
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="metric-label" data-key="pizza">Pentagon Pizza Meter</div>
-                    <div class="metric-value">High (7/10)</div>
-                </div>
-                <div class="param-icon"><i class="fas fa-pizza-slice"></i></div>
-            </div>
-            <div class="sparkline-container"><canvas id="chart1"></canvas></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="metric-label" data-key="gps">GPS Jamming (TLV)</div>
-                    <div class="metric-value" style="color: red;">CRITICAL</div>
-                </div>
-                <div class="param-icon"><i class="fas fa-satellite-dish"></i></div>
-            </div>
-            <div class="sparkline-container"><canvas id="chart2"></canvas></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="metric-label" data-key="news">Global News Sentiment</div>
-                    <div class="metric-value" style="color: orange;">Negative</div>
-                </div>
-                <div class="param-icon"><i class="fas fa-newspaper"></i></div>
-            </div>
-            <div class="sparkline-container"><canvas id="chart3"></canvas></div>
-        </div>
+    <div class="data-grid">
         
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="metric-label" data-key="flight">Flight Cancellations</div>
-                    <div class="metric-value">Moderate</div>
-                </div>
-                <div class="param-icon"><i class="fas fa-plane-slash"></i></div>
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-pizza-slice"></i></div>
+                <div class="card-percent" style="color: var(--warn);">72%</div>
             </div>
-            <div class="sparkline-container"><canvas id="chart4"></canvas></div>
+            <div class="card-title">Pentagon Pizza Meter</div>
+            <div class="card-source"><span class="source-tag">Dominos Arlington</span> High volume</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-satellite-dish"></i></div>
+                <div class="card-percent" style="color: var(--accent);">95%</div>
+            </div>
+            <div class="card-title">GPS Jamming (TLV)</div>
+            <div class="card-source"><span class="source-tag">GPSJam.org</span> Red zone active</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-newspaper"></i></div>
+                <div class="card-percent" style="color: var(--accent);">88%</div>
+            </div>
+            <div class="card-title">News Sentiment</div>
+            <div class="card-source"><span class="source-tag">GDELT Project</span> Negative mentions</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-search"></i></div>
+                <div class="card-percent" style="color: var(--safe);">30%</div>
+            </div>
+            <div class="card-title">Public Interest</div>
+            <div class="card-source"><span class="source-tag">Wikipedia API</span> 22K 'War' Views</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-plane-slash"></i></div>
+                <div class="card-percent" style="color: var(--warn);">45%</div>
+            </div>
+            <div class="card-title">Flight Cancellations</div>
+            <div class="card-source"><span class="source-tag">AviationStack</span> TLV Arrivals</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-chart-line"></i></div>
+                <div class="card-percent" style="color: var(--safe);">12%</div>
+            </div>
+            <div class="card-title">Market Odds</div>
+            <div class="card-source"><span class="source-tag">Polymarket</span> Conflict bet</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-cloud-moon"></i></div>
+                <div class="card-percent" style="color: #fff;">Good</div>
+            </div>
+            <div class="card-title">Op. Conditions</div>
+            <div class="card-source"><span class="source-tag">OpenWeather</span> 22°C, 10% Cloud</div>
+        </div>
+
+        <div class="data-card">
+            <div class="card-top">
+                <div class="card-icon"><i class="fas fa-jet-fighter"></i></div>
+                <div class="card-percent" style="color: var(--warn);">Medium</div>
+            </div>
+            <div class="card-title">Military Tankers</div>
+            <div class="card-source"><span class="source-tag">ADS-B Exch</span> Stratotankers Area</div>
         </div>
     </div>
 
-    <div class="polls-section">
-        <h2 id="pollsTitle">User Predictions</h2>
-        <div class="poll-item">
-            <span class="poll-question" data-key="q1">Will a major conflict erupt in 48h?</span>
-            <div class="poll-options">
-                <button class="poll-btn" onclick="vote(this)">Yes (22%)</button>
-                <button class="poll-btn" onclick="vote(this)">No (65%)</button>
-                <button class="poll-btn" onclick="vote(this)">Unsure (13%)</button>
-            </div>
-            <div class="poll-stats">
-                <div class="stat-bar" style="width: 22%; background: #ff3333;"></div>
-                <div class="stat-bar" style="width: 65%; background: #00ce7c;"></div>
-                <div class="stat-bar" style="width: 13%; background: #888;"></div>
-            </div>
-        </div>
-        
-        <div class="poll-item">
-            <span class="poll-question" data-key="q2">Is the diplomatic channel still effective?</span>
-            <div class="poll-options">
-                <button class="poll-btn" onclick="vote(this)">Yes (40%)</button>
-                <button class="poll-btn" onclick="vote(this)">No (55%)</button>
-                <button class="poll-btn" onclick="vote(this)">Unsure (5%)</button>
-            </div>
-            <div class="poll-stats">
-                <div class="stat-bar" style="width: 40%; background: #00ce7c;"></div>
-                <div class="stat-bar" style="width: 55%; background: #ff3333;"></div>
-                <div class="stat-bar" style="width: 5%; background: #888;"></div>
-            </div>
+    <div class="feedback-section">
+        <h3>Is this dashboard helpful?</h3>
+        <div class="feedback-btns">
+            <button class="fb-btn" onclick="toggleLike(this)"><i class="fas fa-thumbs-up"></i> Helpful</button>
+            <button class="fb-btn" onclick="toggleLike(this, true)"><i class="fas fa-thumbs-down"></i> Not Helpful</button>
         </div>
     </div>
 
-    <div class="comments-section">
-        <div class="comments-header">
-            <h3 id="commTitle">Community Intel</h3>
-            <span style="font-size: 0.9rem; color: #888;">
-                <i class="fas fa-users"></i> <span id="commCount">24,302</span> comments
-            </span>
+    <h2 style="border-bottom: 1px solid #333; padding-bottom: 10px;">Community Intelligence Polls</h2>
+    <div class="polls-grid" id="pollsContainer">
         </div>
-        
-        <div class="comment-scroll" id="commentFeed">
-            </div>
 
-        <div style="margin-top: 15px; display: flex; gap: 10px;">
-            <input type="text" placeholder="Write anonymously..." style="flex:1; padding: 10px; background: #0b0e14; border: 1px solid #333; color: white; border-radius: 4px;">
-            <button style="padding: 10px 20px; background: var(--accent); border: none; color: white; border-radius: 4px; cursor: pointer;">SEND</button>
-        </div>
+    <div style="background: var(--card-bg); padding: 20px; border-radius: 8px; margin-top: 40px;">
+        <h3><i class="fas fa-comments"></i> Live Chatter</h3>
+        <div id="commentFeed" style="height: 200px; overflow-y: hidden; opacity: 0.7; font-size: 0.9rem;"></div>
     </div>
-
-    <footer>
-        <p>Created by <a href="https://t.me/YOUR_TELEGRAM_LINK" class="creator-link" target="_blank">Idan Biton</a> | <i class="fab fa-telegram"></i> Official Telegram</p>
-        <p style="opacity: 0.5;">Use this information wisely. Not for military use.</p>
-    </footer>
 
 </div>
 
+<footer>
+    <div class="disclaimer-box">
+        <strong>⚠️ DISCLAIMER / הצהרת אחריות</strong><br><br>
+        This project is experimental and for informational purposes only. It is NOT official intelligence, verified forecasts, or a basis for decision-making.<br>
+        <strong>Data Sources:</strong> NewsData.io, GDELT Project, Wikipedia, Aviationstack, OpenWeatherMap.<br>
+        <em>Limitations: No classified intelligence or diplomatic activities are displayed.</em><br><br>
+        Created by <a href="https://t.me/YOUR_TELEGRAM" style="color: var(--accent);">Idan Biton</a>
+    </div>
+</footer>
+
 <script>
-    // --- Translations ---
-    const i18n = {
-        en: {
-            title: "WAR INDEX",
-            donate: "Donate",
-            disclaimerTitle: "⚠️ DISCLAIMER:",
-            disclaimerText: "This project is experimental and for informational purposes only. It is NOT official intelligence, verified forecasts, or a basis for decision-making. Data Sources: NewsData.io, GDELT, Wikipedia. Limitations: No classified intelligence displayed.",
-            pizza: "Pentagon Pizza Meter",
-            gps: "GPS Jamming (TLV)",
-            news: "Global News Sentiment",
-            flight: "Flight Cancellations",
-            polls: "User Predictions",
-            commTitle: "Community Intel",
-            q1: "Will a major conflict erupt in 48h?",
-            q2: "Is the diplomatic channel still effective?"
-        },
-        he: {
-            title: "מדד מלחמה",
-            donate: "תרומה",
-            disclaimerTitle: "⚠️ הצהרת אחריות:",
-            disclaimerText: "פרויקט זה הינו ניסיוני ולמטרות מידע בלבד. אינו מהווה מודיעין רשמי, תחזיות מאומתות או בסיס להחלטות. מקורות: NewsData.io, GDELT, ויקיפדיה. מגבלות: לא מוצג מודיעין מסווג.",
-            pizza: "מדד הפיצה בפנטגון",
-            gps: "שיבושי GPS (תל אביב)",
-            news: "סנטימנט חדשות עולמי",
-            flight: "ביטולי טיסות",
-            polls: "סקר גולשים",
-            commTitle: "דיווחים מהשטח",
-            q1: "האם תפרוץ מלחמה ב-48 שעות הקרובות?",
-            q2: "האם הערוץ הדיפלומטי עדיין יעיל?"
-        },
-        // Add FR/RU similarly if needed
-    };
-
-    function setLang(lang) {
-        const t = i18n[lang] || i18n.en;
-        document.body.dir = (lang === 'he') ? 'rtl' : 'ltr';
+    // --- 1. Timer Logic ---
+    function updateTimers() {
+        const now = new Date();
+        document.getElementById('lastUpdate').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
         
-        // Update texts
-        document.getElementById('pageTitle').innerText = t.title;
-        document.getElementById('donateText').innerText = t.donate;
-        document.getElementById('disclaimerTitle').innerText = t.disclaimerTitle;
-        document.getElementById('disclaimerText').innerText = t.disclaimerText;
-        document.getElementById('pollsTitle').innerText = t.polls;
-        document.getElementById('commTitle').innerText = t.commTitle;
+        let timeLeft = 30 * 60; // 30 minutes in seconds
+        const countdownEl = document.getElementById('nextScan');
+        
+        setInterval(() => {
+            timeLeft--;
+            if (timeLeft < 0) timeLeft = 30 * 60;
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            countdownEl.innerText = `${m}:${s}`;
+        }, 1000);
+    }
+    updateTimers();
 
-        // Update Keys
-        document.querySelectorAll('[data-key]').forEach(el => {
-            const key = el.getAttribute('data-key');
-            if(t[key]) el.innerText = t[key];
+    // --- 2. Gauge Logic (Animation) ---
+    setTimeout(() => {
+        // Calculate total risk (Mock calculation)
+        const totalRisk = 68; // Example: 68%
+        
+        // Update Text
+        document.getElementById('riskPercent').innerText = totalRisk + "%";
+        
+        let text = "MODERATE RISK";
+        let color = "#ffb700";
+        if (totalRisk > 75) { text = "HIGH RISK"; color = "#ff3333"; }
+        if (totalRisk < 40) { text = "LOW RISK"; color = "#00ce7c"; }
+        
+        const textEl = document.getElementById('riskText');
+        textEl.innerText = text;
+        textEl.style.color = color;
+
+        // Rotate Needle
+        // 0% = -90deg, 100% = 90deg. Range = 180deg.
+        // Formula: (percent * 1.8) - 90
+        const deg = (totalRisk * 1.8) - 90;
+        document.getElementById('mainNeedle').style.transform = `rotate(${deg}deg)`;
+
+    }, 500); // Small delay for effect
+
+    // --- 3. Like/Dislike Toggle ---
+    function toggleLike(btn, isDislike) {
+        // Reset all buttons
+        const parent = btn.parentElement;
+        parent.querySelectorAll('.fb-btn').forEach(b => {
+            b.classList.remove('active');
+            b.classList.remove('dislike');
         });
-
-        // Highlights flag
-        document.querySelectorAll('.lang-switch img').forEach(img => img.classList.remove('active'));
-        event.target.classList.add('active');
+        
+        // Activate clicked
+        btn.classList.add('active');
+        if(isDislike) btn.classList.add('dislike');
     }
 
-    // --- Charts (Mock Data 72h) ---
-    function createSparkline(ctx, color) {
-        return new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: 72}, (_, i) => i),
-                datasets: [{
-                    data: Array.from({length: 72}, () => Math.random() * 100),
-                    borderColor: color,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    fill: false,
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { x: { display: false }, y: { display: false } }
-            }
-        });
-    }
-
-    createSparkline(document.getElementById('chart1').getContext('2d'), '#ff3333'); // Red
-    createSparkline(document.getElementById('chart2').getContext('2d'), '#ff3333'); // Red
-    createSparkline(document.getElementById('chart3').getContext('2d'), '#ffa500'); // Orange
-    createSparkline(document.getElementById('chart4').getContext('2d'), '#00ce7c'); // Green
-
-    // --- Fake Comments Generator ---
-    const commentsData = [
-        {user: "Anon_882", text: "Just saw heavy movement near the northern border.", neg: false},
-        {user: "Intel_Guy", text: "Pentagon pizza orders are actually normal today.", neg: true},
-        {user: "SarahK", text: "Hoping for peace, bags are packed though.", neg: false},
-        {user: "David1990", text: "GPS shows me in Cairo but I'm in Haifa.", neg: false},
-        {user: "ObserverIL", text: "Sky looks clear, aviationstack confirms no unusual drones.", neg: false}
+    // --- 4. Polls System ---
+    const questions = [
+        { id: 1, q: "Will a major conflict erupt in 48h?", y: 15, n: 75, u: 10 },
+        { id: 2, q: "Are diplomatic talks effective?", y: 30, n: 60, u: 10 },
+        { id: 3, q: "Should civilians prepare shelters?", y: 80, n: 10, u: 10 },
+        { id: 4, q: "Is the northern border secure?", y: 20, n: 70, u: 10 },
+        { id: 5, q: "Will airport shut down today?", y: 5, n: 90, u: 5 }
     ];
 
-    const feed = document.getElementById('commentFeed');
-    
-    function loadComments() {
-        // Create 20 visual comments
-        for(let i=0; i<20; i++) {
-            const c = commentsData[Math.floor(Math.random() * commentsData.length)];
-            const div = document.createElement('div');
-            div.className = 'comment';
-            div.innerHTML = `
-                <div class="comment-meta">
-                    <span>User: ${c.user}</span>
-                    <span>${Math.floor(Math.random()*59)}m ago</span>
-                </div>
-                <div>${c.text}</div>
-                <div style="margin-top:5px; text-align:end; color:#555; font-size:0.8rem;">
-                    <span class="like-dislike"><i class="fas fa-thumbs-up"></i> ${Math.floor(Math.random()*100)}</span>
-                    <span class="like-dislike"><i class="fas fa-thumbs-down"></i> ${c.neg ? Math.floor(Math.random()*50) : Math.floor(Math.random()*5)}</span>
-                </div>
-            `;
-            feed.appendChild(div);
-        }
-    }
-    loadComments();
+    const pollsContainer = document.getElementById('pollsContainer');
 
-    // Fake interactions
-    function vote(btn) {
-        btn.style.background = "#fff";
-        btn.style.color = "#000";
-        btn.innerText = "Voted!";
+    questions.forEach(q => {
+        const div = document.createElement('div');
+        div.className = 'poll-item';
+        div.innerHTML = `
+            <span class="poll-question">${q.q}</span>
+            <div class="poll-actions" id="actions-${q.id}">
+                <button class="p-btn p-yes" onclick="vote(${q.id}, 'y')">YES</button>
+                <button class="p-btn p-no" onclick="vote(${q.id}, 'n')">NO</button>
+                <button class="p-btn p-idk" onclick="vote(${q.id}, 'u')">UNSURE</button>
+            </div>
+            <div class="poll-results" id="results-${q.id}">
+                <div style="display:flex; height:100%; width:100%">
+                    <div style="width:${q.y}%; background:#ff3333;" title="Yes: ${q.y}%"></div>
+                    <div style="width:${q.n}%; background:#00ce7c;" title="No: ${q.n}%"></div>
+                    <div style="width:${q.u}%; background:#888;" title="Unsure: ${q.u}%"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; color:#888; margin-top:5px;">
+                    <span>Yes: ${q.y}%</span><span>No: ${q.n}%</span><span>Unsure: ${q.u}%</span>
+                </div>
+            </div>
+        `;
+        pollsContainer.appendChild(div);
+    });
+
+    function vote(id, type) {
+        document.getElementById(`actions-${id}`).style.display = 'none';
+        const res = document.getElementById(`results-${id}`);
+        res.style.display = 'block';
+        res.style.height = 'auto';
     }
+
+    // --- 5. Chatter (Visual only) ---
+    const chats = [
+        "System: Loading latest satellite imagery...",
+        "Alert: GPS interference detected in North district.",
+        "User88: Heard jets over the coast just now.",
+        "NewsBot: CNN reports calm borders.",
+        "System: Updating Pizza Meter..."
+    ];
+    const chatFeed = document.getElementById('commentFeed');
+    chats.forEach(c => {
+        const d = document.createElement('div');
+        d.style.marginBottom = "5px";
+        d.innerText = "> " + c;
+        chatFeed.appendChild(d);
+    });
 
 </script>
 </body>
