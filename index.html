@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WAR INDEX | Geopolitical Status</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --card-bg: #151a23;
+            --text: #e0e6ed;
+            --accent: #ff3333; /* Red for War/Alert */
+            --safe: #00ce7c;
+            --neutral: #888;
+            --glow: 0 0 10px rgba(255, 51, 51, 0.5);
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* Header & Nav */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .live-badge {
+            background: rgba(255, 0, 0, 0.2);
+            color: red;
+            border: 1px solid red;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            animation: pulse 2s infinite;
+        }
+        
+        .live-dot {
+            width: 8px; height: 8px;
+            background: red;
+            border-radius: 50%;
+        }
+
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+        .lang-switch img {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 5px;
+            opacity: 0.6;
+            transition: 0.3s;
+        }
+        .lang-switch img:hover, .lang-switch img.active { opacity: 1; border: 2px solid var(--text); }
+
+        .donate-btn {
+            background: linear-gradient(45deg, #ffb700, #ff8800);
+            color: #000;
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        h1 { margin: 0; font-size: 1.5rem; text-transform: uppercase; letter-spacing: 2px; }
+
+        /* KPI Cards */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid #2d3748;
+            transition: transform 0.2s;
+        }
+
+        .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .param-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            width: 40px; height: 40px;
+            background: rgba(255, 51, 51, 0.1);
+            border-radius: 8px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .metric-value { font-size: 1.8rem; font-weight: bold; }
+        .metric-label { color: #888; font-size: 0.9rem; }
+
+        .sparkline-container {
+            height: 60px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Disclaimer */
+        .disclaimer-box {
+            background: rgba(255, 165, 0, 0.1);
+            border-left: 4px solid orange;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 0.9rem;
+            color: #ddd;
+        }
+
+        /* Polls */
+        .polls-section { margin-top: 40px; }
+        .poll-item {
+            background: var(--card-bg);
+            margin-bottom: 15px;
+            padding: 15px;
+            border-radius: 8px;
+        }
+        .poll-question { font-weight: bold; margin-bottom: 10px; display: block; }
+        .poll-options { display: flex; gap: 10px; }
+        .poll-btn {
+            flex: 1;
+            padding: 8px;
+            background: #2d3748;
+            border: none;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .poll-btn:hover { background: #4a5568; }
+        .poll-stats {
+            height: 6px;
+            background: #333;
+            margin-top: 10px;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+        }
+        .stat-bar { height: 100%; }
+
+        /* Comments */
+        .comments-section {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 40px;
+        }
+        .comments-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 10px;}
+        .comment-scroll {
+            height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .comment {
+            background: rgba(0,0,0,0.2);
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+        .comment-meta { display: flex; justify-content: space-between; font-size: 0.75rem; color: #666; margin-bottom: 5px; }
+        .like-dislike { cursor: pointer; margin-left: 10px; }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #666;
+            font-size: 0.8rem;
+            border-top: 1px solid #333;
+            margin-top: 40px;
+        }
+        .creator-link { color: var(--accent); text-decoration: none; font-weight: bold; }
+
+        /* RTL Handling for Hebrew */
+        body[dir="rtl"] { direction: rtl; }
+        body[dir="rtl"] .card-header { flex-direction: row-reverse; }
+    </style>
+</head>
+<body dir="ltr">
+
+<header>
+    <div class="logo-section">
+        <div class="live-badge"><div class="live-dot"></div> LIVE</div>
+        <h1 id="pageTitle">WAR INDEX</h1>
+    </div>
+    
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="lang-switch">
+            <img src="https://flagcdn.com/w40/us.png" onclick="setLang('en')" class="active" title="English">
+            <img src="https://flagcdn.com/w40/il.png" onclick="setLang('he')" title="עברית">
+            <img src="https://flagcdn.com/w40/fr.png" onclick="setLang('fr')" title="Français">
+            <img src="https://flagcdn.com/w40/ru.png" onclick="setLang('ru')" title="Русский">
+        </div>
+        <a href="#" class="donate-btn"><i class="fas fa-coffee"></i> <span id="donateText">Donate</span></a>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="disclaimer-box">
+        <strong id="disclaimerTitle">⚠️ DISCLAIMER:</strong>
+        <p id="disclaimerText">
+            This project is experimental and for informational purposes only. It is NOT official intelligence, verified forecasts, or a basis for decision-making. 
+            <strong>Data Sources:</strong> NewsData.io, GDELT Project, Wikipedia, Aviationstack, OpenWeatherMap.
+            <br><em>Limitations: No classified intelligence or diplomatic activities are displayed.</em>
+        </p>
+    </div>
+
+    <div class="metrics-grid">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="metric-label" data-key="pizza">Pentagon Pizza Meter</div>
+                    <div class="metric-value">High (7/10)</div>
+                </div>
+                <div class="param-icon"><i class="fas fa-pizza-slice"></i></div>
+            </div>
+            <div class="sparkline-container"><canvas id="chart1"></canvas></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="metric-label" data-key="gps">GPS Jamming (TLV)</div>
+                    <div class="metric-value" style="color: red;">CRITICAL</div>
+                </div>
+                <div class="param-icon"><i class="fas fa-satellite-dish"></i></div>
+            </div>
+            <div class="sparkline-container"><canvas id="chart2"></canvas></div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="metric-label" data-key="news">Global News Sentiment</div>
+                    <div class="metric-value" style="color: orange;">Negative</div>
+                </div>
+                <div class="param-icon"><i class="fas fa-newspaper"></i></div>
+            </div>
+            <div class="sparkline-container"><canvas id="chart3"></canvas></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <div class="metric-label" data-key="flight">Flight Cancellations</div>
+                    <div class="metric-value">Moderate</div>
+                </div>
+                <div class="param-icon"><i class="fas fa-plane-slash"></i></div>
+            </div>
+            <div class="sparkline-container"><canvas id="chart4"></canvas></div>
+        </div>
+    </div>
+
+    <div class="polls-section">
+        <h2 id="pollsTitle">User Predictions</h2>
+        <div class="poll-item">
+            <span class="poll-question" data-key="q1">Will a major conflict erupt in 48h?</span>
+            <div class="poll-options">
+                <button class="poll-btn" onclick="vote(this)">Yes (22%)</button>
+                <button class="poll-btn" onclick="vote(this)">No (65%)</button>
+                <button class="poll-btn" onclick="vote(this)">Unsure (13%)</button>
+            </div>
+            <div class="poll-stats">
+                <div class="stat-bar" style="width: 22%; background: #ff3333;"></div>
+                <div class="stat-bar" style="width: 65%; background: #00ce7c;"></div>
+                <div class="stat-bar" style="width: 13%; background: #888;"></div>
+            </div>
+        </div>
+        
+        <div class="poll-item">
+            <span class="poll-question" data-key="q2">Is the diplomatic channel still effective?</span>
+            <div class="poll-options">
+                <button class="poll-btn" onclick="vote(this)">Yes (40%)</button>
+                <button class="poll-btn" onclick="vote(this)">No (55%)</button>
+                <button class="poll-btn" onclick="vote(this)">Unsure (5%)</button>
+            </div>
+            <div class="poll-stats">
+                <div class="stat-bar" style="width: 40%; background: #00ce7c;"></div>
+                <div class="stat-bar" style="width: 55%; background: #ff3333;"></div>
+                <div class="stat-bar" style="width: 5%; background: #888;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="comments-section">
+        <div class="comments-header">
+            <h3 id="commTitle">Community Intel</h3>
+            <span style="font-size: 0.9rem; color: #888;">
+                <i class="fas fa-users"></i> <span id="commCount">24,302</span> comments
+            </span>
+        </div>
+        
+        <div class="comment-scroll" id="commentFeed">
+            </div>
+
+        <div style="margin-top: 15px; display: flex; gap: 10px;">
+            <input type="text" placeholder="Write anonymously..." style="flex:1; padding: 10px; background: #0b0e14; border: 1px solid #333; color: white; border-radius: 4px;">
+            <button style="padding: 10px 20px; background: var(--accent); border: none; color: white; border-radius: 4px; cursor: pointer;">SEND</button>
+        </div>
+    </div>
+
+    <footer>
+        <p>Created by <a href="https://t.me/YOUR_TELEGRAM_LINK" class="creator-link" target="_blank">Idan Biton</a> | <i class="fab fa-telegram"></i> Official Telegram</p>
+        <p style="opacity: 0.5;">Use this information wisely. Not for military use.</p>
+    </footer>
+
+</div>
+
+<script>
+    // --- Translations ---
+    const i18n = {
+        en: {
+            title: "WAR INDEX",
+            donate: "Donate",
+            disclaimerTitle: "⚠️ DISCLAIMER:",
+            disclaimerText: "This project is experimental and for informational purposes only. It is NOT official intelligence, verified forecasts, or a basis for decision-making. Data Sources: NewsData.io, GDELT, Wikipedia. Limitations: No classified intelligence displayed.",
+            pizza: "Pentagon Pizza Meter",
+            gps: "GPS Jamming (TLV)",
+            news: "Global News Sentiment",
+            flight: "Flight Cancellations",
+            polls: "User Predictions",
+            commTitle: "Community Intel",
+            q1: "Will a major conflict erupt in 48h?",
+            q2: "Is the diplomatic channel still effective?"
+        },
+        he: {
+            title: "מדד מלחמה",
+            donate: "תרומה",
+            disclaimerTitle: "⚠️ הצהרת אחריות:",
+            disclaimerText: "פרויקט זה הינו ניסיוני ולמטרות מידע בלבד. אינו מהווה מודיעין רשמי, תחזיות מאומתות או בסיס להחלטות. מקורות: NewsData.io, GDELT, ויקיפדיה. מגבלות: לא מוצג מודיעין מסווג.",
+            pizza: "מדד הפיצה בפנטגון",
+            gps: "שיבושי GPS (תל אביב)",
+            news: "סנטימנט חדשות עולמי",
+            flight: "ביטולי טיסות",
+            polls: "סקר גולשים",
+            commTitle: "דיווחים מהשטח",
+            q1: "האם תפרוץ מלחמה ב-48 שעות הקרובות?",
+            q2: "האם הערוץ הדיפלומטי עדיין יעיל?"
+        },
+        // Add FR/RU similarly if needed
+    };
+
+    function setLang(lang) {
+        const t = i18n[lang] || i18n.en;
+        document.body.dir = (lang === 'he') ? 'rtl' : 'ltr';
+        
+        // Update texts
+        document.getElementById('pageTitle').innerText = t.title;
+        document.getElementById('donateText').innerText = t.donate;
+        document.getElementById('disclaimerTitle').innerText = t.disclaimerTitle;
+        document.getElementById('disclaimerText').innerText = t.disclaimerText;
+        document.getElementById('pollsTitle').innerText = t.polls;
+        document.getElementById('commTitle').innerText = t.commTitle;
+
+        // Update Keys
+        document.querySelectorAll('[data-key]').forEach(el => {
+            const key = el.getAttribute('data-key');
+            if(t[key]) el.innerText = t[key];
+        });
+
+        // Highlights flag
+        document.querySelectorAll('.lang-switch img').forEach(img => img.classList.remove('active'));
+        event.target.classList.add('active');
+    }
+
+    // --- Charts (Mock Data 72h) ---
+    function createSparkline(ctx, color) {
+        return new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array.from({length: 72}, (_, i) => i),
+                datasets: [{
+                    data: Array.from({length: 72}, () => Math.random() * 100),
+                    borderColor: color,
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { x: { display: false }, y: { display: false } }
+            }
+        });
+    }
+
+    createSparkline(document.getElementById('chart1').getContext('2d'), '#ff3333'); // Red
+    createSparkline(document.getElementById('chart2').getContext('2d'), '#ff3333'); // Red
+    createSparkline(document.getElementById('chart3').getContext('2d'), '#ffa500'); // Orange
+    createSparkline(document.getElementById('chart4').getContext('2d'), '#00ce7c'); // Green
+
+    // --- Fake Comments Generator ---
+    const commentsData = [
+        {user: "Anon_882", text: "Just saw heavy movement near the northern border.", neg: false},
+        {user: "Intel_Guy", text: "Pentagon pizza orders are actually normal today.", neg: true},
+        {user: "SarahK", text: "Hoping for peace, bags are packed though.", neg: false},
+        {user: "David1990", text: "GPS shows me in Cairo but I'm in Haifa.", neg: false},
+        {user: "ObserverIL", text: "Sky looks clear, aviationstack confirms no unusual drones.", neg: false}
+    ];
+
+    const feed = document.getElementById('commentFeed');
+    
+    function loadComments() {
+        // Create 20 visual comments
+        for(let i=0; i<20; i++) {
+            const c = commentsData[Math.floor(Math.random() * commentsData.length)];
+            const div = document.createElement('div');
+            div.className = 'comment';
+            div.innerHTML = `
+                <div class="comment-meta">
+                    <span>User: ${c.user}</span>
+                    <span>${Math.floor(Math.random()*59)}m ago</span>
+                </div>
+                <div>${c.text}</div>
+                <div style="margin-top:5px; text-align:end; color:#555; font-size:0.8rem;">
+                    <span class="like-dislike"><i class="fas fa-thumbs-up"></i> ${Math.floor(Math.random()*100)}</span>
+                    <span class="like-dislike"><i class="fas fa-thumbs-down"></i> ${c.neg ? Math.floor(Math.random()*50) : Math.floor(Math.random()*5)}</span>
+                </div>
+            `;
+            feed.appendChild(div);
+        }
+    }
+    loadComments();
+
+    // Fake interactions
+    function vote(btn) {
+        btn.style.background = "#fff";
+        btn.style.color = "#000";
+        btn.innerText = "Voted!";
+    }
+
+</script>
+</body>
+</html>
