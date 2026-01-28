@@ -2,427 +2,462 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARADAR | Advanced OSINT Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WARADAR | iOS Style Intel</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --bg: #050505;
-            --panel: #0f1115;
-            --border: #1f2228;
-            --text-main: #e0e6ed;
-            --text-muted: #6b7280;
-            --accent: #ff3333; /* High Risk */
-            --safe: #00ce7c;   /* Low Risk */
-            --warn: #eab308;   /* Medium Risk */
-            --blue: #3b82f6;   /* Info */
+            /* iOS Dark Mode Palette */
+            --bg: #000000;
+            --card: #1c1c1e;
+            --card-border: #2c2c2e;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent-blue: #0a84ff;
+            --accent-green: #30d158;
+            --accent-red: #ff453a;
+            --accent-orange: #ff9f0a;
+            --accent-yellow: #ffd60a;
+            --separator: #38383a;
         }
-
-        * { box-sizing: border-box; }
 
         body {
             background-color: var(--bg);
-            color: var(--text-main);
-            font-family: 'Segoe UI', 'Roboto', monospace;
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0; padding: 0;
+            -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            font-size: 14px;
+            padding-bottom: 60px;
         }
 
         /* --- HEADER --- */
         header {
-            background: rgba(5, 5, 5, 0.95);
-            border-bottom: 1px solid var(--border);
-            padding: 15px 20px;
-            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px;
+            background: rgba(28, 28, 30, 0.8);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
             position: sticky; top: 0; z-index: 100;
-            backdrop-filter: blur(10px);
-        }
-        .brand { font-size: 1.5rem; font-weight: 800; letter-spacing: 2px; color: #fff; display: flex; align-items: center; gap: 10px; }
-        .live-dot { height: 8px; width: 8px; background: red; border-radius: 50%; box-shadow: 0 0 10px red; animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-        
-        .header-meta { display: flex; gap: 20px; font-family: monospace; color: var(--text-muted); font-size: 0.85rem; }
-        .meta-item b { color: var(--text-main); }
-
-        /* --- LAYOUT --- */
-        .container {
-            max-width: 1400px; margin: 0 auto; padding: 20px;
-            display: grid; grid-template-columns: 3fr 1fr; gap: 20px;
+            border-bottom: 0.5px solid var(--separator);
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* --- MAIN GAUGE AREA --- */
-        .risk-overview {
-            grid-column: 1 / -1;
-            background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
-            padding: 20px; display: flex; align-items: center; justify-content: space-between;
+        .app-title {
+            font-size: 22px; font-weight: 700; letter-spacing: -0.5px;
+            display: flex; align-items: center; gap: 8px;
         }
-        .gauge-container { width: 100%; max-width: 400px; height: 20px; background: #222; border-radius: 10px; position: relative; overflow: hidden; }
-        .gauge-fill { height: 100%; background: linear-gradient(90deg, var(--safe), var(--warn), var(--accent)); width: 0%; transition: width 1s; }
-        .risk-text { font-size: 2rem; font-weight: bold; margin-bottom: 5px; }
-        .risk-desc { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* --- METRIC CARDS --- */
-        .metrics-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;
+        .header-actions { display: flex; gap: 15px; }
+        .icon-btn { color: var(--accent-blue); font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .icon-btn:hover { opacity: 0.7; }
+
+        .donate-pill {
+            background: var(--accent-blue); color: white;
+            padding: 6px 14px; border-radius: 20px;
+            font-size: 13px; font-weight: 600; text-decoration: none;
         }
-        .card {
-            background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
-            padding: 15px; display: flex; flex-direction: column; transition: 0.2s;
+
+        /* --- CONTAINER --- */
+        .container { max-width: 1000px; margin: 20px auto; padding: 0 20px; }
+
+        /* --- DUAL RISK GAUGE (HERO SECTION) --- */
+        .risk-hero {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 30px;
         }
-        .card:hover { border-color: #333; transform: translateY(-2px); }
         
-        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-        .card-title { font-weight: 600; font-size: 1rem; color: #fff; display: flex; align-items: center; gap: 8px; }
-        .card-source { font-size: 0.75rem; color: var(--text-muted); cursor: pointer; text-decoration: underline; }
-        
-        .card-stats { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
-        .stat-value { font-size: 1.8rem; font-weight: 700; font-family: monospace; }
-        .stat-change { font-size: 0.9rem; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
-        .change-up { color: var(--accent); background: rgba(255, 51, 51, 0.1); }
-        .change-down { color: var(--safe); background: rgba(0, 206, 124, 0.1); }
-        
-        .chart-wrapper { height: 80px; width: 100%; margin-top: auto; }
+        .hero-card {
+            background: var(--card); border-radius: 22px; padding: 20px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
+            position: relative; overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
 
-        /* --- SIDEBAR (Sources & News) --- */
-        .sidebar { display: flex; flex-direction: column; gap: 20px; }
-        .side-panel { background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 15px; }
-        .side-title { font-weight: bold; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; color: var(--text-muted); }
-        
-        .source-link { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #1a1a1a; font-size: 0.9rem; text-decoration: none; color: var(--text-main); transition: 0.2s; }
-        .source-link:hover { padding-left: 5px; color: var(--blue); }
-        .source-link span:last-child { color: var(--text-muted); font-size: 0.8rem; }
+        .ring-container {
+            width: 120px; height: 120px; position: relative; margin: 15px 0;
+        }
+        .ring-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+        .ring-circle-bg { fill: none; stroke: #2c2c2e; stroke-width: 8; }
+        .ring-circle-fg { 
+            fill: none; stroke-width: 8; stroke-linecap: round; 
+            stroke-dasharray: 339.29; stroke-dashoffset: 339.29; 
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+        .ring-text {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 26px; font-weight: 700; font-variant-numeric: tabular-nums;
+        }
 
-        .news-item { margin-bottom: 12px; font-size: 0.85rem; line-height: 1.4; border-left: 2px solid var(--blue); padding-left: 10px; }
-        .news-time { color: var(--text-muted); font-size: 0.75rem; display: block; margin-bottom: 2px; }
+        .hero-title { font-size: 15px; font-weight: 600; color: var(--text-secondary); }
+        .hero-status { font-size: 17px; font-weight: 700; margin-top: 5px; letter-spacing: -0.3px; }
+
+        /* --- WIDGET GRID (iOS Style) --- */
+        .widget-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 15px;
+        }
+
+        .widget {
+            background: var(--card); border-radius: 20px; padding: 16px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            aspect-ratio: 1 / 1; /* Square widgets like iOS */
+            transition: transform 0.2s; cursor: default;
+        }
+        .widget:active { transform: scale(0.98); }
+
+        .widget-header { display: flex; justify-content: space-between; align-items: flex-start; }
+        
+        .icon-box {
+            width: 32px; height: 32px; border-radius: 8px;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-size: 16px;
+        }
+
+        .widget-val { font-size: 24px; font-weight: 700; margin: 5px 0; letter-spacing: -0.5px; }
+        .widget-label { font-size: 13px; font-weight: 500; color: var(--text-secondary); line-height: 1.2; }
+        
+        .chart-mini { height: 40px; width: 100%; margin-top: auto; opacity: 0.8; }
+
+        /* --- SECTION TITLES --- */
+        .section-header {
+            font-size: 20px; font-weight: 700; margin: 40px 0 15px 5px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .last-updated { font-size: 13px; color: var(--text-secondary); font-weight: 400; }
+
+        /* --- NEWS LIST (iOS Settings Style) --- */
+        .news-list {
+            background: var(--card); border-radius: 18px; overflow: hidden;
+        }
+        .news-item {
+            padding: 16px; border-bottom: 0.5px solid var(--separator);
+            display: flex; flex-direction: column; gap: 4px;
+        }
+        .news-item:last-child { border-bottom: none; }
+        .news-source { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; }
+        .news-headline { font-size: 15px; font-weight: 500; line-height: 1.4; }
 
         /* --- FOOTER --- */
-        footer { border-top: 1px solid var(--border); padding: 30px; text-align: center; color: var(--text-muted); margin-top: 40px; font-size: 0.8rem; }
+        .footer {
+            text-align: center; margin-top: 50px; color: var(--text-secondary); font-size: 12px;
+        }
+        .footer a { color: var(--text-secondary); text-decoration: none; }
 
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
-            .container { grid-template-columns: 1fr; }
+        /* --- RTL SUPPORT --- */
+        body[dir="rtl"] { font-family: -apple-system, BlinkMacSystemFont, "Heebo", sans-serif; }
+        body[dir="rtl"] .hero-card { direction: rtl; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 600px) {
+            .widget { aspect-ratio: auto; height: 160px; }
         }
     </style>
 </head>
-<body>
+<body dir="ltr">
 
 <header>
-    <div class="brand">
-        <div class="live-dot"></div>
-        WARADAR <span style="font-weight:400; font-size:0.9rem; opacity:0.7;">PRO</span>
+    <div class="app-title">
+        <i class="fas fa-layer-group" style="color:var(--accent-blue)"></i> WARADAR
     </div>
-    <div class="header-meta">
-        <div class="meta-item">DEFCON: <b>3</b></div>
-        <div class="meta-item">UPDATE: <b id="lastUpdate">--:--</b></div>
-        <div class="meta-item">SCAN: <b id="nextScan" style="color:var(--blue)">00:30</b></div>
+    <div class="header-actions">
+        <div class="lang-switch" style="cursor: pointer;" onclick="toggleLang()">
+            <i class="fas fa-globe"></i>
+        </div>
+        <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-pill" id="btnDonate">Donate</a>
     </div>
 </header>
 
 <div class="container">
 
-    <div class="risk-overview">
-        <div>
-            <div class="risk-text" id="riskLabel">MODERATE</div>
-            <div class="risk-desc">Weighted Probability Index</div>
+    <div class="section-header">
+        <span id="txtThreat">Threat Analysis</span>
+        <span class="last-updated" id="lastUpdate">Updated: Just now</span>
+    </div>
+
+    <div class="risk-hero">
+        <div class="hero-card">
+            <div class="hero-title" id="lblUsIran">US-Iran Escalation</div>
+            <div class="ring-container">
+                <svg class="ring-svg">
+                    <circle cx="60" cy="60" r="54" class="ring-circle-bg"></circle>
+                    <circle cx="60" cy="60" r="54" class="ring-circle-fg" id="ring1" stroke="#ff9f0a"></circle>
+                </svg>
+                <div class="ring-text" id="valUsIran">0%</div>
+            </div>
+            <div class="hero-status" id="statUsIran" style="color:var(--accent-orange)">Calculating...</div>
         </div>
-        <div style="flex: 1; margin: 0 40px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.8rem; color:#888;">
-                <span>Routine</span>
-                <span>Elevated</span>
-                <span>Critical</span>
+
+        <div class="hero-card">
+            <div class="hero-title" id="lblIlImpact">Israel Risk Impact</div>
+            <div class="ring-container">
+                <svg class="ring-svg">
+                    <circle cx="60" cy="60" r="54" class="ring-circle-bg"></circle>
+                    <circle cx="60" cy="60" r="54" class="ring-circle-fg" id="ring2" stroke="#ff453a"></circle>
+                </svg>
+                <div class="ring-text" id="valIlImpact">0%</div>
             </div>
-            <div class="gauge-container">
-                <div class="gauge-fill" id="riskFill"></div>
-            </div>
-            <div style="text-align:right; margin-top:5px; font-family:monospace; font-size:1.2rem; font-weight:bold;" id="riskPercent">0%</div>
+            <div class="hero-status" id="statIlImpact" style="color:var(--accent-red)">Calculating...</div>
         </div>
     </div>
 
-    <div class="metrics-grid">
-        
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-jet-fighter"></i> Stratotankers</div>
-                <a href="https://globe.adsbexchange.com/" target="_blank" class="card-source">ADS-B Exch</a>
+    <div class="section-header" id="txtIntel">Live Intelligence</div>
+    
+    <div class="widget-grid">
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:var(--accent-orange)"><i class="fas fa-plane"></i></div>
+                <i class="fas fa-arrow-up" style="color:var(--accent-orange); font-size:12px;"></i>
             </div>
-            <div class="card-stats">
-                <div class="stat-value" id="val_tanker">62</div>
-                <div class="stat-change change-up" id="chg_tanker">+4.2%</div>
+            <div>
+                <div class="widget-val">62%</div>
+                <div class="widget-label" id="lblTanker">Mil. Tankers</div>
             </div>
-            <div class="chart-wrapper"><canvas id="chart_tanker"></canvas></div>
+            <div class="chart-mini"><canvas id="c1"></canvas></div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-satellite-dish"></i> GPS Interference</div>
-                <a href="https://gpsjam.org/" target="_blank" class="card-source">GPSJam.org</a>
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:var(--accent-red)"><i class="fas fa-location-slash"></i></div>
+                <i class="fas fa-exclamation" style="color:var(--accent-red); font-size:12px;"></i>
             </div>
-            <div class="card-stats">
-                <div class="stat-value" id="val_gps" style="color:var(--accent)">98%</div>
-                <div class="stat-change change-up" id="chg_gps">+1.1%</div>
+            <div>
+                <div class="widget-val">95%</div>
+                <div class="widget-label" id="lblGps">GPS Jamming</div>
             </div>
-            <div class="chart-wrapper"><canvas id="chart_gps"></canvas></div>
+            <div class="chart-mini"><canvas id="c2"></canvas></div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-pizza-slice"></i> Pentagon Pizza</div>
-                <a href="#" class="card-source">Google Maps</a>
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:var(--accent-blue)"><i class="fas fa-plane-slash"></i></div>
             </div>
-            <div class="card-stats">
-                <div class="stat-value" id="val_pizza">High</div>
-                <div class="stat-change change-down" id="chg_pizza">-2.5%</div>
+            <div>
+                <div class="widget-val">30%</div>
+                <div class="widget-label" id="lblFlight">Flight Cancels</div>
             </div>
-            <div class="chart-wrapper"><canvas id="chart_pizza"></canvas></div>
+            <div class="chart-mini"><canvas id="c3"></canvas></div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-chart-line"></i> Conflict Odds</div>
-                <a href="https://polymarket.com/" target="_blank" class="card-source">Polymarket</a>
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:var(--accent-yellow)"><i class="fas fa-pizza-slice"></i></div>
             </div>
-            <div class="card-stats">
-                <div class="stat-value" id="val_market">18%</div>
-                <div class="stat-change change-down" id="chg_market">0.0%</div>
+            <div>
+                <div class="widget-val">High</div>
+                <div class="widget-label" id="lblPizza">Pentagon Pizza</div>
             </div>
-            <div class="chart-wrapper"><canvas id="chart_market"></canvas></div>
+            <div class="chart-mini"><canvas id="c4"></canvas></div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-newspaper"></i> News Sentiment</div>
-                <a href="https://www.gdeltproject.org/" target="_blank" class="card-source">GDELT</a>
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:var(--accent-green)"><i class="fas fa-chart-line"></i></div>
             </div>
-            <div class="card-stats">
-                <div class="stat-value" id="val_news">Neg</div>
-                <div class="stat-change change-up" id="chg_news">+8.4%</div>
+            <div>
+                <div class="widget-val">18%</div>
+                <div class="widget-label" id="lblMarket">Market Odds</div>
             </div>
-            <div class="chart-wrapper"><canvas id="chart_news"></canvas></div>
+            <div class="chart-mini"><canvas id="c5"></canvas></div>
         </div>
 
-        <div class="card">
-            <div class="card-header">
-                <div class="card-title"><i class="fas fa-cloud"></i> Visibility (Ops)</div>
-                <a href="https://open-meteo.com/" target="_blank" class="card-source">OpenMeteo</a>
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:#5856d6"><i class="fas fa-newspaper"></i></div>
             </div>
-            <div class="card-stats">
-                <div class="stat-value" id="val_weather">10km</div>
-                <div class="stat-change change-down" style="color:#aaa">Stable</div>
+            <div>
+                <div class="widget-val">Neg</div>
+                <div class="widget-label" id="lblNews">Sentiment</div>
             </div>
-            <div class="chart-wrapper"><canvas id="chart_weather"></canvas></div>
+            <div class="chart-mini"><canvas id="c6"></canvas></div>
         </div>
 
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:#5ac8fa"><i class="fas fa-cloud"></i></div>
+            </div>
+            <div>
+                <div class="widget-val" id="valWeather">Clear</div>
+                <div class="widget-label" id="lblWeather">Op. Weather</div>
+            </div>
+            <div class="chart-mini"><canvas id="c7"></canvas></div>
+        </div>
+
+        <div class="widget">
+            <div class="widget-header">
+                <div class="icon-box" style="background:#8e8e93"><i class="fas fa-search"></i></div>
+            </div>
+            <div>
+                <div class="widget-val">Normal</div>
+                <div class="widget-label" id="lblWiki">Public Interest</div>
+            </div>
+            <div class="chart-mini"><canvas id="c8"></canvas></div>
+        </div>
     </div>
 
-    <div class="sidebar">
-        
-        <div class="side-panel">
-            <div class="side-title">Critical Intel Sources</div>
-            <a href="https://www.iaea.org/" target="_blank" class="source-link">
-                IAEA (Nuclear Watch) <span>Official</span>
-            </a>
-            <a href="https://www.centcom.mil/" target="_blank" class="source-link">
-                US CENTCOM <span>Military</span>
-            </a>
-            <a href="https://www.understandingwar.org/" target="_blank" class="source-link">
-                Inst. Study of War <span>Research</span>
-            </a>
-            <a href="https://liveuamap.com/" target="_blank" class="source-link">
-                LiveUAMap <span>Map</span>
-            </a>
-            <a href="https://www.oref.org.il/" target="_blank" class="source-link">
-                Home Front Cmd <span>Civil</span>
-            </a>
+    <div class="section-header" id="txtNews">Latest Updates</div>
+    <div class="news-list" id="newsFeed">
         </div>
 
-        <div class="side-panel">
-            <div class="side-title">Live Updates</div>
-            <div id="news-feed">
-                </div>
-        </div>
-
+    <div class="footer">
+        Created by <a href="#">Idan Biton</a> | Based on OSINT Data.<br>
+        Not official military intelligence.
     </div>
 
 </div>
 
-<footer>
-    <p>WARADAR PRO | Advanced Geopolitical Analysis Dashboard</p>
-    <p style="opacity:0.5; margin-top:10px;">Created by Idan Biton. Data sources: OSINT, GDELT, ADS-B, Weather APIs. Not for operational use.</p>
-</footer>
-
 <script>
-    // --- 1. CHART.JS CONFIGURATION (THE INTERACTIVE PART) ---
-    // This creates the "Pizzint" style interactive graphs
-    
-    Chart.defaults.color = '#6b7280';
-    Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
-
-    const commonOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: {
-            mode: 'index',
-            intersect: false,
-        },
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                enabled: true,
-                backgroundColor: 'rgba(0,0,0,0.9)',
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                borderColor: '#333',
-                borderWidth: 1,
-                displayColors: false,
-                callbacks: {
-                    title: function(context) {
-                        return 'Time: -' + (24 - context[0].dataIndex) + 'H';
-                    },
-                    label: function(context) {
-                        return 'Value: ' + context.raw;
-                    }
-                }
-            }
-        },
-        scales: {
-            x: { display: false }, // Hide X axis for clean look
-            y: { display: false }  // Hide Y axis
-        },
-        elements: {
-            point: { radius: 0, hoverRadius: 4 }, // Only show dots on hover
-            line: { tension: 0.1, borderWidth: 2 } // Sharp lines
-        }
+    // --- 1. CONFIG & DATA ---
+    const params = {
+        tanker: 62, gps: 95, flight: 30, pizza: 75, market: 18, news: 65, weather: 85, wiki: 28
     };
 
-    // Helper to generate fake history data (24 points)
-    function generateHistory(base, volatility) {
-        let data = [];
-        let current = base;
-        for(let i=0; i<24; i++) {
-            let change = (Math.random() - 0.5) * volatility;
-            current += change;
-            if(current < 0) current = 0;
-            if(current > 100) current = 100;
-            data.push(Math.floor(current));
-        }
-        return data;
-    }
-
-    // --- 2. DATA INITIALIZATION ---
-    
-    const metrics = {
-        tanker: { base: 60, vol: 15, color: '#ffb700', label: 'Activity' },
-        gps: { base: 95, vol: 5, color: '#ff3333', label: 'Interference' },
-        pizza: { base: 50, vol: 20, color: '#eab308', label: 'Volume' },
-        market: { base: 18, vol: 5, color: '#3b82f6', label: 'Odds' },
-        news: { base: 70, vol: 10, color: '#ef4444', label: 'Sentiment' },
-        weather: { base: 85, vol: 5, color: '#00ce7c', label: 'Visibility' }
-    };
-
-    const charts = {};
-
-    // Initialize all charts
-    for (const [key, config] of Object.entries(metrics)) {
-        const ctx = document.getElementById(`chart_${key}`).getContext('2d');
-        const history = generateHistory(config.base, config.vol);
-        
-        // Calculate Change for display
-        const current = history[history.length - 1];
-        const prev = history[history.length - 2];
-        const change = ((current - prev) / prev * 100).toFixed(1);
-        
-        // Update DOM Text
-        const elVal = document.getElementById(`val_${key}`);
-        const elChg = document.getElementById(`chg_${key}`);
-        
-        if(key === 'weather') elVal.innerText = current + '%'; // Special formatting
-        else if(key === 'pizza') elVal.innerText = current > 70 ? 'High' : 'Normal';
-        else if(key === 'news') elVal.innerText = current > 60 ? 'Neg' : 'Pos';
-        else elVal.innerText = current;
-
-        // Update Change Badge
-        elChg.innerText = (change > 0 ? '+' : '') + change + '%';
-        elChg.className = `stat-change ${change >= 0 ? 'change-up' : 'change-down'}`;
-        if(key === 'gps' || key === 'tanker') {
-             // For bad things, increase is red (change-up style)
-             // Default logic works
-        } else if (key === 'weather') {
-             // For weather, increase is good? Logic depends. Keeping simple.
-        }
-
-        // Draw Chart
-        charts[key] = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: Array.from({length: 24}, (_, i) => i),
-                datasets: [{
-                    label: config.label,
-                    data: history,
-                    borderColor: config.color,
-                    backgroundColor: config.color.replace(')', ', 0.1)').replace('rgb', 'rgba'),
-                    fill: true
-                }]
-            },
-            options: commonOptions
-        });
-    }
-
-    // --- 3. RISK CALCULATION ---
-    function updateRisk() {
-        // Weighted calculation based on current chart values
-        const vals = {};
-        for (const key of Object.keys(metrics)) {
-            const data = charts[key].data.datasets[0].data;
-            vals[key] = data[data.length - 1];
-        }
-
-        const score = (
-            (vals.tanker * 0.25) + 
-            (vals.gps * 0.25) + 
-            (vals.news * 0.15) + 
-            (vals.market * 0.15) + 
-            (vals.pizza * 0.10) + 
-            (vals.weather * 0.10)
+    // --- 2. DUAL RISK ALGORITHM ---
+    function calculateRisks() {
+        // Algorithm 1: US-Iran Escalation Probability
+        // Heavily weighted on Tankers (Offensive) + Market + Pizza + News
+        const usRisk = Math.floor(
+            (params.tanker * 0.4) + 
+            (params.market * 0.2) + 
+            (params.news * 0.2) + 
+            (params.pizza * 0.2)
         );
-        
-        const risk = Math.floor(score);
-        
-        // Update UI
-        document.getElementById('riskPercent').innerText = risk + "%";
-        document.getElementById('riskFill').style.width = risk + "%";
-        
-        const label = document.getElementById('riskLabel');
-        if(risk < 40) { label.innerText = "LOW"; label.style.color = "var(--safe)"; }
-        else if(risk < 75) { label.innerText = "ELEVATED"; label.style.color = "var(--warn)"; }
-        else { label.innerText = "CRITICAL"; label.style.color = "var(--accent)"; }
+
+        // Algorithm 2: Israel Impact Risk
+        // Heavily weighted on GPS (Defensive) + Flights + US_Risk spillover
+        const ilRisk = Math.floor(
+            (params.gps * 0.5) + 
+            (params.flight * 0.3) + 
+            (usRisk * 0.2)
+        );
+
+        updateGauge('ring1', 'valUsIran', 'statUsIran', usRisk);
+        updateGauge('ring2', 'valIlImpact', 'statIlImpact', ilRisk);
     }
-    updateRisk();
 
-    // --- 4. NEWS SIMULATION ---
-    const newsItems = [
-        { time: "10:42", text: "US CENTCOM reports routine patrol activity in Persian Gulf." },
-        { time: "10:15", text: "Satellite imagery shows minor movement at Iranian missile sites." },
-        { time: "09:30", text: "Oil prices stabilize after morning volatility." },
-        { time: "08:45", text: "Diplomatic channels remain active in Cairo." }
-    ];
+    function updateGauge(ringId, valId, statId, percentage) {
+        // Update Text
+        document.getElementById(valId).innerText = percentage + "%";
+        
+        // Update Ring Stroke (Circumference ~339)
+        const offset = 339.29 - (339.29 * percentage) / 100;
+        const ring = document.getElementById(ringId);
+        ring.style.strokeDashoffset = offset;
 
-    const newsContainer = document.getElementById('news-feed');
-    newsItems.forEach(item => {
-        newsContainer.innerHTML += `
+        // Update Status & Color
+        let status = "Routine";
+        let color = "var(--accent-green)";
+        
+        if(percentage > 40) { status = "Elevated"; color = "var(--accent-yellow)"; }
+        if(percentage > 60) { status = "High Tension"; color = "var(--accent-orange)"; }
+        if(percentage > 80) { status = "Critical"; color = "var(--accent-red)"; }
+
+        document.getElementById(statId).innerText = status;
+        document.getElementById(statId).style.color = color;
+        ring.style.stroke = color;
+    }
+
+    // --- 3. CHARTS (IOS SPARKLINE STYLE) ---
+    Chart.defaults.scale.grid.display = false;
+    
+    function initCharts() {
+        const commonConfig = {
+            type: 'line',
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: {display:false}, tooltip: {enabled: true, mode: 'index', intersect: false} },
+                scales: { x: {display:false}, y: {display:false} },
+                elements: { point: {radius: 0, hitRadius: 10}, line: {tension: 0.4, borderWidth: 2} }
+            }
+        };
+
+        const chartColors = [
+            '#ff9f0a', '#ff453a', '#0a84ff', '#ffd60a', 
+            '#30d158', '#5856d6', '#5ac8fa', '#8e8e93'
+        ];
+
+        for(let i=1; i<=8; i++) {
+            const ctx = document.getElementById('c'+i).getContext('2d');
+            // Generate mock smooth data
+            let data = [];
+            let curr = 50;
+            for(let j=0; j<15; j++) {
+                curr += (Math.random() - 0.5) * 20;
+                data.push(curr);
+            }
+
+            new Chart(ctx, {
+                ...commonConfig,
+                data: {
+                    labels: Array(15).fill(''),
+                    datasets: [{
+                        data: data,
+                        borderColor: chartColors[i-1],
+                        backgroundColor: 'transparent', // Minimal look
+                        fill: false
+                    }]
+                }
+            });
+        }
+    }
+
+    // --- 4. NEWS SIMULATOR ---
+    async function loadNews() {
+        // Fallback simulated news if CORS blocks real RSS
+        const news = [
+            { src: "CNN", text: "Pentagon monitoring increased drone activity." },
+            { src: "YNET", text: "Home Front Command: No change in instructions." },
+            { src: "REUTERS", text: "Diplomats scramble to ease regional tensions." },
+            { src: "AP", text: "Satellite images show movement at airbases." }
+        ];
+
+        const container = document.getElementById('newsFeed');
+        container.innerHTML = news.map(n => `
             <div class="news-item">
-                <span class="news-time">${item.time}</span>
-                ${item.text}
+                <span class="news-source">${n.src}</span>
+                <span class="news-headline">${n.text}</span>
             </div>
-        `;
-    });
+        `).join('');
+    }
 
-    // --- 5. TIME UPDATES ---
+    // --- 5. TRANSLATIONS & RTL ---
+    let currentLang = 'en';
+    const dict = {
+        en: {
+            txtThreat: "Threat Analysis", lblUsIran: "US-Iran Escalation", lblIlImpact: "Israel Risk Impact",
+            txtIntel: "Live Intelligence", txtNews: "Latest Updates",
+            lblTanker: "Mil. Tankers", lblGps: "GPS Jamming", lblFlight: "Flight Cancels",
+            lblPizza: "Pentagon Pizza", lblMarket: "Market Odds", lblNews: "Sentiment",
+            lblWeather: "Op. Weather", lblWiki: "Public Interest"
+        },
+        he: {
+            txtThreat: "ניתוח איומים", lblUsIran: "הסלמה ארה\"ב-איראן", lblIlImpact: "השפעת סיכון על ישראל",
+            txtIntel: "מודיעין זמן-אמת", txtNews: "עדכונים אחרונים",
+            lblTanker: "מיכליות תדלוק", lblGps: "שיבושי GPS", lblFlight: "ביטולי טיסות",
+            lblPizza: "מדד הפיצה", lblMarket: "סיכויי שוק", lblNews: "סנטימנט חדשות",
+            lblWeather: "מזג אוויר מבצעי", lblWiki: "עניין הציבור"
+        }
+    };
+
+    function toggleLang() {
+        currentLang = currentLang === 'en' ? 'he' : 'en';
+        document.body.dir = currentLang === 'he' ? 'rtl' : 'ltr';
+        
+        const t = dict[currentLang];
+        for (const [key, value] of Object.entries(t)) {
+            const el = document.getElementById(key);
+            if(el) el.innerText = value;
+        }
+    }
+
+    // --- INIT ---
+    setTimeout(calculateRisks, 500); // Simulate calculation delay
+    initCharts();
+    loadNews();
+    
+    // Timer
     setInterval(() => {
-        const now = new Date();
-        document.getElementById('lastUpdate').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-    }, 1000);
+        document.getElementById('lastUpdate').innerText = "Updated: " + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+    }, 10000);
 
 </script>
 </body>
