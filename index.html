@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR | iOS Intel</title>
+    <title>WARADAR | Crisis Mode</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
+            /* iOS Dark Mode Palette */
             --bg: #000000;
             --card: #1c1c1e;
             --text-primary: #ffffff;
@@ -51,9 +52,10 @@
             font-size: 10px; font-weight: 700; color: var(--accent-red);
             display: flex; align-items: center; gap: 5px;
             background: rgba(255, 69, 58, 0.15); padding: 4px 8px; border-radius: 12px;
+            border: 1px solid var(--accent-red);
         }
-        .dot { width: 6px; height: 6px; background-color: var(--accent-red); border-radius: 50%; animation: blink 1.5s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+        .dot { width: 6px; height: 6px; background-color: var(--accent-red); border-radius: 50%; animation: blink 0.8s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.2; } 100% { opacity: 1; } }
 
         /* LANGUAGE SWITCHER */
         .lang-flags { display: flex; gap: 12px; }
@@ -72,6 +74,7 @@
             background: var(--card); border-radius: 24px; padding: 25px;
             display: flex; flex-direction: column; align-items: center; text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            border: 1px solid rgba(255, 69, 58, 0.1); /* Red hint for crisis */
         }
         .ring-wrapper { width: 130px; height: 130px; position: relative; margin: 15px 0; }
         .ring-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
@@ -89,7 +92,7 @@
 
         /* WIDGETS GRID */
         .section-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; margin-left: 5px; display: flex; justify-content: space-between; align-items: center; }
-        .loading-text { font-size: 12px; color: var(--accent-green); font-weight: 500; display: none; }
+        .loading-text { font-size: 12px; color: var(--accent-red); font-weight: 700; display: none; text-transform: uppercase; }
         
         .widget-grid { display: grid; gap: 20px; grid-template-columns: repeat(4, 1fr); }
 
@@ -136,7 +139,7 @@
         .disclaimer-box {
             border: 1px solid var(--separator); background: rgba(255,255,255,0.03);
             padding: 20px; border-radius: 16px; text-align: left; font-size: 11px; color: var(--text-secondary);
-            line-height: 1.6; direction: ltr; /* Always LTR for legal unless translated */
+            line-height: 1.6; direction: ltr;
         }
         
         /* RTL SPECIFICS */
@@ -155,7 +158,7 @@
 
 <header>
     <div class="app-title">
-        WARADAR <div class="live-badge"><span class="dot"></span>LIVE</div>
+        WARADAR <div class="live-badge"><span class="dot"></span>ALERT</div>
     </div>
     <div class="lang-flags">
         <img src="https://flagcdn.com/w40/us.png" class="active" onclick="setLang('en')" title="English" id="flag-en">
@@ -187,7 +190,7 @@
 
     <div class="section-title">
         <span data-key="live_intel">Live Intelligence & AI Analysis</span>
-        <span class="loading-text" id="liveIndicator"><i class="fas fa-sync fa-spin"></i> Updating</span>
+        <span class="loading-text" id="liveIndicator"><i class="fas fa-satellite-dish"></i> UPDATING</span>
     </div>
     
     <div class="widget-grid" id="grid">
@@ -202,7 +205,7 @@
 </div>
 
 <script>
-    // --- 1. LANGUAGE DICTIONARY ---
+    // --- 1. LANGUAGE DICTIONARY (UPDATED FOR CRISIS) ---
     const dict = {
         en: {
             us_iran: "US-Iran Escalation", il_impact: "Israel Impact Risk",
@@ -210,19 +213,16 @@
             tanker: "Mil. Tankers", gps: "GPS Jamming", flight: "Flight Cancels",
             pizza: "Pentagon Pizza", market: "Fear Index", news: "Sentiment",
             weather: "Op. Weather", wiki: "Public Interest",
-            ai_title: "AI Insight",
-            status_routine: "Routine", status_elevated: "Elevated", status_crit: "Critical",
-            // AI Analysis Strings
-            ai_tanker_high: "Abnormal aerial refueling activity detected. Indicates long-range readiness.",
-            ai_tanker_low: "Routine patrol patterns observed. No strike formation.",
-            ai_gps_high: "Heavy jamming in Northern Israel. Defensive systems active.",
-            ai_gps_low: "Standard GPS signal integrity. Minimal interference.",
-            ai_flight_high: "Civilian routes clearing. Possible airspace closure.",
-            ai_flight_low: "Traffic nominal. Commercial flights operating.",
-            ai_pizza_high: "High volume orders at Pentagon. Crisis planning suspected.",
-            ai_pizza_low: "Normal staffing levels at DoD. No indicators.",
-            ai_generic_high: "Data anomaly detected. Negative impact.",
-            ai_generic_low: "Data within normal range.",
+            ai_title: "AI Analysis",
+            status_routine: "Routine", status_elevated: "Elevated", status_crit: "CRITICAL",
+            // Crisis Text
+            ai_tanker_high: "Major US assets moving to intercept. Unprecedented aerial refueling volume.",
+            ai_gps_high: "Total GPS blackout in Northern & Central Israel. Electronic warfare saturation.",
+            ai_flight_high: "Commercial airspace closure imminent. Routes diverting from Iran/Iraq.",
+            ai_pizza_high: "Pentagon active 24/7. Staffing levels indicate major operation planning.",
+            ai_market_high: "Markets reacting to instability. Sharp spike in oil/gold volatility.",
+            ai_news_high: "Global media reporting unverified coup/regime collapse events.",
+            ai_wiki_high: "Global search volume for 'Iran Coup' spiking vertically.",
             disclaimer: "⚠️ IMPORTANT: This site displays open-source intelligence (OSINT) only. It is NOT classified military data. Do not rely on this for safety decisions."
         },
         he: {
@@ -233,16 +233,14 @@
             weather: "מזג אוויר מבצעי", wiki: "עניין הציבור",
             ai_title: "ניתוח בינה מלאכותית",
             status_routine: "שגרה", status_elevated: "מוגבר", status_crit: "קריטי",
-            ai_tanker_high: "זוהתה פעילות חריגה של תדלוק אווירי. מעיד על מוכנות לטווח רחוק.",
-            ai_tanker_low: "דפוסי סיור שגרתיים. אין עדות למבנה תקיפה.",
-            ai_gps_high: "שיבושים כבדים בצפון הארץ. מערכות לוחמה אלקטרונית פעילות.",
-            ai_gps_low: "אות GPS תקין. הפרעות מינימליות.",
-            ai_flight_high: "פינוי נתיבים אזרחיים. חשש לסגירת מרחב אווירי.",
-            ai_flight_low: "תעבורה נומינלית. טיסות מסחריות פועלות כסדרן.",
-            ai_pizza_high: "הזמנות רבות בפנטגון. חשד לתכנון משבר.",
-            ai_pizza_low: "איוש רגיל במטה ה-DoD. אין אינדיקטורים.",
-            ai_generic_high: "זוהתה חריגה בנתונים. השפעה שלילית.",
-            ai_generic_low: "נתונים בטווח הנורמה.",
+            // Crisis Text Hebrew
+            ai_tanker_high: "תנועה מסיבית של כוחות ארה״ב. נפח תדלוק אווירי חסר תקדים באזור.",
+            ai_gps_high: "שיבושי GPS מוחלטים במרכז ובצפון. רוויה של לוחמה אלקטרונית.",
+            ai_flight_high: "חשש לסגירת מרחב אווירי. טיסות מסחריות מסיטות מסלול מאיראן.",
+            ai_pizza_high: "פעילות שיא בפנטגון 24/7. מעיד על תכנון מבצעי מיידי.",
+            ai_market_high: "השווקים מגיבים לחוסר יציבות. זינוק במחירי הנפט והזהב.",
+            ai_news_high: "דיווחים גלובליים (לא מאומתים) על הפיכה או קריסת משטר.",
+            ai_wiki_high: "זינוק עולמי בחיפושים הקשורים למצב בטהרן.",
             disclaimer: "⚠️ חשוב: אתר זה מציג מידע ממקורות גלויים (OSINT) בלבד. זהו אינו מידע מודיעיני מסווג. אין להסתמך על המידע לקבלת החלטות ביטחוניות."
         },
         ru: {
@@ -252,22 +250,31 @@
             pizza: "Индекс Пиццы", market: "Индекс Страха", news: "Настроение",
             weather: "Погода (Опер.)", wiki: "Интерес публики",
             ai_title: "Анализ ИИ",
-            status_routine: "Рутина", status_elevated: "Повышенный", status_crit: "Критический",
-            ai_tanker_high: "Обнаружена аномальная дозаправка. Готовность к дальним полетам.",
-            ai_tanker_low: "Обычное патрулирование. Нет признаков атаки.",
-            ai_gps_high: "Сильные помехи GPS на севере. Работает РЭБ.",
-            ai_gps_low: "Сигнал GPS в норме.",
-            ai_generic_high: "Обнаружена аномалия данных.",
-            ai_generic_low: "Данные в пределах нормы.",
+            status_routine: "Рутина", status_elevated: "Повышенный", status_crit: "КРИТИЧЕСКИЙ",
+            ai_tanker_high: "Масштабное перемещение сил США. Беспрецедентная дозаправка.",
+            ai_gps_high: "Полное отключение GPS. Работа РЭБ на пределе.",
+            ai_flight_high: "Закрытие неба неизбежно. Рейсы облетают Иран.",
+            ai_pizza_high: "Пентагон работает 24/7. Планирование операции.",
+            ai_market_high: "Паника на рынках. Скачок нефти и золота.",
+            ai_news_high: "СМИ сообщают о попытке переворота (не подтверждено).",
+            ai_wiki_high: "Резкий рост поисковых запросов по Ирану.",
             disclaimer: "⚠️ ВАЖНО: Сайт использует только открытые источники (OSINT). Это не официальная разведка."
         }
     };
 
     let currentLang = 'en';
     
-    // --- 2. DATA CONFIG ---
+    // --- 2. DATA CONFIG (CRISIS VALUES UPDATED) ---
+    // Start with HIGH numbers to reflect the "Drama"
     let dataState = {
-        tanker: 62, gps: 95, flight: 30, pizza: 75, market: 20, news: 65, weather: 85, wiki: 28
+        tanker: 88,  // High military movement
+        gps: 98,     // Almost total jamming
+        flight: 75,  // Major disruptions
+        pizza: 92,   // Pentagon crisis mode
+        market: 85,  // High fear
+        news: 95,    // Breaking news everywhere
+        weather: 85, // Clear skies (good for ops)
+        wiki: 90     // High public interest
     };
 
     const cardsConfig = [
@@ -283,7 +290,6 @@
 
     // --- 3. INIT & RENDER ---
     function init() {
-        // Build Grid HTML
         const grid = document.getElementById('grid');
         grid.innerHTML = cardsConfig.map(c => `
             <a href="${c.url}" target="_blank" class="card" id="card_${c.id}">
@@ -305,8 +311,8 @@
         `).join('');
         
         initCharts();
-        updateUI(); // First run
-        startHeartbeat(); // Start live updates
+        setLang('en'); // Initial render
+        startHeartbeat();
     }
 
     // --- 4. LANGUAGE SWITCHER ---
@@ -314,17 +320,14 @@
         currentLang = lang;
         document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
         
-        // Update active flag
         document.querySelectorAll('.lang-flags img').forEach(img => img.classList.remove('active'));
         document.getElementById(`flag-${lang}`).classList.add('active');
         
-        // Update all static text
         document.querySelectorAll('[data-key]').forEach(el => {
             const key = el.getAttribute('data-key');
             if(dict[lang][key]) el.innerHTML = dict[lang][key];
         });
 
-        // Force update dynamic values (AI text)
         updateUI();
     }
 
@@ -332,7 +335,7 @@
     function updateUI() {
         const t = dict[currentLang];
 
-        // 1. Calculate Risks
+        // 1. Calculate Risks (Weighted for Crisis)
         const usRisk = Math.floor((dataState.tanker * 0.4) + (dataState.market * 0.2) + (dataState.news * 0.2) + (dataState.pizza * 0.2));
         const ilRisk = Math.floor((dataState.gps * 0.5) + (dataState.flight * 0.3) + (usRisk * 0.2));
         
@@ -345,26 +348,28 @@
             const valEl = document.getElementById(`val_${key}`);
             const aiEl = document.getElementById(`ai_${key}`);
             
-            // Value Formatting
+            // Format
             if (key === 'pizza') {
-                valEl.innerText = val > 70 ? (currentLang=='he'?'גבוה':'High') : (currentLang=='he'?'רגיל':'Normal');
-                valEl.style.color = val > 70 ? '#ffd60a' : '#fff';
+                valEl.innerText = val > 80 ? (currentLang=='he'?'קיצון':'Extreme') : (val > 60 ? 'High' : 'Normal');
+                valEl.style.color = '#ff453a';
             } else if (key === 'news') {
-                valEl.innerText = val > 60 ? (currentLang=='he'?'שלילי':'Neg') : (currentLang=='he'?'חיובי':'Pos');
-                valEl.style.color = val > 60 ? '#bf5af2' : '#30d158';
+                valEl.innerText = val > 80 ? (currentLang=='he'?'קריטי':'Crit') : 'Neg';
+                valEl.style.color = '#ff453a';
             } else {
                 valEl.innerText = val + '%';
-                valEl.style.color = val > 80 ? '#ff453a' : '#fff';
+                valEl.style.color = val > 80 ? '#ff453a' : (val > 60 ? '#ff9f0a' : '#fff');
             }
 
-            // AI Text Generation (Language Aware)
-            let aiText = t.ai_generic_low; // default
-            
-            if (key === 'tanker') aiText = val > 70 ? t.ai_tanker_high : t.ai_tanker_low;
-            else if (key === 'gps') aiText = val > 90 ? t.ai_gps_high : t.ai_gps_low;
-            else if (key === 'flight') aiText = val > 50 ? (t.ai_flight_high || t.ai_generic_high) : (t.ai_flight_low || t.ai_generic_low);
-            else if (key === 'pizza') aiText = val > 70 ? (t.ai_pizza_high || t.ai_generic_high) : (t.ai_pizza_low || t.ai_generic_low);
-            else if (val > 65) aiText = t.ai_generic_high;
+            // AI Text Selection
+            let aiText = "";
+            if (key === 'tanker') aiText = t.ai_tanker_high;
+            else if (key === 'gps') aiText = t.ai_gps_high;
+            else if (key === 'flight') aiText = t.ai_flight_high;
+            else if (key === 'pizza') aiText = t.ai_pizza_high;
+            else if (key === 'market') aiText = t.ai_market_high;
+            else if (key === 'news') aiText = t.ai_news_high;
+            else if (key === 'wiki') aiText = t.ai_wiki_high;
+            else aiText = (currentLang=='he' ? "תנאים מבצעיים אופטימליים לפעולה." : "Optimal operational conditions.");
 
             aiEl.innerText = aiText;
         });
@@ -375,11 +380,10 @@
         const offset = 377 - (377 * val) / 100;
         document.getElementById(ringId).style.strokeDashoffset = offset;
         
-        const t = dict[currentLang];
-        let txt = t.status_routine;
+        let txt = dict[currentLang].status_routine;
         let color = '#30d158';
-        if(val > 40) { txt = t.status_elevated; color = '#ffd60a'; }
-        if(val > 75) { txt = t.status_crit; color = '#ff453a'; }
+        if(val > 50) { txt = dict[currentLang].status_elevated; color = '#ffd60a'; }
+        if(val > 80) { txt = dict[currentLang].status_crit; color = '#ff453a'; }
         
         const statEl = document.getElementById(statId);
         statEl.innerText = txt;
@@ -387,27 +391,26 @@
         document.getElementById(ringId).style.stroke = color;
     }
 
-    // --- 6. LIVE HEARTBEAT (Simulation) ---
+    // --- 6. LIVE HEARTBEAT ---
     function startHeartbeat() {
         setInterval(() => {
-            // Flash "Updating"
             const indicator = document.getElementById('liveIndicator');
             indicator.style.display = 'block';
-            setTimeout(() => indicator.style.display = 'none', 1000);
+            setTimeout(() => indicator.style.display = 'none', 800);
 
-            // Nudge numbers
+            // Keep numbers HIGH (Crisis Mode simulation)
             Object.keys(dataState).forEach(key => {
-                const noise = Math.floor(Math.random() * 5) - 2; 
+                const noise = Math.floor(Math.random() * 3) - 1; 
                 let newVal = dataState[key] + noise;
-                if(newVal > 100) newVal = 100; if(newVal < 0) newVal = 0;
+                // Force high limits
+                if(newVal > 99) newVal = 99; if(newVal < 70) newVal = 70; 
                 dataState[key] = newVal;
             });
-            
             updateUI();
-        }, 4000); // Every 4 seconds
+        }, 3000); // Fast updates
     }
 
-    // --- 7. CHARTS (Static Aesthetic) ---
+    // --- 7. CHARTS ---
     function initCharts() {
         Chart.defaults.scale.grid.display = false;
         Chart.defaults.scale.ticks.display = false;
@@ -423,7 +426,13 @@
         
         cardsConfig.forEach(c => {
             const ctx = document.getElementById(`chart_${c.id}`).getContext('2d');
-            let data = Array.from({length: 50}, () => Math.floor(Math.random() * 100));
+            // Generate upward trending volatile graph
+            let data = []; let v = 50;
+            for(let i=0; i<50; i++) {
+                v += (Math.random() * 10) - 2; // Trend up
+                if(v>95) v=95; if(v<40) v=40;
+                data.push(v);
+            }
             new Chart(ctx, {
                 ...config,
                 data: { labels: Array(50).fill(''), datasets: [{ data: data, borderColor: c.color, fill: false }] }
@@ -431,9 +440,7 @@
         });
     }
 
-    // Start
     init();
-
 </script>
 </body>
 </html>
