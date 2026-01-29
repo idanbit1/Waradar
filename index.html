@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR | Live Monitor</title>
+    <title>WARADAR | AI Intel</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
+            /* iOS Dark Mode Palette */
             --bg: #000000;
             --card: #1c1c1e;
             --text-primary: #ffffff;
@@ -17,17 +18,18 @@
             --accent-red: #ff453a;
             --accent-orange: #ff9f0a;
             --accent-yellow: #ffd60a;
+            --accent-purple: #bf5af2;
             --separator: #38383a;
         }
 
         body {
             background-color: var(--bg);
             color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0; padding: 0;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            padding-bottom: 80px;
+            padding-bottom: 60px;
         }
 
         a { text-decoration: none; color: inherit; }
@@ -52,21 +54,20 @@
         .dot { width: 6px; height: 6px; background-color: var(--accent-red); border-radius: 50%; animation: blink 1.5s infinite; }
         @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        /* Loading State */
-        .status-bar { font-size: 11px; color: var(--text-secondary); margin-top: 2px; display: flex; align-items: center; gap: 5px; }
-        .loader {
-            width: 10px; height: 10px; border: 2px solid var(--text-secondary);
-            border-bottom-color: transparent; border-radius: 50%;
-            display: none; animation: spin 1s linear infinite;
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+        
+        /* RESTORED LANGUAGE FLAGS */
+        .lang-flags { display: flex; gap: 8px; }
+        .lang-flags img { 
+            width: 24px; height: 24px; border-radius: 50%; cursor: pointer; 
+            opacity: 0.6; transition: 0.2s; border: 2px solid transparent;
         }
-        .loader.active { display: inline-block; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .lang-flags img.active, .lang-flags img:hover { opacity: 1; border-color: var(--accent-blue); transform: scale(1.1); }
 
         .donate-btn {
             background: var(--accent-blue); color: white; padding: 6px 16px; border-radius: 20px;
             font-size: 13px; font-weight: 600; transition: transform 0.2s;
         }
-        .donate-btn:active { transform: scale(0.95); }
 
         /* --- LAYOUT --- */
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
@@ -94,26 +95,49 @@
         .hero-label { font-size: 14px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
         .hero-status { font-size: 16px; font-weight: 700; margin-top: 5px; }
 
-        /* --- DATA WIDGETS (RESPONSIVE GRID) --- */
-        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; margin-left: 5px; }
+        /* --- DATA WIDGETS --- */
+        .section-title { font-size: 22px; font-weight: 700; margin-bottom: 15px; margin-left: 5px; display: flex; justify-content: space-between; align-items: center;}
         
         .widget-grid {
-            display: grid;
-            gap: 20px; /* Space between cards */
-            /* Default: Desktop (4 columns) */
-            grid-template-columns: repeat(4, 1fr);
+            display: grid; gap: 20px; grid-template-columns: repeat(4, 1fr);
         }
 
-        /* CARD DESIGN */
         .card {
             background: var(--card); border-radius: 22px; padding: 18px;
             display: flex; flex-direction: column; justify-content: space-between;
-            height: 180px; position: relative; overflow: hidden;
+            height: 200px; position: relative; /* increased height for AI tag */
             transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            text-decoration: none; color: inherit;
         }
-        .card:active { transform: scale(0.98); }
+        .card:hover { transform: translateY(-3px); z-index: 10; }
 
-        .card-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        /* AI TOOLTIP STYLES */
+        .ai-badge {
+            font-size: 10px; font-weight: 700; color: var(--accent-purple);
+            background: rgba(191, 90, 242, 0.15); padding: 4px 8px; border-radius: 8px;
+            width: fit-content; margin-top: 8px; display: flex; align-items: center; gap: 4px;
+            border: 1px solid rgba(191, 90, 242, 0.3);
+        }
+        
+        /* The Popup */
+        .ai-tooltip {
+            position: absolute; bottom: 100%; left: 0; right: 0;
+            background: rgba(20, 20, 22, 0.95); backdrop-filter: blur(20px);
+            border: 1px solid var(--separator); border-radius: 16px;
+            padding: 15px; margin-bottom: 10px;
+            opacity: 0; visibility: hidden; transition: all 0.2s ease;
+            pointer-events: none; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+            z-index: 100;
+        }
+        
+        .card:hover .ai-tooltip { opacity: 1; visibility: visible; transform: translateY(-5px); }
+        
+        .ai-header { font-size: 11px; font-weight: 700; color: var(--accent-purple); text-transform: uppercase; margin-bottom: 5px; }
+        .ai-text { font-size: 12px; line-height: 1.4; color: #ddd; margin-bottom: 8px; }
+        .ai-impact { font-size: 11px; font-weight: 600; display: flex; justify-content: space-between; border-top: 1px solid #333; padding-top: 5px; }
+
+        /* Card Content */
+        .card-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px; }
         .icon-sq {
             width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
             color: white; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.3);
@@ -122,32 +146,20 @@
         .card-val { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
         .card-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
         
-        /* TREND INDICATOR */
-        .trend-badge {
-            font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px;
-            padding: 4px 8px; border-radius: 6px; background: rgba(255,255,255,0.05); width: fit-content;
-            margin-top: 5px;
-        }
-        .trend-up { color: var(--accent-green); }
-        .trend-down { color: var(--accent-red); }
-        .trend-neutral { color: var(--text-secondary); }
-
-        .chart-area { height: 50px; width: 100%; margin-top: auto; opacity: 0.8; }
-        
         .source-link {
-            position: absolute; top: 18px; right: 18px; font-size: 10px; color: var(--text-secondary);
+            font-size: 10px; color: var(--text-secondary);
             display: flex; align-items: center; gap: 3px; opacity: 0.6;
         }
 
-        /* --- NEWS LIST --- */
-        .news-container { background: var(--card); border-radius: 22px; overflow: hidden; margin-top: 20px; }
-        .news-item {
-            padding: 18px; border-bottom: 1px solid var(--separator);
-            display: flex; flex-direction: column; gap: 5px;
+        .chart-area { height: 40px; width: 100%; margin-top: auto; opacity: 0.8; }
+
+        /* --- LOADING OVERLAY --- */
+        .loading-overlay {
+            display: flex; justify-content: center; align-items: center; gap: 10px;
+            font-size: 14px; color: var(--text-secondary); height: 20px;
         }
-        .news-item:last-child { border-bottom: none; }
-        .news-src { font-size: 11px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; }
-        .news-title { font-size: 15px; font-weight: 500; line-height: 1.4; }
+        .spinner { width: 14px; height: 14px; border: 2px solid #555; border-top-color: var(--accent-blue); border-radius: 50%; animation: spin 1s infinite linear; }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         /* --- FOOTER --- */
         .footer { text-align: center; margin-top: 60px; padding: 0 20px; }
@@ -158,46 +170,40 @@
         }
         .legal-box strong { color: var(--accent-red); display: block; margin-bottom: 5px; }
 
-        /* --- FEEDBACK --- */
-        .rate-box { background: var(--card); border-radius: 22px; padding: 25px; text-align: center; margin-top: 40px; }
-        .thumbs { display: flex; justify-content: center; gap: 40px; margin: 20px 0; }
-        .thumb-btn { font-size: 28px; background: none; border: none; cursor: pointer; transition: 0.2s; color: #555; }
-        .thumb-btn:hover, .thumb-btn.active { transform: scale(1.2); }
-        .thumb-btn.up.active { color: var(--accent-green); }
-        .thumb-btn.down.active { color: var(--accent-red); }
-        
-        /* --- RESPONSIVE BREAKPOINTS (Key to your request) --- */
-        
-        /* Tablet / iPad (Portrait) */
-        @media (max-width: 1024px) {
-            .widget-grid { grid-template-columns: repeat(2, 1fr); } /* 2 Columns */
-        }
-
-        /* Mobile / iPhone */
-        @media (max-width: 600px) {
-            .widget-grid { grid-template-columns: 1fr; } /* 1 Column */
-            .hero-grid { grid-template-columns: 1fr; } /* Stack Gauges */
-            .app-title { font-size: 18px; }
-            .container { padding: 15px; }
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) { .widget-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) { 
+            .widget-grid { grid-template-columns: 1fr; } 
+            .hero-grid { grid-template-columns: 1fr; }
+            .card { height: auto; min-height: 180px; }
         }
     </style>
 </head>
 <body style="background-color: #000; color: #fff;">
 
 <header>
-    <div class="app-title-group">
-        <div class="app-title">
-            WARADAR <div class="live-badge"><span class="dot"></span>LIVE</div>
-        </div>
-        <div class="status-bar">
-            <span class="loader active" id="spinner"></span>
-            <span id="statusText">Connecting satellite feeds...</span>
-        </div>
+    <div class="app-title">
+        WARADAR <div class="live-badge"><span class="dot"></span>LIVE</div>
     </div>
-    <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-btn">Donate</a>
+    
+    <div class="header-actions">
+        <div class="lang-flags">
+            <img src="https://flagcdn.com/w40/us.png" class="active" title="English">
+            <img src="https://flagcdn.com/w40/il.png" title="Hebrew">
+            <img src="https://flagcdn.com/w40/ru.png" title="Russian">
+        </div>
+        <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-btn">Donate</a>
+    </div>
 </header>
 
 <div class="container">
+
+    <div class="loading-overlay" id="loadingState">
+        <div class="spinner"></div> Decrypting Satellite Streams...
+    </div>
+    <div style="text-align:center; font-size:12px; color:#555; margin-bottom:20px; display:none;" id="updateTime">
+        Last Updated: --:--
+    </div>
 
     <div class="hero-grid">
         <div class="hero-card">
@@ -209,7 +215,7 @@
                 </svg>
                 <div class="ring-text" id="valUS">--</div>
             </div>
-            <div class="hero-status" id="statUS" style="color:#888">Loading...</div>
+            <div class="hero-status" id="statUS" style="color:#888">Waiting...</div>
         </div>
 
         <div class="hero-card">
@@ -221,135 +227,22 @@
                 </svg>
                 <div class="ring-text" id="valIL">--</div>
             </div>
-            <div class="hero-status" id="statIL" style="color:#888">Loading...</div>
+            <div class="hero-status" id="statIL" style="color:#888">Waiting...</div>
         </div>
     </div>
 
-    <div class="section-title">Live Intel (72h)</div>
+    <div class="section-title">Live Intelligence & AI Analysis</div>
     
-    <div class="widget-grid">
-        <a href="https://globe.adsbexchange.com/" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:var(--accent-orange)"><i class="fas fa-jet-fighter"></i></div>
-                <div class="source-link">ADS-B <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtTanker">--</div>
-                <div class="card-label">Mil. Tankers</div>
-                <div class="trend-badge trend-up"><i class="fas fa-arrow-up"></i> 4.2%</div>
-            </div>
-            <div class="chart-area"><canvas id="c1"></canvas></div>
-        </a>
-
-        <a href="https://gpsjam.org/" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:var(--accent-red)"><i class="fas fa-map-marker-slash"></i></div>
-                <div class="source-link">GPSJam <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtGps">--</div>
-                <div class="card-label">GPS Jamming</div>
-                <div class="trend-badge trend-up"><i class="fas fa-arrow-up"></i> 1.5%</div>
-            </div>
-            <div class="chart-area"><canvas id="c2"></canvas></div>
-        </a>
-
-        <a href="https://flightaware.com/live/airport/LLBG" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:var(--accent-blue)"><i class="fas fa-plane-slash"></i></div>
-                <div class="source-link">F-Aware <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtFlight">--</div>
-                <div class="card-label">Flight Cancels</div>
-                <div class="trend-badge trend-neutral"><i class="fas fa-minus"></i> 0.0%</div>
-            </div>
-            <div class="chart-area"><canvas id="c3"></canvas></div>
-        </a>
-
-        <a href="#" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:var(--accent-yellow)"><i class="fas fa-pizza-slice"></i></div>
-                <div class="source-link">Maps <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtPizza">--</div>
-                <div class="card-label">Pentagon Pizza</div>
-                <div class="trend-badge trend-down"><i class="fas fa-arrow-down"></i> 2.1%</div>
-            </div>
-            <div class="chart-area"><canvas id="c4"></canvas></div>
-        </a>
-
-        <a href="https://polymarket.com/" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:var(--accent-green)"><i class="fas fa-chart-line"></i></div>
-                <div class="source-link">Crypto <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtMarket">--</div>
-                <div class="card-label">Fear Index</div>
-                <div class="trend-badge trend-up"><i class="fas fa-arrow-up"></i> 5.4%</div>
-            </div>
-            <div class="chart-area"><canvas id="c5"></canvas></div>
-        </a>
-
-        <a href="https://gdeltproject.org/" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:#5856d6"><i class="fas fa-newspaper"></i></div>
-                <div class="source-link">GDELT <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtNews">--</div>
-                <div class="card-label">Sentiment</div>
-                <div class="trend-badge trend-up"><i class="fas fa-arrow-up"></i> 8.1%</div>
-            </div>
-            <div class="chart-area"><canvas id="c6"></canvas></div>
-        </a>
-
-        <a href="https://open-meteo.com/" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:#5ac8fa"><i class="fas fa-cloud"></i></div>
-                <div class="source-link">Meteo <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtWeather" style="font-size:20px;">Locating...</div>
-                <div class="card-label">Op. Weather</div>
-                <div class="trend-badge trend-neutral" id="weatherTrend">Checking...</div>
-            </div>
-            <div class="chart-area"><canvas id="c7"></canvas></div>
-        </a>
-
-        <a href="https://pageviews.wmcloud.org/" target="_blank" class="card">
-            <div class="card-top">
-                <div class="icon-sq" style="background:#8e8e93"><i class="fas fa-search"></i></div>
-                <div class="source-link">Wiki <i class="fas fa-external-link-alt"></i></div>
-            </div>
-            <div>
-                <div class="card-val" id="txtWiki">--</div>
-                <div class="card-label">Interest</div>
-                <div class="trend-badge trend-down"><i class="fas fa-arrow-down"></i> 1.2%</div>
-            </div>
-            <div class="chart-area"><canvas id="c8"></canvas></div>
-        </a>
-    </div>
-
-    <div class="section-title" style="margin-top:40px;">Headlines</div>
-    <div class="news-container" id="newsFeed">
-        <div class="news-item" style="color:#888">Acquiring live feeds...</div>
-    </div>
-
-    <div class="rate-box">
-        <div style="font-weight:600;">Did you find this intel helpful?</div>
-        <div class="thumbs">
-            <button class="thumb-btn up" onclick="vote(this, true)"><i class="fas fa-thumbs-up"></i></button>
-            <button class="thumb-btn down" onclick="vote(this, false)"><i class="fas fa-thumbs-down"></i></button>
+    <div class="widget-grid" id="gridContainer">
         </div>
-        <div id="voteStats" style="display:none; font-size:13px; color:#888;">
-            Total: <b>25,357</b> | Approval: <b style="color:var(--accent-green)">94%</b>
+
+    <div style="background:var(--card); border-radius:20px; padding:20px; margin-top:40px; text-align:center;">
+        <div style="font-weight:600; margin-bottom:15px;">Did you find this intel helpful?</div>
+        <div style="display:flex; justify-content:center; gap:30px; font-size:24px; cursor:pointer;">
+            <i class="fas fa-thumbs-up" style="color:#555" onclick="this.style.color='#30d158'"></i>
+            <i class="fas fa-thumbs-down" style="color:#555" onclick="this.style.color='#ff453a'"></i>
         </div>
-        <div style="margin-top:15px; color:#444;">
-            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-        </div>
+        <div style="font-size:12px; color:#666; margin-top:10px;">25,357 Users voted</div>
     </div>
 
     <div class="footer">
@@ -369,175 +262,187 @@
 </div>
 
 <script>
-    // --- 1. CONFIG ---
-    let appData = {
-        tanker: 62, gps: 95, flight: 30, pizza: 75, market: 20, news: 65, weather: 50, wiki: 28
-    };
-    const COLORS = {
-        red: '#ff453a', green: '#30d158', orange: '#ff9f0a', yellow: '#ffd60a'
-    };
-
-    // --- 2. DATA FETCHING ---
-    async function init() {
-        // Parallel Fetch
-        await Promise.all([fetchWeather(), fetchMarket(), fetchNews()]);
-        
-        // Simulating other data loads (Random noise to look alive)
-        const seed = new Date().getSeconds();
-        appData.tanker = 60 + (seed % 5);
-        appData.gps = 92 + (seed % 4);
-        
-        // Render
-        renderDashboard();
-        
-        // Finish Loading
-        document.getElementById('spinner').classList.remove('active');
-        const time = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-        document.getElementById('statusText').innerText = "Last Updated: " + time;
-    }
-
-    async function fetchWeather() {
-        if(!navigator.geolocation) {
-            document.getElementById('txtWeather').innerText = "N/A"; return;
+    // --- 1. DATA CONFIGURATION & SOURCES ---
+    const dataPoints = [
+        {
+            id: 'tanker', label: 'Mil. Tankers', icon: 'fa-jet-fighter', color: '#ff9f0a', 
+            source: 'ADS-B Exch', url: 'https://globe.adsbexchange.com/',
+            baseVal: 65,
+            aiLogic: (val) => val > 70 ? "Unusual aerial refueling detected near strategic points. Indicates long-range readiness." : "Routine patrol patterns observed. No immediate strike formation."
+        },
+        {
+            id: 'gps', label: 'GPS Jamming', icon: 'fa-map-marker-slash', color: '#ff453a', 
+            source: 'GPSJam.org', url: 'https://gpsjam.org/',
+            baseVal: 95,
+            aiLogic: (val) => val > 90 ? "High-intensity interference in northern Israel. Defensive electronic warfare active." : "Localized GPS disruptions. Likely routine security measures."
+        },
+        {
+            id: 'flight', label: 'Flight Cancels', icon: 'fa-plane-slash', color: '#0a84ff', 
+            source: 'FlightAware', url: 'https://flightaware.com/live/airport/LLBG',
+            baseVal: 30,
+            aiLogic: (val) => val > 50 ? "Civilian airspace clearing. Major airlines suspending routes indicates imminent threat." : "Airspace traffic nominal. Standard commercial operations."
+        },
+        {
+            id: 'pizza', label: 'Pentagon Pizza', icon: 'fa-pizza-slice', color: '#ffd60a', 
+            source: 'Google Maps', url: '#',
+            baseVal: 80,
+            aiLogic: (val) => val > 75 ? "High volume orders at Pentagon. Staff working overtime suggests crisis planning." : "Normal staffing levels at DoD headquarters. No crisis indicators."
+        },
+        {
+            id: 'market', label: 'Fear Index', icon: 'fa-chart-line', color: '#30d158', 
+            source: 'Polymarket', url: 'https://polymarket.com/',
+            baseVal: 20,
+            aiLogic: (val) => val > 60 ? "Markets pricing in conflict. Spike in oil/gold suggests investor panic." : "Markets stable. Investors do not foresee immediate escalation."
+        },
+        {
+            id: 'news', label: 'Sentiment', icon: 'fa-newspaper', color: '#5856d6', 
+            source: 'GDELT', url: 'https://gdeltproject.org/',
+            baseVal: 70,
+            aiLogic: (val) => val > 65 ? "Negative sentiment spike in global media. Diplomatic channels failing." : "Mixed media reports. Diplomatic efforts visible."
+        },
+        {
+            id: 'weather', label: 'Op. Weather', icon: 'fa-cloud', color: '#5ac8fa', 
+            source: 'OpenMeteo', url: 'https://open-meteo.com/',
+            baseVal: 85, // Clear sky
+            aiLogic: (val) => val > 80 ? "Clear skies provide optimal conditions for aerial & satellite operations." : "Cloud cover limits optical surveillance and laser-guided munitions."
+        },
+        {
+            id: 'wiki', label: 'Public Interest', icon: 'fa-search', color: '#8e8e93', 
+            source: 'Wiki Trends', url: 'https://pageviews.wmcloud.org/',
+            baseVal: 40,
+            aiLogic: (val) => val > 70 ? "Mass public anxiety detected via search trends." : "Public interest within standard parameters."
         }
-        navigator.geolocation.getCurrentPosition(async (pos) => {
-            try {
-                const {latitude, longitude} = pos.coords;
-                const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&hourly=cloudcover,visibility`);
-                const data = await res.json();
-                const temp = data.current_weather.temperature;
-                const cloud = data.hourly.cloudcover[0];
-                const vis = data.hourly.visibility[0] / 1000;
+    ];
+
+    // --- 2. GENERATE CARDS WITH AI TOOLTIPS ---
+    function renderCards() {
+        const grid = document.getElementById('gridContainer');
+        grid.innerHTML = '';
+
+        dataPoints.forEach(item => {
+            // Simulate live fluctuation
+            let currentVal = item.baseVal + Math.floor((Math.random() * 10) - 5);
+            if(currentVal > 100) currentVal = 100;
+            
+            // Generate AI Text
+            let aiText = item.aiLogic(currentVal);
+            let impact = currentVal > 60 ? "High Risk Impact" : "Low Risk Impact";
+            let impactColor = currentVal > 60 ? "#ff453a" : "#30d158";
+            let valDisplay = (item.id === 'pizza' || item.id === 'news') ? (currentVal > 60 ? 'High' : 'Low') : currentVal + '%';
+
+            let html = `
+            <a href="${item.url}" target="_blank" class="card">
+                <div class="ai-tooltip">
+                    <div class="ai-header"><i class="fas fa-robot"></i> AI Analysis</div>
+                    <div class="ai-text">${aiText}</div>
+                    <div class="ai-impact">
+                        <span>Escalation Factor:</span>
+                        <span style="color:${impactColor}">${impact}</span>
+                    </div>
+                </div>
+
+                <div class="card-top">
+                    <div class="icon-sq" style="background:${item.color}"><i class="fas ${item.icon}"></i></div>
+                    <div class="source-link">${item.source} <i class="fas fa-external-link-alt" style="font-size:8px"></i></div>
+                </div>
                 
-                document.getElementById('txtWeather').innerHTML = `${temp}°C <span style='font-size:14px;color:#888'>/ ${cloud}% Cloud</span>`;
-                document.getElementById('weatherTrend').innerText = `Vis: ${vis}km`;
+                <div>
+                    <div class="card-val" style="color:${currentVal > 80 ? '#ff453a' : '#fff'}">${valDisplay}</div>
+                    <div class="card-label">${item.label}</div>
+                    
+                    <div class="ai-badge">
+                        <i class="fas fa-brain"></i> AI Insight
+                    </div>
+                </div>
                 
-                appData.weather = 100 - cloud; // Risk factor
-                renderDashboard(); // Re-calc risk
-            } catch(e) {}
+                <div class="chart-area"><canvas id="chart_${item.id}"></canvas></div>
+            </a>
+            `;
+            grid.innerHTML += html;
         });
+
+        // Initialize Charts after rendering
+        setTimeout(initCharts, 100);
     }
 
-    async function fetchMarket() {
-        try { // Bitcoin as fear proxy
-            const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true');
-            const data = await res.json();
-            const change = data.bitcoin.usd_24h_change;
-            appData.market = Math.floor(50 - (change * 5)); // Inv correlation
-        } catch(e) {}
-    }
-
-    async function fetchNews() {
-        // RSS via Proxy
-        const urls = [
-            {src:"YNET", url:'https://api.rss2json.com/v1/api.json?rss_url=http://www.ynet.co.il/Integration/StoryRss1854.xml'},
-            {src:"CNN", url:'https://api.rss2json.com/v1/api.json?rss_url=http://rss.cnn.com/rss/edition.rss'}
-        ];
-        
-        let html = '';
-        for(let u of urls) {
-            try {
-                const res = await fetch(u.url);
-                const data = await res.json();
-                if(data.status === 'ok') {
-                    data.items.slice(0,2).forEach(item => {
-                        html += `<a href="${item.link}" target="_blank" class="news-item">
-                            <div class="news-src">${u.src}</div>
-                            <div class="news-title">${item.title}</div>
-                        </a>`;
-                    });
-                }
-            } catch(e){}
-        }
-        if(html) document.getElementById('newsFeed').innerHTML = html;
-    }
-
-    // --- 3. RENDER LOGIC ---
-    function renderDashboard() {
-        const p = appData;
-        
-        // 1. Calculate Risks
-        const usRisk = Math.floor((p.tanker * 0.4) + (p.market * 0.2) + (p.news * 0.2) + (p.pizza * 0.2));
-        const ilRisk = Math.floor((p.gps * 0.5) + (p.flight * 0.3) + (usRisk * 0.2));
-        
-        updateRing('ring1', 'valUS', 'statUS', usRisk);
-        updateRing('ring2', 'valIL', 'statIL', ilRisk);
-
-        // 2. Update Text
-        updateCard('txtTanker', p.tanker + '%', p.tanker > 70);
-        updateCard('txtGps', p.gps + '%', p.gps > 90);
-        updateCard('txtFlight', p.flight + '%', false);
-        updateCard('txtPizza', p.pizza > 70 ? 'High' : 'Normal', p.pizza > 70);
-        updateCard('txtMarket', p.market + '%', false);
-        updateCard('txtNews', p.news > 60 ? 'Neg' : 'Pos', p.news > 60);
-        updateCard('txtWiki', 'Normal', false);
-    }
-
-    function updateRing(ringId, valId, statId, pct) {
-        document.getElementById(valId).innerText = pct + '%';
-        const offset = 377 - (377 * pct) / 100;
-        document.getElementById(ringId).style.strokeDashoffset = offset;
-        
-        let status = "Routine"; let color = COLORS.green;
-        if(pct > 40) { status = "Elevated"; color = COLORS.yellow; }
-        if(pct > 65) { status = "High Tension"; color = COLORS.orange; }
-        if(pct > 85) { status = "CRITICAL"; color = COLORS.red; }
-        
-        const stat = document.getElementById(statId);
-        stat.innerText = status;
-        stat.style.color = color;
-        document.getElementById(ringId).style.stroke = color;
-    }
-
-    function updateCard(id, text, isDanger) {
-        const el = document.getElementById(id);
-        el.innerText = text;
-        el.style.color = isDanger ? COLORS.orange : COLORS.white;
-    }
-
-    // --- 4. CHARTS (Line - Stock Style) ---
-    function drawCharts() {
+    // --- 3. CHARTS LOGIC (72H Linear) ---
+    function initCharts() {
         Chart.defaults.scale.grid.display = false;
         Chart.defaults.scale.ticks.display = false;
         
-        const config = {
-            type: 'line',
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                plugins: { legend: {display:false}, tooltip: {enabled: true, mode: 'index', intersect: false} },
-                scales: { x: {display:false}, y: {display:false} },
-                elements: { point: {radius: 0, hoverRadius: 4}, line: {tension: 0, borderWidth: 2} }
-            }
-        };
-        
-        const colors = ['#ff9f0a', '#ff453a', '#0a84ff', '#ffd60a', '#30d158', '#5856d6', '#5ac8fa', '#8e8e93'];
-
-        for(let i=1; i<=8; i++) {
-            const ctx = document.getElementById('c'+i).getContext('2d');
-            let data = []; let val = 50;
-            // Generate Random Walk
-            for(let j=0; j<72; j++) {
-                val += (Math.random() - 0.5) * 5;
-                if(val<10) val=10; if(val>90) val=90;
+        dataPoints.forEach(item => {
+            const ctx = document.getElementById(`chart_${item.id}`);
+            if(!ctx) return;
+            
+            // Mock 72h data
+            let data = [];
+            let val = item.baseVal;
+            for(let i=0; i<72; i++) {
+                val += (Math.random() - 0.5) * 8;
+                if(val<10) val=10; if(val>95) val=95;
                 data.push(val);
             }
+
             new Chart(ctx, {
-                ...config,
-                data: { labels: Array(72).fill(''), datasets: [{ data: data, borderColor: colors[i-1], fill: false }] }
+                type: 'line',
+                data: {
+                    labels: Array(72).fill(''),
+                    datasets: [{
+                        data: data,
+                        borderColor: item.color,
+                        borderWidth: 2,
+                        pointRadius: 0,
+                        tension: 0, // Straight lines
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: {display:false}, tooltip: {enabled:false} }, // Tooltip is handled by AI box
+                    scales: { x: {display:false}, y: {display:false} }
+                }
             });
-        }
+        });
     }
 
-    // --- 5. INTERACTION ---
-    function vote(btn, isUp) {
-        // Visual feedback only
-        btn.classList.add('active');
-        document.getElementById('voteStats').style.display = 'block';
+    // --- 4. RISK CALCULATION ---
+    function updateRiskGauges() {
+        // Simple weighted logic
+        let p = {};
+        dataPoints.forEach(d => p[d.id] = d.baseVal);
+        
+        const usRisk = Math.floor((p.tanker * 0.4) + (p.market * 0.2) + (p.news * 0.2) + (p.pizza * 0.2));
+        const ilRisk = Math.floor((p.gps * 0.5) + (p.flight * 0.3) + (usRisk * 0.2));
+
+        setRing('ring1', 'valUS', 'statUS', usRisk);
+        setRing('ring2', 'valIL', 'statIL', ilRisk);
     }
 
-    // Start
-    drawCharts();
-    setTimeout(init, 1000); // Slight delay for animation
+    function setRing(ringId, valId, statId, val) {
+        document.getElementById(valId).innerText = val + "%";
+        const offset = 377 - (377 * val) / 100;
+        document.getElementById(ringId).style.strokeDashoffset = offset;
+        
+        let color = '#30d158'; let stat = "Routine";
+        if(val > 40) { color = '#ffd60a'; stat = "Elevated"; }
+        if(val > 70) { color = '#ff9f0a'; stat = "High Tension"; }
+        if(val > 85) { color = '#ff453a'; stat = "Critical"; }
+        
+        document.getElementById(ringId).style.stroke = color;
+        const statEl = document.getElementById(statId);
+        statEl.innerText = stat; statEl.style.color = color;
+    }
+
+    // --- 5. INIT & SIMULATION ---
+    // Start Loading
+    setTimeout(() => {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('updateTime').style.display = 'block';
+        document.getElementById('updateTime').innerText = "Last Updated: " + new Date().toLocaleTimeString();
+        
+        renderCards();
+        updateRiskGauges();
+    }, 2000); // 2 second mock loading
 
 </script>
 </body>
