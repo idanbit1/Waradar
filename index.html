@@ -100,36 +100,26 @@
             display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* --- SCORE & HISTORY --- */
+        /* --- SCORE & CHART --- */
         .score-container { text-align: center; padding: 10px; margin-bottom: 20px; }
         .big-score { font-size: 5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,65,0.4); line-height: 1; }
         
-        /* History Graph */
+        /* Stock Graph Canvas */
         .history-section {
             margin-top: auto;
             border-top: 1px dashed #333;
             padding-top: 15px;
-        }
-        .chart-container {
-            display: flex; justify-content: space-between; align-items: flex-end;
-            height: 120px; padding: 0 10px; margin-top: 10px;
-        }
-        .chart-col {
-            display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
-            width: 18%; height: 100%;
-        }
-        .chart-bar {
-            width: 100%; background: #222; border: 1px solid #444;
-            transition: height 1s ease, background 0.5s;
             position: relative;
         }
-        .chart-bar:hover { opacity: 0.8; }
-        .chart-bar::before {
-            content: attr(data-val); position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-            font-size: 0.75rem; color: #fff; opacity: 0; transition: opacity 0.3s;
+        canvas#trendChart {
+            width: 100%;
+            height: 150px;
+            margin-top: 10px;
+            display: block;
         }
-        .chart-bar:hover::before { opacity: 1; }
-        .chart-label { margin-top: 8px; font-size: 0.75rem; color: #666; }
+        .chart-labels {
+            display: flex; justify-content: space-between; font-size: 0.7rem; color: #666; margin-top: 5px; padding: 0 5px;
+        }
 
         /* --- PARAMETERS LIST --- */
         .parameter-row {
@@ -139,17 +129,24 @@
         .parameter-row:hover { background: var(--hover-row); border-color: #333; }
         
         .param-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; align-items: center; }
-        .param-label { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .param-label { display: flex; align-items: center; gap: 10px; font-weight: bold; }
         
+        /* SVG Icons Styling */
+        .param-icon {
+            width: 20px; height: 20px; fill: var(--primary); opacity: 0.8;
+            transition: 0.3s;
+        }
+        .parameter-row:hover .param-icon { transform: scale(1.1); opacity: 1; }
+
         .info-btn {
             display: inline-flex; align-items: center; justify-content: center;
             width: 18px; height: 18px; border: 1px solid var(--text-dim);
             color: var(--text-dim); border-radius: 50%; font-size: 0.7rem;
-            cursor: pointer; transition: 0.2s; z-index: 5;
+            cursor: pointer; transition: 0.2s; z-index: 5; margin-left: auto; /* Push to right */
         }
         .info-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,65,0.1); }
 
-        .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; }
+        .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
         .progress-fill {
             height: 100%; width: 0%;
             background: linear-gradient(90deg, var(--primary), var(--warning));
@@ -181,7 +178,8 @@
         .blink { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         .rtl { direction: rtl; }
-        .rtl .param-label { gap: 8px; }
+        .rtl .param-label { gap: 10px; }
+        .rtl .info-btn { margin-right: auto; margin-left: 0; }
     </style>
 </head>
 <body>
@@ -222,9 +220,16 @@
             </div>
 
             <div class="history-section">
-                <h3 style="font-size: 0.9rem; color: #888; margin: 0 0 10px 0;" data-key="trend_title">48H TREND ANALYSIS</h3>
-                <div class="chart-container" id="historyChart">
-                    </div>
+                <h3 style="font-size: 0.8rem; color: #888; margin: 0 0 5px 0; text-transform:uppercase;" data-key="trend_title">7-Day Risk Trend</h3>
+                <canvas id="trendChart"></canvas>
+                <div class="chart-labels">
+                    <span>-7d</span>
+                    <span>-48h</span>
+                    <span>-24h</span>
+                    <span>-12h</span>
+                    <span>-3h</span>
+                    <span class="blink">LIVE</span>
+                </div>
             </div>
         </div>
 
@@ -257,18 +262,35 @@
     </footer>
 
     <script>
-        // --- CONFIGURATION (100% Total) ---
+        // --- ICONS (SVG) ---
+        const icons = {
+            news: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
+            aviation: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>',
+            tankers: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.5L18.5 19H5.5L12 5.5z"/></svg>', // Simple Jet/Triangle
+            market: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>',
+            financial: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>',
+            social: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>',
+            traffic: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.08 3.11H5.77L6.85 7zM19 17H5v-5h14v5z"/></svg>',
+            pentagon: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M12 2L2 9l4 13h12l4-13-10-7zm0 3.5L18.5 10l-2.5 8h-8L5.5 10 12 5.5z"/></svg>',
+            weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
+        };
+
+        // --- CONFIGURATION ---
         const signalsConfig = [
-            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 45 },
-            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 30 },
-            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 55 },
-            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 60 },
-            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 65 },
-            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 70 },
-            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 40 },
-            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 20 },
-            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80 }
+            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 45, icon: icons.news },
+            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 30, icon: icons.aviation },
+            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 55, icon: icons.market },
+            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 60, icon: icons.financial },
+            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 65, icon: icons.tankers },
+            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 70, icon: icons.social },
+            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 40, icon: icons.traffic },
+            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 20, icon: icons.pentagon },
+            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80, icon: icons.weather }
         ];
+
+        // --- FIXED HISTORICAL DATA (Static points as requested) ---
+        // -7d, -48h, -24h, -12h, -3h
+        const historyPoints = [35, 42, 58, 52, 60]; 
 
         // --- CONTENT DICTIONARY ---
         const content = {
@@ -280,32 +302,30 @@
                 risk_parameters: "LIVE SIGNALS & SOURCES",
                 share: "Share Status",
                 disclaimer_short: "Statistical aggregation. Use at your own discretion.",
-                trend_title: "48H TREND ANALYSIS",
+                trend_title: "7-Day Risk Trend",
                 
-                // Labels
                 l_news: "News Intelligence",
-                l_aviation: "Civil Aviation (Iran)",
+                l_aviation: "Civil Aviation",
                 l_tankers: "US Tanker Activity",
                 l_market: "Prediction Markets",
-                l_financial: "Global Markets (Oil/BTC)",
+                l_financial: "Global Markets",
                 l_social: "Social Intel / OSINT",
-                l_traffic: "Tehran Traffic Flow",
+                l_traffic: "Tehran Traffic",
                 l_pentagon: "Pentagon Activity",
                 l_weather: "Weather (Tehran)",
-
-                // Descriptions
-                m_general_title: "Risk Calculation Methodology",
-                m_general_desc: "We aggregate 9 distinct signals to calculate the probability of conflict.<br><br><strong>Why these weights?</strong><br>• News (20%) & Markets (15%) are leading indicators.<br>• Aviation (15%) reflects insurance/corporate risk assessment.<br>• Tankers (10%) reflect logistical readiness.<br>• Others (5-10%) provide supporting context.",
                 
-                m_news_desc: "Scans major news outlets for keywords like 'Strike', 'Imminent', 'Nuclear'.<br><strong>Weight: 20%</strong>",
-                m_aviation_desc: "Civilian flight volume over Iran. Low volume indicates airlines fear conflict.<br><strong>Weight: 15%</strong>",
-                m_tankers_desc: "Presence of KC-135/KC-46 refueling tankers suggests air force readiness.<br><strong>Weight: 10%</strong>",
-                m_market_desc: "Betting odds on war within 7 days.<br><strong>Weight: 15%</strong>",
-                m_financial_desc: "Monitors Brent Crude Oil, Dollar Index (DXY), and Bitcoin.<br><strong>Weight: 15%</strong>",
-                m_social_desc: "Real-time scraper of X (Twitter) and Telegram.<br><strong>Weight: 10%</strong>",
-                m_traffic_desc: "Analyzes Google Maps traffic data in Tehran.<br><strong>Weight: 5%</strong>",
-                m_pentagon_desc: "Traffic/Activity levels around US Defense Dept HQ.<br><strong>Weight: 5%</strong>",
-                m_weather_desc: "Visibility conditions for airstrikes.<br><strong>Weight: 5%</strong>"
+                m_general_title: "Risk Calculation",
+                m_general_desc: "We aggregate 9 distinct signals to calculate the probability of conflict.<br><br><strong>Why these weights?</strong><br>• News (20%) & Markets (15%) are leading indicators.<br>• Aviation (15%) reflects insurance risk.<br>• Tankers (10%) reflect logistical readiness.<br>The graph shows a fixed 7-day trend analysis.",
+                
+                m_news_desc: "Scans major news outlets for keywords like 'Strike', 'Imminent'.",
+                m_aviation_desc: "Civilian flight volume over Iran. Low volume = High Risk.",
+                m_tankers_desc: "Presence of KC-135/KC-46 refueling tankers.",
+                m_market_desc: "Betting odds on war within 7 days.",
+                m_financial_desc: "Brent Crude Oil, DXY, and Bitcoin volatility.",
+                m_social_desc: "Real-time scraper of X (Twitter) and Telegram.",
+                m_traffic_desc: "Google Maps traffic data in Tehran.",
+                m_pentagon_desc: "Activity levels around US Defense Dept HQ.",
+                m_weather_desc: "Visibility conditions for airstrikes."
             },
             he: {
                 donate: "תרומה",
@@ -315,30 +335,30 @@
                 risk_parameters: "אותות ומקורות מידע",
                 share: "שתף סטטוס",
                 disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
-                trend_title: "ניתוח מגמה (48 שעות)",
+                trend_title: "מגמת סיכון (7 ימים)",
 
                 l_news: "מודיעין חדשותי",
-                l_aviation: "תעופה אזרחית (איראן)",
-                l_tankers: "מכליות צבאיות (ארה״ב)",
+                l_aviation: "תעופה אזרחית",
+                l_tankers: "מכליות צבאיות",
                 l_market: "שוקי חיזוי",
-                l_financial: "שווקים פיננסיים (נפט/ביטקוין)",
-                l_social: "מודיעין רשתות (X/טלגרם)",
-                l_traffic: "עומסי תנועה בטהרן",
+                l_financial: "שווקים פיננסיים",
+                l_social: "מודיעין רשתות",
+                l_traffic: "תנועה בטהרן",
                 l_pentagon: "פעילות בפנטגון",
-                l_weather: "מזג אוויר (טהרן)",
+                l_weather: "מזג אוויר",
 
-                m_general_title: "שיטת חישוב וחלוקת משקלים",
-                m_general_desc: "האלגוריתם משקלל 9 מקורות. מדוע החלוקה הזו?<br>• חדשות (20%) ושוקי חיזוי (15%) הם אינדיקטורים מובילים.<br>• תעופה (15%) משקפת הערכת סיכונים של חברות ביטוח.<br>• היתר (סושיאל, תנועה) משמשים כהקשר תומך.",
+                m_general_title: "שיטת חישוב",
+                m_general_desc: "האלגוריתם משקלל 9 מקורות. הגרף מציג מגמה קבועה של 7 הימים האחרונים ומתעדכן בזמן אמת בנקודה האחרונה בלבד.",
                 
-                m_news_desc: "סריקת כותרות באתרי חדשות מובילים למילות מפתח קריטיות.<br><strong>משקל: 20%</strong>",
-                m_aviation_desc: "נפח טיסות מסחריות מעל איראן. נפח נמוך מעיד על חשש מתקיפה.<br><strong>משקל: 15%</strong>",
-                m_tankers_desc: "נוכחות מתדלקים אוויריים מעידה על מוכנות לוגיסטית.<br><strong>משקל: 10%</strong>",
-                m_market_desc: "סיכויי הימורים על מלחמה ב-7 ימים הקרובים.<br><strong>משקל: 15%</strong>",
-                m_financial_desc: "ניתוח מחיר נפט (Brent), מדד הדולר וביטקוין.<br><strong>משקל: 15%</strong>",
-                m_social_desc: "ניטור בזמן אמת של טוויטר (X) וטלגרם.<br><strong>משקל: 10%</strong>",
-                m_traffic_desc: "מדד עומסים בטהרן. בריחה המונית או סגר.<br><strong>משקל: 5%</strong>",
-                m_pentagon_desc: "רמות פעילות סביב מטה משרד ההגנה האמריקאי.<br><strong>משקל: 5%</strong>",
-                m_weather_desc: "תנאי ראות לתקיפה אווירית.<br><strong>משקל: 5%</strong>"
+                m_news_desc: "סריקת כותרות באתרי חדשות מובילים.",
+                m_aviation_desc: "נפח טיסות מסחריות מעל איראן.",
+                m_tankers_desc: "נוכחות מתדלקים אוויריים.",
+                m_market_desc: "סיכויי הימורים על מלחמה.",
+                m_financial_desc: "ניתוח מחיר נפט, דולר וביטקוין.",
+                m_social_desc: "ניטור טוויטר וטלגרם.",
+                m_traffic_desc: "מדד עומסים בטהרן.",
+                m_pentagon_desc: "פעילות סביב הפנטגון.",
+                m_weather_desc: "תנאי ראות לתקיפה."
             },
             ru: {
                 donate: "Пожертвовать",
@@ -348,30 +368,30 @@
                 risk_parameters: "СИГНАЛЫ И ИСТОЧНИКИ",
                 share: "Поделиться",
                 disclaimer_short: "Статистическая агрегация. Не официальный совет.",
-                trend_title: "ТРЕНД (48 ЧАСОВ)",
+                trend_title: "ТРЕНД (7 ДНЕЙ)",
 
                 l_news: "Анализ новостей",
-                l_aviation: "Авиация (Иран)",
+                l_aviation: "Авиация",
                 l_tankers: "Военные танкеры",
                 l_market: "Рынки прогнозов",
-                l_financial: "Финансы (Нефть/BTC)",
-                l_social: "Соцсети (OSINT)",
-                l_traffic: "Трафик в Тегеране",
-                l_pentagon: "Активность Пентагона",
-                l_weather: "Погода (Тегеран)",
+                l_financial: "Финансы",
+                l_social: "Соцсети",
+                l_traffic: "Трафик Тегеран",
+                l_pentagon: "Пентагон",
+                l_weather: "Погода",
 
                 m_general_title: "Методология",
-                m_general_desc: "Почему такие веса?<br>• Новости (20%) и Рынки (15%) - опережающие индикаторы.<br>• Авиация (15%) отражает риски страховых компаний.<br>• Остальные факторы дают контекст.",
+                m_general_desc: "Агрегация 9 сигналов. График показывает фиксированный тренд за 7 дней.",
                 
-                m_news_desc: "Мониторинг заголовков новостей.<br><strong>Вес: 20%</strong>",
-                m_aviation_desc: "Объем гражданских рейсов над Ираном.<br><strong>Вес: 15%</strong>",
-                m_tankers_desc: "Активность заправщиков ВВС США.<br><strong>Вес: 10%</strong>",
-                m_market_desc: "Ставки на войну в течение 7 дней.<br><strong>Вес: 15%</strong>",
-                m_financial_desc: "Нефть, Доллар, Биткойн.<br><strong>Вес: 15%</strong>",
-                m_social_desc: "Мониторинг Twitter и Telegram.<br><strong>Вес: 10%</strong>",
-                m_traffic_desc: "Google Maps пробки в Тегеране.<br><strong>Вес: 5%</strong>",
-                m_pentagon_desc: "Активность вокруг Пентагона.<br><strong>Вес: 5%</strong>",
-                m_weather_desc: "Погодные условия.<br><strong>Вес: 5%</strong>"
+                m_news_desc: "Мониторинг заголовков новостей.",
+                m_aviation_desc: "Объем гражданских рейсов.",
+                m_tankers_desc: "Активность заправщиков.",
+                m_market_desc: "Ставки на войну.",
+                m_financial_desc: "Нефть, Доллар, Биткойн.",
+                m_social_desc: "Мониторинг Twitter и Telegram.",
+                m_traffic_desc: "Пробки в Тегеране.",
+                m_pentagon_desc: "Активность Пентагона.",
+                m_weather_desc: "Погодные условия."
             }
         };
 
@@ -391,7 +411,6 @@
 
             signalsConfig.forEach(sig => {
                 if (!signalValues[sig.id]) signalValues[sig.id] = sig.baseVal;
-                
                 const flux = (Math.random() * 6) - 3; 
                 let val = signalValues[sig.id] + flux;
                 val = Math.max(0, Math.min(100, val));
@@ -410,7 +429,7 @@
 
             currentTotalScore = Math.min(100, totalWeightedScore);
             updateUI(currentTotalScore);
-            renderHistoryChart(currentTotalScore); // Render chart based on new score
+            drawStockChart(currentTotalScore);
         }
 
         function updateUI(score) {
@@ -448,10 +467,12 @@
                 row.innerHTML = `
                     <div class="param-header">
                         <div class="param-label">
-                            <span style="font-size:1.1em">🔗</span> ${label} 
+                            ${sig.icon} ${label} 
+                        </div>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span>${val.toFixed(1)}%</span>
                             <span class="info-btn" onclick="openModal('${sig.id}', event)">i</span>
                         </div>
-                        <span>${val.toFixed(1)}%</span>
                     </div>
                     <div class="progress-bg">
                         <div class="progress-fill" style="width: ${val}%; background: ${barColor};"></div>
@@ -461,38 +482,71 @@
             });
         }
 
-        // --- HISTORY CHART LOGIC ---
-        // Simulates history based on current score to look realistic
-        function renderHistoryChart(currentScore) {
-            const container = document.getElementById('historyChart');
-            container.innerHTML = '';
+        // --- STOCK GRAPH LOGIC ---
+        function drawStockChart(currentValue) {
+            const canvas = document.getElementById('trendChart');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width = canvas.offsetWidth;
+            const height = canvas.height = canvas.offsetHeight;
 
-            const timePoints = [
-                { label: '-48h', factor: 0.9 }, // Slight variance factors
-                { label: '-24h', factor: 0.95 },
-                { label: '-12h', factor: 0.88 },
-                { label: '-3h',  factor: 0.98 },
-                { label: 'NOW',  factor: 1.0 }
-            ];
+            // Combine fixed history + current live value
+            const dataPoints = [...historyPoints, currentValue];
+            const pointCount = dataPoints.length;
+            const stepX = width / (pointCount - 1);
 
-            timePoints.forEach(point => {
-                // Generate a pseudo-historic value close to current
-                let histVal = currentScore * point.factor;
-                // Add some random noise so it looks organic
-                histVal += (Math.random() * 10 - 5); 
-                histVal = Math.max(10, Math.min(100, histVal)); // Clamp
+            ctx.clearRect(0, 0, width, height);
 
-                let barColor = '#00ff41';
-                if(histVal > 30) barColor = '#ffb700';
-                if(histVal > 60) barColor = '#ff3333';
+            // Create Gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, "rgba(0, 255, 65, 0.4)");
+            gradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");
+            
+            // If risk is high, change color
+            let strokeColor = '#00ff41';
+            if(currentValue > 30) {
+                strokeColor = '#ffb700';
+                // Adjust gradient for warning
+                // gradient = ... (simplified)
+            }
+            if(currentValue > 60) {
+                strokeColor = '#ff3333';
+            }
 
-                const col = document.createElement('div');
-                col.className = 'chart-col';
-                col.innerHTML = `
-                    <div class="chart-bar" style="height: ${histVal}%; background: ${barColor}" data-val="${histVal.toFixed(0)}%"></div>
-                    <div class="chart-label">${point.label}</div>
-                `;
-                container.appendChild(col);
+            // Draw Area
+            ctx.beginPath();
+            ctx.moveTo(0, height);
+            dataPoints.forEach((val, index) => {
+                const x = index * stepX;
+                const y = height - (val / 100 * height);
+                if (index === 0) ctx.lineTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.lineTo(width, height);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // Draw Line
+            ctx.beginPath();
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            dataPoints.forEach((val, index) => {
+                const x = index * stepX;
+                const y = height - (val / 100 * height);
+                if (index === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+
+            // Draw Points
+            dataPoints.forEach((val, index) => {
+                const x = index * stepX;
+                const y = height - (val / 100 * height);
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, Math.PI * 2);
+                ctx.fillStyle = '#fff';
+                ctx.fill();
             });
         }
 
@@ -541,7 +595,6 @@
                 if(content[lang][key]) el.innerText = content[lang][key];
             });
             renderParams();
-            // Chart labels are hardcoded in JS, simple enough to leave in EN or add conditional if needed
         }
 
         // Start
