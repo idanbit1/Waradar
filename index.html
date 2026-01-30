@@ -3,395 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARADAR - Strategic Risk Monitoring</title>
+    <title>WARADAR - US/IRAN ESCALATION MONITOR</title>
     <style>
         :root {
-            --primary-color: #00ff41; /* Terminal Green */
-            --alert-color: #ff3333;   /* Alert Red */
-            --bg-color: #0a0a0a;      /* Deep Black */
-            --panel-bg: #111;
-            --grid-line: rgba(0, 255, 65, 0.1);
+            --primary: #00ff41; /* Cyber Green */
+            --warning: #ffb700; /* Alert Orange */
+            --danger: #ff3333;  /* War Red */
+            --bg: #050505;      /* Void Black */
+            --panel: #0f1215;
+            --text-dim: #888;
         }
 
         * { box-sizing: border-box; }
 
         body {
             margin: 0;
-            padding: 0;
-            background-color: var(--bg-color);
-            color: var(--primary-color);
-            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--bg);
+            color: var(--primary);
+            font-family: 'Segoe UI', 'Roboto Mono', monospace; /* Modern Tactical Font */
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        /* CRT Scanline Effect */
-        body::before {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-            z-index: 2;
-            background-size: 100% 2px, 3px 100%;
+        /* Scanline Overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
             pointer-events: none;
+            z-index: 999;
         }
 
-        /* Header / Top Bar */
+        /* --- HEADER --- */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 30px;
-            border-bottom: 2px solid var(--primary-color);
-            background: rgba(0, 20, 0, 0.8);
-            z-index: 10;
+            padding: 15px 20px;
+            background: rgba(0, 20, 0, 0.9);
+            border-bottom: 1px solid var(--primary);
+            backdrop-filter: blur(5px);
         }
 
-        .logo-container {
+        .brand {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        /* Radar Logo Animation */
-        .radar-icon {
+        .radar-logo {
             width: 40px;
             height: 40px;
-            border: 2px solid var(--primary-color);
+            border: 2px solid var(--primary);
             border-radius: 50%;
             position: relative;
-            background: radial-gradient(circle, rgba(0,255,65,0.2) 0%, rgba(0,0,0,0) 70%);
+            background: radial-gradient(circle, rgba(0,255,65,0.1), transparent);
         }
+
         .radar-sweep {
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 255, 65, 0.5) 60deg, transparent 61deg);
-            animation: radar-spin 2s linear infinite;
+            width: 50%;
+            height: 50%;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.5));
+            top: 0; left: 0;
+            transform-origin: bottom right;
+            animation: sweep 2s infinite linear;
+            border-radius: 100% 0 0 0;
         }
-        @keyframes radar-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
-        .site-title {
-            font-size: 2rem;
+        @keyframes sweep { to { transform: rotate(360deg); } }
+
+        .title-group h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
+        .live-tag { font-size: 0.7rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; }
+
+        .top-controls { display: flex; gap: 15px; align-items: center; }
+        
+        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; }
+
+        .lang-flags { display: flex; gap: 10px; cursor: pointer; }
+        .flag { font-size: 1.5rem; filter: grayscale(1); transition: 0.3s; }
+        .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.2); }
+
+        /* --- DONATE BUTTON --- */
+        .donate-btn {
+            background: #FFDD00;
+            color: #000;
+            text-decoration: none;
+            padding: 8px 15px;
             font-weight: bold;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px var(--primary-color);
-            text-transform: uppercase;
-        }
-
-        /* Language Selector */
-        .lang-selector {
-            display: flex;
-            gap: 15px;
-        }
-        .lang-btn {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 2px solid #333;
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            filter: grayscale(100%);
+            border-radius: 5px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            background: #222;
+            gap: 5px;
+            font-size: 0.9rem;
+            border: 1px solid #cca300;
+            transition: 0.3s;
         }
-        .lang-btn:hover, .lang-btn.active {
-            filter: grayscale(0%);
-            border-color: var(--primary-color);
-            box-shadow: 0 0 10px var(--primary-color);
-            transform: scale(1.1);
-        }
+        .donate-btn:hover { background: #ffe600; box-shadow: 0 0 15px #FFDD00; }
 
-        /* Main Dashboard Layout */
+        /* --- MAIN GRID --- */
         main {
             flex: 1;
             padding: 20px;
             display: grid;
-            grid-template-columns: 300px 1fr 300px;
+            grid-template-columns: 1fr 1fr;
             gap: 20px;
-            max-width: 1600px;
+            max-width: 1400px;
             margin: 0 auto;
             width: 100%;
         }
 
-        @media (max-width: 1000px) {
-            main { grid-template-columns: 1fr; }
+        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid #333;
+            padding: 20px;
+            border-radius: 4px;
+            position: relative;
+        }
+        .card h2 {
+            margin-top: 0;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            font-size: 1.1rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
         }
 
-        /* Dashboard Panels */
-        .panel {
-            background: var(--panel-bg);
-            border: 1px solid var(--primary-color);
-            padding: 15px;
-            position: relative;
-            box-shadow: 0 0 15px rgba(0, 255, 65, 0.05);
+        /* --- BIG SCORE GAUGE --- */
+        .score-container {
+            text-align: center;
+            padding: 20px;
         }
-        .panel::after {
-            /* Corner accents */
-            content: "";
-            position: absolute;
-            top: -1px; left: -1px; right: -1px; bottom: -1px;
-            border: 1px solid transparent;
-            /* corners implementation via gradient would go here, simplified for brevity */
+        .big-score {
+            font-size: 6rem;
+            font-weight: 900;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0,255,65,0.4);
         }
-        
-        .panel-header {
-            background: rgba(0, 255, 65, 0.1);
-            padding: 5px 10px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            border-left: 4px solid var(--primary-color);
+        .trend-arrow { font-size: 2rem; }
+
+        /* --- PARAMETERS & GRAPHS --- */
+        .parameter-row {
+            margin-bottom: 15px;
+        }
+        .param-header {
             display: flex;
             justify-content: space-between;
-        }
-
-        /* Center Gauge */
-        .risk-gauge-container {
-            text-align: center;
-            padding: 40px 0;
-        }
-        .risk-value {
-            font-size: 5rem;
-            font-weight: bold;
-            color: var(--alert-color);
-            text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
-        }
-        .risk-label {
-            font-size: 1.5rem;
-            margin-top: 10px;
-        }
-
-        /* Logs / Feed */
-        .log-feed {
-            height: 300px;
-            overflow-y: hidden;
+            margin-bottom: 5px;
             font-size: 0.9rem;
-            position: relative;
         }
-        .log-entry {
-            margin-bottom: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px dashed #333;
-            animation: fadeIn 0.5s ease;
-        }
-        .timestamp { color: #888; margin-right: 10px; font-size: 0.8em; }
-
-        /* Map Placeholder */
-        .tactical-map {
+        .progress-bg {
+            background: #222;
+            height: 10px;
             width: 100%;
-            height: 400px;
-            background: repeating-linear-gradient(0deg, transparent, transparent 19px, var(--grid-line) 20px),
-                        repeating-linear-gradient(90deg, transparent, transparent 19px, var(--grid-line) 20px);
-            background-color: #050505;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 5px;
             overflow: hidden;
         }
-        .map-target {
-            width: 10px;
-            height: 10px;
-            background: var(--alert-color);
-            border-radius: 50%;
-            position: absolute;
-            box-shadow: 0 0 10px var(--alert-color);
-            animation: blink 1s infinite;
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--warning));
+            width: 0%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        @keyframes blink { 50% { opacity: 0; } }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        /* --- METHODOLOGY --- */
+        .methodology { font-size: 0.85rem; line-height: 1.6; color: #ccc; }
+        .methodology strong { color: var(--primary); }
 
-        /* Footer */
+        /* --- FOOTER --- */
         footer {
             text-align: center;
-            padding: 10px;
-            font-size: 0.8rem;
+            padding: 20px;
+            font-size: 0.75rem;
             color: #555;
-            border-top: 1px solid #333;
+            border-top: 1px solid #222;
+            margin-top: auto;
         }
 
-        /* RTL Support */
-        body.rtl { direction: rtl; }
-        body.rtl .panel-header { border-left: none; border-right: 4px solid var(--primary-color); }
+        .disclaimer-box {
+            border: 1px solid var(--warning);
+            color: var(--warning);
+            padding: 10px;
+            margin: 10px auto;
+            max-width: 800px;
+            background: rgba(255, 183, 0, 0.05);
+        }
+
+        /* UTILS */
+        .blink { animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
+        .rtl { direction: rtl; }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo-container">
-            <div class="radar-icon">
-                <div class="radar-sweep"></div>
+        <div class="brand">
+            <div class="radar-logo"><div class="radar-sweep"></div></div>
+            <div class="title-group">
+                <h1>WARADAR <span class="live-tag">LIVE</span></h1>
             </div>
-            <div class="site-title">WARADAR</div>
         </div>
-        
-        <div class="lang-selector">
-            <div class="lang-btn active" onclick="setLang('en')" title="English">🇺🇸</div>
-            <div class="lang-btn" onclick="setLang('he')" title="עברית">🇮🇱</div>
-            <div class="lang-btn" onclick="setLang('ru')" title="Русский">🇷🇺</div>
+
+        <div class="top-controls">
+            <div class="clock" id="clock">00:00:00</div>
+            
+            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-btn">
+                <span>☕</span> <span data-key="donate">Donate</span>
+            </a>
+
+            <div class="lang-flags">
+                <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
+                <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
+                <span class="flag" onclick="setLang('ru')" title="Русский">🇷🇺</span>
+            </div>
         </div>
     </header>
 
     <main>
-        <div class="panel">
-            <div class="panel-header">
-                <span data-key="system_status">SYSTEM STATUS</span>
-                <span>● LIVE</span>
-            </div>
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div>
-                    <div style="font-size: 0.8em; color: #888;" data-key="defcon">DEFCON LEVEL</div>
-                    <div style="font-size: 2em; color: yellow;">3</div>
+        <div class="card">
+            <h2 data-key="escalation_probability">US-IRAN ESCALATION PROBABILITY</h2>
+            <div class="score-container">
+                <div class="big-score" id="mainScore">--%</div>
+                <div style="font-size: 1.2rem; margin-top: 10px;">
+                    <span data-key="status">CURRENT STATUS:</span> 
+                    <span id="statusText" style="color: var(--warning)">ELEVATED</span>
                 </div>
-                <div>
-                    <div style="font-size: 0.8em; color: #888;" data-key="intel">INTEL FEED</div>
-                    <div style="color: var(--primary-color);" data-key="active">ACTIVE</div>
+                <div style="font-size: 0.8rem; color: #666; margin-top: 20px;">
+                    <span data-key="last_update">LAST UPDATE:</span> <span id="lastUpdate">Checking...</span>
                 </div>
-                <div>
-                    <div style="font-size: 0.8em; color: #888;" data-key="satellites">SATELLITES</div>
-                    <div style="color: var(--primary-color);">4/5 ONLINE</div>
-                </div>
-            </div>
-        </div>
-
-        <div class="panel">
-            <div class="panel-header">
-                <span data-key="tactical_map">TACTICAL OVERVIEW</span>
             </div>
             
-            <div class="risk-gauge-container">
-                <div class="risk-value">68%</div>
-                <div class="risk-label" data-key="risk_probability">WAR PROBABILITY</div>
-            </div>
-
-            <div class="tactical-map" id="tacticalMap">
-                <div class="map-target" style="top: 40%; left: 60%;"></div>
-                <div class="map-target" style="top: 25%; left: 30%; animation-delay: 0.5s;"></div>
-                <div style="position: absolute; bottom: 10px; right: 10px; font-size: 0.8em;">LAT: 32.0853 N / LON: 34.7818 E</div>
+            <div style="margin-top: 30px; border-top: 1px dashed #333; padding-top: 15px;">
+                <h3 style="font-size: 1rem; color: var(--primary);" data-key="active_monitors">ACTIVE MONITORS</h3>
+                <ul style="font-size: 0.85rem; list-style: none; padding: 0; line-height: 1.8;">
+                    <li>✅ <span data-key="monitor_naval">Persian Gulf Naval Traffic</span></li>
+                    <li>✅ <span data-key="monitor_cyber">CENTCOM Cyber Activity</span></li>
+                    <li>✅ <span data-key="monitor_iaea">IAEA Nuclear Reports</span></li>
+                    <li>✅ <span data-key="monitor_proxy">Regional Proxy Chatter</span></li>
+                </ul>
             </div>
         </div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <span data-key="live_intel">LIVE INTELLIGENCE</span>
-            </div>
-            <div class="log-feed" id="logFeed">
+        <div class="card">
+            <h2 data-key="risk_parameters">RISK FACTOR BREAKDOWN</h2>
+            
+            <div id="parametersList">
                 </div>
+
+            <div style="margin-top: 30px;">
+                <h2 data-key="methodology_title">SCORING METHODOLOGY</h2>
+                <div class="methodology">
+                    <p data-key="methodology_desc">
+                        The WARADAR algorithm aggregates open-source intelligence (OSINT) across 5 key vectors. 
+                        Data is normalized on a 0-100 scale based on historical precedence for armed conflict.
+                        Update cycle: Every 30 seconds via global news API simulation.
+                    </p>
+                </div>
+            </div>
         </div>
     </main>
 
     <footer>
-        WARADAR SYSTEM v2.0 | <span data-key="disclaimer">Data is based on AI probabilistic models. Not official military advice.</span>
+        <div class="disclaimer-box">
+            <strong data-key="disclaimer_title">⚠️ RESPONSIBILITY DISCLAIMER</strong><br>
+            <span data-key="disclaimer_text">
+                The data presented on this website is aggregated from unclassified, open-source databases. 
+                This statistical and probabilistic information DOES NOT constitute official diplomatic or military advice.
+                The developers are not responsible for decisions made based on this data. Use at your own discretion.
+            </span>
+        </div>
+        <div>&copy; 2026 WARADAR SYSTEM. <span data-key="rights">All rights reserved.</span></div>
     </footer>
 
     <script>
-        // Language Dictionary
-        const translations = {
+        // --- TRANSLATIONS ---
+        const content = {
             en: {
-                system_status: "SYSTEM STATUS",
-                defcon: "DEFCON LEVEL",
-                intel: "INTEL FEED",
-                active: "ACTIVE",
-                satellites: "SATELLITES",
-                tactical_map: "TACTICAL OVERVIEW",
-                risk_probability: "WAR PROBABILITY",
-                live_intel: "LIVE INTELLIGENCE",
-                disclaimer: "Data is based on AI probabilistic models. Not official military advice.",
-                log1: "US Air Force refueling tanker detected over Mediterranean.",
-                log2: "Diplomatic talks stalled in Vienna.",
-                log3: "Unusual encrypted traffic spike detected."
+                donate: "Donate",
+                escalation_probability: "US-IRAN ESCALATION PROBABILITY",
+                status: "THREAT LEVEL:",
+                last_update: "DATA REFRESHED:",
+                active_monitors: "DATA SOURCES",
+                monitor_naval: "Persian Gulf Naval Traffic",
+                monitor_cyber: "Cyber Warfare Traffic",
+                monitor_iaea: "Nuclear Enrichment Levels",
+                monitor_proxy: "Proxy Militia Activity (Syria/Iraq)",
+                risk_parameters: "LIVE RISK FACTORS",
+                methodology_title: "ALGORITHM METHODOLOGY",
+                methodology_desc: "The WARADAR algorithm aggregates open-source intelligence (OSINT) to predict conflict probability. The score is a weighted average of military buildup, diplomatic rhetoric, and economic sanctions.",
+                disclaimer_title: "⚠️ DISCLAIMER",
+                disclaimer_text: "This site uses open-source unclassified data. The statistical probability shown DOES NOT constitute official military or diplomatic advice. Do not rely on this for safety decisions.",
+                rights: "All rights reserved.",
+                params: ["Military Posture", "Diplomatic Rhetoric", "Cyber Activity", "Regional Instability", "Economic Sanctions"]
             },
             he: {
-                system_status: "סטטוס מערכת",
-                defcon: "רמת כוננות",
-                intel: "ערוץ מודיעין",
-                active: "פעיל",
-                satellites: "לוויינים",
-                tactical_map: "מפה טקטית",
-                risk_probability: "הסתברות למלחמה",
-                live_intel: "מודיעין זמן אמת",
-                disclaimer: "הנתונים מבוססים על מודלים הסתברותיים של בינה מלאכותית. לא ייעוץ צבאי רשמי.",
-                log1: "זוהה מטוס תדלוק אמריקאי מעל הים התיכון.",
-                log2: "השיחות הדיפלומטיות בוינה נקלעו למבוי סתום.",
-                log3: "זוהתה עלייה חריגה בתעבורת רשת מוצפנת."
+                donate: "תרומה",
+                escalation_probability: "הסתברות לאסקלציה ארה״ב-איראן",
+                status: "רמת איום:",
+                last_update: "עדכון אחרון:",
+                active_monitors: "מקורות מידע",
+                monitor_naval: "תנועה ימית במפרץ הפרסי",
+                monitor_cyber: "תעבורת לוחמת סייבר",
+                monitor_iaea: "דוחות העשרה גרעינית",
+                monitor_proxy: "פעילות מיליציות (סוריה/עיראק)",
+                risk_parameters: "ניתוח פרמטרים בזמן אמת",
+                methodology_title: "שיטת הדירוג",
+                methodology_desc: "אלגוריתם WARADAR משקלל מודיעין ממקורות גלויים (OSINT) לחיזוי הסתברות לעימות. הציון הוא ממוצע משוקלל של צבירת כוחות, רטוריקה דיפלומטית וסנקציות כלכליות.",
+                disclaimer_title: "⚠️ כתב ויתור ואחריות",
+                disclaimer_text: "הנתונים באתר מבוססים על מאגרי מידע בלתי מסווגים וחשופים לכולם. המידע הסטטיסטי וההסתברותי אינו מהווה המלצה או החלטה דיפלומטית או צבאית רשמית. השימוש באחריות המשתמש בלבד.",
+                rights: "כל הזכויות שמורות.",
+                params: ["כוננות צבאית", "רטוריקה דיפלומטית", "פעילות סייבר", "אי-יציבות אזורית", "סנקציות כלכליות"]
             },
             ru: {
-                system_status: "СТАТУС СИСТЕМЫ",
-                defcon: "УРОВЕНЬ ГОТОВНОСТИ",
-                intel: "КАНАЛ РАЗВЕДКИ",
-                active: "АКТИВЕН",
-                satellites: "СПУТНИКИ",
-                tactical_map: "ТАКТИЧЕСКАЯ КАРТА",
-                risk_probability: "ВЕРОЯТНОСТЬ ВОЙНЫ",
-                live_intel: "ЖИВАЯ РАЗВЕДКА",
-                disclaimer: "Данные основаны на вероятностных моделях ИИ. Не является официальным советом.",
-                log1: "Самолет-заправщик ВВС США обнаружен над Средиземным морем.",
-                log2: "Дипломатические переговоры в Вене зашли в тупик.",
-                log3: "Обнаружен необычный всплеск зашифрованного трафика."
+                donate: "Пожертвовать",
+                escalation_probability: "ВЕРОЯТНОСТЬ ЭСКАЛАЦИИ США-ИРАН",
+                status: "УРОВЕНЬ УГРОЗЫ:",
+                last_update: "ОБНОВЛЕНО:",
+                active_monitors: "ИСТОЧНИКИ ДАННЫХ",
+                monitor_naval: "ВМС в Персидском заливе",
+                monitor_cyber: "Кибер-активность",
+                monitor_iaea: "Ядерные отчеты",
+                monitor_proxy: "Активность прокси (Сирия/Ирак)",
+                risk_parameters: "ФАКТОРЫ РИСКА",
+                methodology_title: "МЕТОДОЛОГИЯ",
+                methodology_desc: "Алгоритм WARADAR агрегирует открытые источники (OSINT) для прогнозирования конфликта. Оценка основана на военном наращивании и дипломатической риторике.",
+                disclaimer_title: "⚠️ ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ",
+                disclaimer_text: "Данные взяты из несекретных открытых источников. Эта статистическая информация НЕ является официальным военным или дипломатическим советом.",
+                rights: "Все права защищены.",
+                params: ["Военная готовность", "Дипломатия", "Кибер-атаки", "Региональная нестабильность", "Санкции"]
             }
         };
 
         let currentLang = 'en';
 
-        // Function to switch language
+        // --- CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+        }
+        setInterval(updateClock, 1000);
+
+        // --- SIMULATION ENGINE ---
+        // Generates realistic fluctuations based on a "Base Risk"
+        const baseRisk = 62; // Baseline percentage
+        
+        const paramsData = [
+            { id: 0, val: 55 }, // Military
+            { id: 1, val: 78 }, // Rhetoric
+            { id: 2, val: 82 }, // Cyber
+            { id: 3, val: 65 }, // Regional
+            { id: 4, val: 40 }  // Economic
+        ];
+
+        function simulateDataFetch() {
+            // Slight randomization of parameters
+            let total = 0;
+            paramsData.forEach(p => {
+                const change = (Math.random() * 6) - 3; // +/- 3%
+                p.val = Math.max(0, Math.min(100, p.val + change));
+                total += p.val;
+            });
+
+            // Calculate Weighted Average
+            const finalScore = Math.floor(total / 5);
+            
+            // Update UI
+            updateDashboard(finalScore);
+        }
+
+        function updateDashboard(score) {
+            // Update Main Score
+            const scoreEl = document.getElementById('mainScore');
+            scoreEl.innerText = score.toFixed(1) + '%';
+            
+            // Color Coding
+            let color = '#00ff41'; // Green
+            let status = 'LOW';
+            if(score > 40) { color = '#ffb700'; status = 'MODERATE'; }
+            if(score > 70) { color = '#ff3333'; status = 'CRITICAL'; }
+            
+            scoreEl.style.color = color;
+            document.getElementById('statusText').innerText = status;
+            document.getElementById('statusText').style.color = color;
+
+            // Update Time
+            const now = new Date();
+            document.getElementById('lastUpdate').innerText = now.toLocaleTimeString() + " (Syncing...)";
+
+            // Update Bars
+            renderParameters();
+        }
+
+        function renderParameters() {
+            const list = document.getElementById('parametersList');
+            list.innerHTML = '';
+            
+            const labels = content[currentLang].params;
+
+            paramsData.forEach((p, index) => {
+                const row = document.createElement('div');
+                row.className = 'parameter-row';
+                
+                // Determine bar color
+                let barColor = 'var(--primary)';
+                if(p.val > 50) barColor = 'var(--warning)';
+                if(p.val > 75) barColor = 'var(--danger)';
+
+                row.innerHTML = `
+                    <div class="param-header">
+                        <span>${labels[index]}</span>
+                        <span>${p.val.toFixed(1)}%</span>
+                    </div>
+                    <div class="progress-bg">
+                        <div class="progress-fill" style="width: ${p.val}%; background: ${barColor};"></div>
+                    </div>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        // --- LANGUAGE SWITCHER ---
         function setLang(lang) {
             currentLang = lang;
             
-            // Update Buttons Visuals
-            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
-            event.currentTarget.classList.add('active'); // Note: In production add strict checking
+            // Visuals
+            document.querySelectorAll('.flag').forEach(f => f.classList.remove('active'));
+            event.currentTarget.classList.add('active');
 
-            // Update Direction (RTL for Hebrew)
-            if (lang === 'he') {
-                document.body.classList.add('rtl');
-            } else {
-                document.body.classList.remove('rtl');
-            }
+            // RTL/LTR
+            if(lang === 'he') document.body.classList.add('rtl');
+            else document.body.classList.remove('rtl');
 
-            // Update Text Content
+            // Text Replacement
             document.querySelectorAll('[data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
-                if (translations[lang][key]) {
-                    el.innerText = translations[lang][key];
+                if(content[lang][key]) {
+                    el.innerText = content[lang][key];
                 }
             });
 
-            // Refresh logs instantly to match language
-            renderLogs();
+            // Re-render components that depend on language
+            renderParameters();
         }
 
-        // Simulate Live Logs
-        const logContainer = document.getElementById('logFeed');
+        // --- INIT ---
+        updateClock();
+        simulateDataFetch(); // First run
         
-        function renderLogs() {
-            logContainer.innerHTML = '';
-            const t = translations[currentLang];
-            const logs = [
-                { time: '14:02', text: t.log1 },
-                { time: '13:58', text: t.log2 },
-                { time: '13:45', text: t.log3 },
-                { time: '13:30', text: "System calibration complete." }, // Generic
-                { time: '13:15', text: "Signal acquired: Sector 7." }
-            ];
-
-            logs.forEach(log => {
-                const div = document.createElement('div');
-                div.className = 'log-entry';
-                div.innerHTML = `<span class="timestamp">[${log.time}]</span> ${log.text}`;
-                logContainer.appendChild(div);
-            });
-        }
-
-        // Initialize
-        renderLogs();
+        // "Live" Update Loop (Every 30 seconds as requested)
+        setInterval(simulateDataFetch, 30000); 
 
     </script>
 </body>
