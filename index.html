@@ -2,452 +2,397 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR | Command Center</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WARADAR - Strategic Risk Monitoring</title>
     <style>
         :root {
-            /* iOS Dark Mode Palette */
-            --bg: #000000;
-            --card: #1c1c1e;
-            --text-primary: #ffffff;
-            --text-secondary: #98989d;
-            --accent-blue: #0a84ff;
-            --accent-green: #30d158;
-            --accent-red: #ff453a;
-            --accent-orange: #ff9f0a;
-            --accent-yellow: #ffd60a;
-            --separator: #38383a;
-            --radar-grid: rgba(255, 255, 255, 0.1);
+            --primary-color: #00ff41; /* Terminal Green */
+            --alert-color: #ff3333;   /* Alert Red */
+            --bg-color: #0a0a0a;      /* Deep Black */
+            --panel-bg: #111;
+            --grid-line: rgba(0, 255, 65, 0.1);
         }
+
+        * { box-sizing: border-box; }
 
         body {
-            background-color: var(--bg);
-            color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; padding: 0;
-            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--primary-color);
+            font-family: 'Courier New', Courier, monospace;
             overflow-x: hidden;
-            padding-bottom: 60px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
 
-        a { text-decoration: none; color: inherit; }
-
-        /* --- NEWS TICKER --- */
-        .news-ticker-wrap {
-            background: #111; border-bottom: 1px solid var(--separator);
-            overflow: hidden; white-space: nowrap; height: 30px; display: flex; align-items: center;
+        /* CRT Scanline Effect */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
-        .ticker-content {
-            display: inline-block; padding-left: 100%; animation: ticker 40s linear infinite;
-            font-size: 12px; color: var(--text-primary); font-weight: 500;
-        }
-        .ticker-item { margin-right: 40px; }
-        .ticker-item b { color: var(--accent-red); margin-right: 5px; }
-        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
 
-        /* --- HEADER --- */
+        /* Header / Top Bar */
         header {
-            padding: 15px 20px;
-            background: rgba(28, 28, 30, 0.8);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            position: sticky; top: 0; z-index: 100;
-            border-bottom: 1px solid var(--separator);
-            display: flex; justify-content: space-between; align-items: center;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            border-bottom: 2px solid var(--primary-color);
+            background: rgba(0, 20, 0, 0.8);
+            z-index: 10;
         }
 
-        .app-title { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; display: flex; align-items: center; gap: 8px; }
-        .live-badge {
-            font-size: 10px; font-weight: 700; color: var(--accent-red);
-            display: flex; align-items: center; gap: 5px;
-            background: rgba(255, 69, 58, 0.15); padding: 4px 8px; border-radius: 12px; border: 1px solid rgba(255, 69, 58, 0.3);
-        }
-        .dot { width: 6px; height: 6px; background-color: var(--accent-red); border-radius: 50%; animation: blink 1s infinite; }
-        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-
-        .lang-flags { display: flex; gap: 12px; }
-        .lang-flags img { 
-            width: 24px; height: 24px; border-radius: 50%; cursor: pointer; 
-            opacity: 0.5; transition: 0.2s; border: 2px solid transparent;
-        }
-        .lang-flags img.active { opacity: 1; border-color: var(--accent-blue); transform: scale(1.1); }
-
-        /* --- CONTAINER --- */
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
-        /* --- COMMAND CENTER HERO --- */
-        .command-center {
-            display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 20px; margin-bottom: 30px;
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
 
-        .cc-panel {
-            background: var(--card); border-radius: 24px; padding: 20px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.05);
-            position: relative; overflow: hidden;
-        }
-
-        /* RADAR ANIMATION */
-        .radar-box {
-            width: 200px; height: 200px; border-radius: 50%;
-            border: 1px solid var(--radar-grid); position: relative;
-            background: radial-gradient(circle, rgba(10,132,255,0.1) 0%, rgba(0,0,0,0) 70%);
-        }
-        .radar-box::before { /* Grid Rings */
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 66%; height: 66%; border-radius: 50%; border: 1px solid var(--radar-grid);
-        }
-        .radar-box::after { /* Grid Rings */
-            content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 33%; height: 33%; border-radius: 50%; border: 1px solid var(--radar-grid);
+        /* Radar Logo Animation */
+        .radar-icon {
+            width: 40px;
+            height: 40px;
+            border: 2px solid var(--primary-color);
+            border-radius: 50%;
+            position: relative;
+            background: radial-gradient(circle, rgba(0,255,65,0.2) 0%, rgba(0,0,0,0) 70%);
         }
         .radar-sweep {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%;
-            background: conic-gradient(from 0deg, transparent 0deg, rgba(10,132,255,0.4) 360deg);
-            animation: radarSpin 3s linear infinite; opacity: 0.5;
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 255, 65, 0.5) 60deg, transparent 61deg);
+            animation: radar-spin 2s linear infinite;
         }
-        @keyframes radarSpin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes radar-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .site-title {
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--primary-color);
+            text-transform: uppercase;
+        }
+
+        /* Language Selector */
+        .lang-selector {
+            display: flex;
+            gap: 15px;
+        }
+        .lang-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid #333;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            filter: grayscale(100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: #222;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            filter: grayscale(0%);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 10px var(--primary-color);
+            transform: scale(1.1);
+        }
+
+        /* Main Dashboard Layout */
+        main {
+            flex: 1;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 20px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 1000px) {
+            main { grid-template-columns: 1fr; }
+        }
+
+        /* Dashboard Panels */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--primary-color);
+            padding: 15px;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.05);
+        }
+        .panel::after {
+            /* Corner accents */
+            content: "";
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            border: 1px solid transparent;
+            /* corners implementation via gradient would go here, simplified for brevity */
+        }
         
-        .radar-ping {
-            position: absolute; width: 8px; height: 8px; background: var(--accent-red); border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-red); animation: ping 2s infinite;
+        .panel-header {
+            background: rgba(0, 255, 65, 0.1);
+            padding: 5px 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            justify-content: space-between;
         }
-        @keyframes ping { 0% { opacity: 1; transform: scale(1); } 100% { opacity: 0; transform: scale(2); } }
 
-        /* DEFCON STYLE */
-        .defcon-box { text-align: center; }
-        .defcon-title { font-size: 12px; letter-spacing: 2px; color: var(--text-secondary); margin-bottom: 5px; }
-        .defcon-val { font-size: 60px; font-weight: 900; line-height: 1; color: var(--accent-orange); text-shadow: 0 0 20px rgba(255, 159, 10, 0.4); }
-        .defcon-desc { font-size: 14px; font-weight: 600; color: var(--accent-orange); margin-top: 5px; text-transform: uppercase; }
-
-        /* SMALL RINGS */
-        .mini-ring-wrapper { width: 90px; height: 90px; position: relative; margin: 10px 0; }
-        .mini-ring-svg { transform: rotate(-90deg); width: 100%; height: 100%; }
-        .mini-ring-bg { fill: none; stroke: #2c2c2e; stroke-width: 8; }
-        .mini-ring-val { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dashoffset 1s ease; }
-        .mini-ring-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; font-weight: 700; }
-        .mini-label { font-size: 12px; color: var(--text-secondary); text-align: center; }
-
-        /* --- WIDGET GRID --- */
-        .section-header {
-            font-size: 18px; font-weight: 700; margin: 30px 0 15px 5px;
-            display: flex; justify-content: space-between; align-items: flex-end;
+        /* Center Gauge */
+        .risk-gauge-container {
+            text-align: center;
+            padding: 40px 0;
         }
-        
-        .widget-grid { display: grid; gap: 20px; grid-template-columns: repeat(4, 1fr); }
+        .risk-value {
+            font-size: 5rem;
+            font-weight: bold;
+            color: var(--alert-color);
+            text-shadow: 0 0 20px rgba(255, 51, 51, 0.5);
+        }
+        .risk-label {
+            font-size: 1.5rem;
+            margin-top: 10px;
+        }
 
-        .card {
-            background: var(--card); border-radius: 22px; padding: 18px;
-            display: flex; flex-direction: column; justify-content: space-between;
-            height: 200px; position: relative; text-decoration: none; color: inherit;
-            transition: transform 0.2s; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        /* Logs / Feed */
+        .log-feed {
+            height: 300px;
+            overflow-y: hidden;
+            font-size: 0.9rem;
+            position: relative;
         }
-        .card:hover { transform: translateY(-3px); z-index: 10; background: #232325; }
+        .log-entry {
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed #333;
+            animation: fadeIn 0.5s ease;
+        }
+        .timestamp { color: #888; margin-right: 10px; font-size: 0.8em; }
 
-        .card-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 5px; }
-        .icon-sq {
-            width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;
-            color: white; font-size: 16px;
+        /* Map Placeholder */
+        .tactical-map {
+            width: 100%;
+            height: 400px;
+            background: repeating-linear-gradient(0deg, transparent, transparent 19px, var(--grid-line) 20px),
+                        repeating-linear-gradient(90deg, transparent, transparent 19px, var(--grid-line) 20px);
+            background-color: #050505;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
         }
-        .card-val { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 2px; }
-        .card-label { font-size: 12px; color: var(--text-secondary); font-weight: 500; }
-        .source-link { font-size: 10px; color: var(--text-secondary); opacity: 0.6; display: flex; align-items: center; gap: 3px; }
+        .map-target {
+            width: 10px;
+            height: 10px;
+            background: var(--alert-color);
+            border-radius: 50%;
+            position: absolute;
+            box-shadow: 0 0 10px var(--alert-color);
+            animation: blink 1s infinite;
+        }
 
-        /* AI TOOLTIP */
-        .ai-badge {
-            font-size: 9px; font-weight: 700; color: var(--accent-purple);
-            background: rgba(191, 90, 242, 0.1); padding: 3px 6px; border-radius: 6px;
-            width: fit-content; margin-top: 8px; display: flex; align-items: center; gap: 3px; border: 1px solid rgba(191, 90, 242, 0.2);
-        }
-        .ai-tooltip {
-            position: absolute; bottom: 100%; left: 0; right: 0;
-            background: rgba(25, 25, 28, 0.98); backdrop-filter: blur(20px);
-            border: 1px solid var(--separator); border-radius: 16px;
-            padding: 15px; margin-bottom: 10px; pointer-events: none;
-            opacity: 0; visibility: hidden; transition: all 0.2s ease; z-index: 100;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-        }
-        .card:hover .ai-tooltip { opacity: 1; visibility: visible; transform: translateY(-5px); }
-        .ai-text { font-size: 12px; line-height: 1.4; color: #eee; }
+        @keyframes blink { 50% { opacity: 0; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .chart-area { height: 40px; width: 100%; margin-top: auto; opacity: 0.7; }
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 0.8rem;
+            color: #555;
+            border-top: 1px solid #333;
+        }
 
-        /* FOOTER */
-        .footer { text-align: center; margin-top: 60px; padding: 0 20px; }
-        .disclaimer-box {
-            border: 1px solid var(--separator); background: rgba(255,255,255,0.03);
-            padding: 20px; border-radius: 16px; text-align: left; font-size: 11px; color: var(--text-secondary);
-            line-height: 1.6; direction: ltr;
-        }
-        body[dir="rtl"] .disclaimer-box { text-align: right; direction: rtl; }
-
-        /* RESPONSIVE */
-        @media (max-width: 1024px) { 
-            .command-center { grid-template-columns: 1fr; }
-            .widget-grid { grid-template-columns: repeat(2, 1fr); } 
-            .cc-panel { min-height: 200px; }
-        }
-        @media (max-width: 600px) { 
-            .widget-grid { grid-template-columns: 1fr; } 
-            .app-title { font-size: 18px; }
-        }
+        /* RTL Support */
+        body.rtl { direction: rtl; }
+        body.rtl .panel-header { border-left: none; border-right: 4px solid var(--primary-color); }
     </style>
 </head>
-<body dir="ltr" style="background-color: #000; color: #fff;">
+<body>
 
-<div class="news-ticker-wrap">
-    <div class="ticker-content" id="newsTicker">
-        </div>
-</div>
-
-<header>
-    <div class="app-title">
-        WARADAR <div class="live-badge"><span class="dot"></span>LIVE</div>
-    </div>
-    <div class="lang-flags">
-        <img src="https://flagcdn.com/w40/us.png" class="active" onclick="setLang('en')" title="English" id="flag-en">
-        <img src="https://flagcdn.com/w40/il.png" onclick="setLang('he')" title="Hebrew" id="flag-he">
-        <img src="https://flagcdn.com/w40/ru.png" onclick="setLang('ru')" title="Russian" id="flag-ru">
-    </div>
-</header>
-
-<div class="container">
-
-    <div class="command-center">
-        <div class="cc-panel">
-            <div class="mini-label" data-key="us_iran">US-IRAN Escalation</div>
-            <div class="mini-ring-wrapper">
-                <svg class="mini-ring-svg"><circle cx="45" cy="45" r="40" class="mini-ring-bg"></circle><circle cx="45" cy="45" r="40" class="mini-ring-val" id="ring1" stroke="#ff9f0a" stroke-dasharray="251" stroke-dashoffset="251"></circle></svg>
-                <div class="mini-ring-text" id="valUS">--</div>
-            </div>
-            <div style="font-size:13px; font-weight:600; color:#888" id="statUS">Loading...</div>
-        </div>
-
-        <div class="cc-panel">
-            <div class="radar-box">
+    <header>
+        <div class="logo-container">
+            <div class="radar-icon">
                 <div class="radar-sweep"></div>
-                <div class="radar-ping" style="top: 30%; left: 60%"></div>
-                <div class="radar-ping" style="top: 50%; left: 40%; animation-delay: 1s"></div>
             </div>
-            <div style="position: absolute; bottom: 20px; text-align: center;">
-                <div class="defcon-title">DEFCON LEVEL</div>
-                <div class="defcon-val">3</div>
-                <div class="defcon-desc" data-key="status_elevated">ELEVATED</div>
+            <div class="site-title">WARADAR</div>
+        </div>
+        
+        <div class="lang-selector">
+            <div class="lang-btn active" onclick="setLang('en')" title="English">🇺🇸</div>
+            <div class="lang-btn" onclick="setLang('he')" title="עברית">🇮🇱</div>
+            <div class="lang-btn" onclick="setLang('ru')" title="Русский">🇷🇺</div>
+        </div>
+    </header>
+
+    <main>
+        <div class="panel">
+            <div class="panel-header">
+                <span data-key="system_status">SYSTEM STATUS</span>
+                <span>● LIVE</span>
             </div>
-        </div>
-
-        <div class="cc-panel">
-            <div class="mini-label" data-key="il_impact">Israel Impact Risk</div>
-            <div class="mini-ring-wrapper">
-                <svg class="mini-ring-svg"><circle cx="45" cy="45" r="40" class="mini-ring-bg"></circle><circle cx="45" cy="45" r="40" class="mini-ring-val" id="ring2" stroke="#ff453a" stroke-dasharray="251" stroke-dashoffset="251"></circle></svg>
-                <div class="mini-ring-text" id="valIL">--</div>
-            </div>
-            <div style="font-size:13px; font-weight:600; color:#888" id="statIL">Loading...</div>
-        </div>
-    </div>
-
-    <div class="section-header">
-        <span data-key="live_intel">Strategic Intelligence</span>
-        <span style="font-size:12px; color:var(--text-secondary); font-weight:400" id="lastUpdate">Updating...</span>
-    </div>
-    
-    <div class="widget-grid" id="grid"></div>
-
-    <div class="footer">
-        <div class="disclaimer-box" data-key="disclaimer">
-            <strong>⚠️ IMPORTANT LEGAL DISCLAIMER:</strong> This website is an independent open-source project. Not official intelligence.
-        </div>
-        <div style="margin-top:20px; font-size:12px; color:#666;">Created by Idan Biton</div>
-    </div>
-</div>
-
-<script>
-    // --- 1. CONFIG & DICTIONARY ---
-    const dict = {
-        en: {
-            us_iran: "US-Iran Escalation", il_impact: "Israel Risk",
-            live_intel: "Strategic Intelligence",
-            status_routine: "Routine", status_elevated: "Elevated", status_crit: "Critical",
-            ai_title: "AI Analysis",
-            // Alerts
-            news_alert_1: "US forces in region on high alert.",
-            news_alert_2: "Diplomatic channels active but tense.",
-            news_alert_3: "Pentagon confirms movement of assets.",
-            // AI Texts
-            ai_tanker_high: "High volume of aerial refueling. Long-range ops likely.",
-            ai_tanker_low: "Routine patrol patterns observed.",
-            ai_gps_high: "GPS Blackout in North. Electronic warfare active.",
-            ai_gps_low: "Signal integrity normal.",
-            disclaimer: "⚠️ IMPORTANT: OSINT Data Only. Not classified military intel. Do not rely for safety."
-        },
-        he: {
-            us_iran: "הסלמה ארה״ב-איראן", il_impact: "סיכון השפעה על ישראל",
-            live_intel: "מודיעין אסטרטגי",
-            status_routine: "שגרה", status_elevated: "מוגבר", status_crit: "קריטי",
-            ai_title: "ניתוח בינה מלאכותית",
-            news_alert_1: "כוחות ארה״ב בכוננות גבוהה באזור.",
-            news_alert_2: "ערוצים דיפלומטיים פעילים אך מתוחים.",
-            news_alert_3: "הפנטגון מאשר תזוזת כוחות.",
-            ai_tanker_high: "נפח גבוה של תדלוק אווירי. סבירות למבצע רחוק.",
-            ai_tanker_low: "דפוסי סיור שגרתיים.",
-            ai_gps_high: "חסימות GPS נרחבות בצפון. לוחמה אלקטרונית פעילה.",
-            ai_gps_low: "אות תקין.",
-            disclaimer: "⚠️ חשוב: מידע ממקורות גלויים בלבד. לא מודיעין מסווג. האחריות על המשתמש."
-        },
-        ru: {
-            us_iran: "Эскалация США-Иран", il_impact: "Риск для Израиля",
-            live_intel: "Стратегическая разведка",
-            status_routine: "Рутина", status_elevated: "Повышенный", status_crit: "Критический",
-            ai_title: "Анализ ИИ",
-            news_alert_1: "Силы США в высокой готовности.",
-            news_alert_2: "Дипломатия активна, но напряженна.",
-            news_alert_3: "Пентагон подтверждает движение сил.",
-            ai_tanker_high: "Высокая активность заправщиков.",
-            ai_tanker_low: "Обычное патрулирование.",
-            ai_gps_high: "Блокировка GPS на севере.",
-            ai_gps_low: "Сигнал в норме.",
-            disclaimer: "⚠️ ВАЖНО: Только открытые источники (OSINT)."
-        }
-    };
-
-    let currentLang = 'en';
-    let dataState = { tanker: 88, gps: 98, flight: 75, pizza: 92, market: 85, news: 95, weather: 85, wiki: 90 }; // Crisis start
-
-    const cards = [
-        { id: 'tanker', label: 'Mil. Tankers', color: '#ff9f0a', icon: 'fa-jet-fighter', src: 'ADS-B', url: 'https://globe.adsbexchange.com/' },
-        { id: 'gps', label: 'GPS Jamming', color: '#ff453a', icon: 'fa-map-marker-slash', src: 'GPSJam', url: 'https://gpsjam.org/' },
-        { id: 'flight', label: 'Flight Cancels', color: '#0a84ff', icon: 'fa-plane-slash', src: 'FlightAware', url: 'https://flightaware.com/' },
-        { id: 'pizza', label: 'Pentagon Pizza', color: '#ffd60a', icon: 'fa-pizza-slice', src: 'Google Maps', url: '#' },
-        { id: 'market', label: 'Fear Index', color: '#30d158', icon: 'fa-chart-line', src: 'Polymarket', url: 'https://polymarket.com/' },
-        { id: 'news', label: 'Media Sentiment', color: '#bf5af2', icon: 'fa-newspaper', src: 'GDELT', url: 'https://gdeltproject.org/' },
-        { id: 'weather', label: 'Op. Weather', color: '#5ac8fa', icon: 'fa-cloud', src: 'OpenMeteo', url: 'https://open-meteo.com/' },
-        { id: 'wiki', label: 'Public Interest', color: '#8e8e93', icon: 'fa-search', src: 'Wiki', url: '#' }
-    ];
-
-    // --- 2. INIT ---
-    function init() {
-        const grid = document.getElementById('grid');
-        grid.innerHTML = cards.map(c => `
-            <a href="${c.url}" target="_blank" class="card" id="card_${c.id}">
-                <div class="ai-tooltip">
-                    <div style="font-size:10px; font-weight:700; color:${c.color}; margin-bottom:5px">
-                        <i class="fas fa-robot"></i> <span data-key="ai_title">AI Analysis</span>
-                    </div>
-                    <div class="ai-text" id="ai_${c.id}">Analyzing...</div>
-                </div>
-                <div class="card-top">
-                    <div class="icon-sq" style="background:${c.color}"><i class="fas ${c.icon}"></i></div>
-                    <div class="source-link">${c.src} <i class="fas fa-external-link-alt" style="font-size:8px"></i></div>
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <div>
+                    <div style="font-size: 0.8em; color: #888;" data-key="defcon">DEFCON LEVEL</div>
+                    <div style="font-size: 2em; color: yellow;">3</div>
                 </div>
                 <div>
-                    <div class="card-val" id="val_${c.id}">--%</div>
-                    <div class="card-label">${c.label}</div>
-                    <div class="ai-badge"><i class="fas fa-brain"></i> AI</div>
+                    <div style="font-size: 0.8em; color: #888;" data-key="intel">INTEL FEED</div>
+                    <div style="color: var(--primary-color);" data-key="active">ACTIVE</div>
                 </div>
-                <div class="chart-area"><canvas id="chart_${c.id}"></canvas></div>
-            </a>
-        `).join('');
+                <div>
+                    <div style="font-size: 0.8em; color: #888;" data-key="satellites">SATELLITES</div>
+                    <div style="color: var(--primary-color);">4/5 ONLINE</div>
+                </div>
+            </div>
+        </div>
 
-        initCharts();
-        setLang('en');
-        setInterval(simulateData, 3000);
-    }
-
-    // --- 3. LOGIC ---
-    function setLang(lang) {
-        currentLang = lang;
-        document.body.dir = lang === 'he' ? 'rtl' : 'ltr';
-        
-        document.querySelectorAll('.lang-flags img').forEach(img => img.classList.remove('active'));
-        document.getElementById(`flag-${lang}`).classList.add('active');
-        
-        // Update Static Text
-        document.querySelectorAll('[data-key]').forEach(el => {
-            const key = el.getAttribute('data-key');
-            if(dict[lang][key]) el.innerHTML = dict[lang][key];
-        });
-
-        // Update Ticker
-        const news = [dict[lang].news_alert_1, dict[lang].news_alert_2, dict[lang].news_alert_3];
-        document.getElementById('newsTicker').innerHTML = news.map(n => `<span class="ticker-item"><b>BREAKING:</b> ${n}</span>`).join('');
-
-        updateUI();
-    }
-
-    function simulateData() {
-        // Randomize numbers slightly
-        Object.keys(dataState).forEach(k => {
-            let n = dataState[k] + (Math.random() > 0.5 ? 1 : -1);
-            if(n>99) n=99; if(n<60) n=60; // Keep high for crisis feel
-            dataState[k] = n;
-        });
-        updateUI();
-        document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
-    }
-
-    function updateUI() {
-        const t = dict[currentLang];
-        
-        // 1. Gauges
-        const usRisk = Math.floor((dataState.tanker * 0.4) + (dataState.market * 0.2) + (dataState.news * 0.2) + (dataState.pizza * 0.2));
-        const ilRisk = Math.floor((dataState.gps * 0.5) + (dataState.flight * 0.3) + (usRisk * 0.2));
-        
-        updateGauge('ring1', 'valUS', 'statUS', usRisk);
-        updateGauge('ring2', 'valIL', 'statIL', ilRisk);
-
-        // 2. Cards
-        Object.keys(dataState).forEach(k => {
-            const val = dataState[k];
-            const el = document.getElementById(`val_${k}`);
-            const aiEl = document.getElementById(`ai_${k}`);
+        <div class="panel">
+            <div class="panel-header">
+                <span data-key="tactical_map">TACTICAL OVERVIEW</span>
+            </div>
             
-            // Text Color
-            el.innerText = val + "%";
-            el.style.color = val > 85 ? '#ff453a' : '#fff';
+            <div class="risk-gauge-container">
+                <div class="risk-value">68%</div>
+                <div class="risk-label" data-key="risk_probability">WAR PROBABILITY</div>
+            </div>
 
-            // AI Text Logic
-            let aiTxt = "Data nominal.";
-            if(k === 'tanker') aiTxt = val > 80 ? t.ai_tanker_high : t.ai_tanker_low;
-            if(k === 'gps') aiTxt = val > 90 ? t.ai_gps_high : t.ai_gps_low;
-            // Add other cases...
+            <div class="tactical-map" id="tacticalMap">
+                <div class="map-target" style="top: 40%; left: 60%;"></div>
+                <div class="map-target" style="top: 25%; left: 30%; animation-delay: 0.5s;"></div>
+                <div style="position: absolute; bottom: 10px; right: 10px; font-size: 0.8em;">LAT: 32.0853 N / LON: 34.7818 E</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span data-key="live_intel">LIVE INTELLIGENCE</span>
+            </div>
+            <div class="log-feed" id="logFeed">
+                </div>
+        </div>
+    </main>
+
+    <footer>
+        WARADAR SYSTEM v2.0 | <span data-key="disclaimer">Data is based on AI probabilistic models. Not official military advice.</span>
+    </footer>
+
+    <script>
+        // Language Dictionary
+        const translations = {
+            en: {
+                system_status: "SYSTEM STATUS",
+                defcon: "DEFCON LEVEL",
+                intel: "INTEL FEED",
+                active: "ACTIVE",
+                satellites: "SATELLITES",
+                tactical_map: "TACTICAL OVERVIEW",
+                risk_probability: "WAR PROBABILITY",
+                live_intel: "LIVE INTELLIGENCE",
+                disclaimer: "Data is based on AI probabilistic models. Not official military advice.",
+                log1: "US Air Force refueling tanker detected over Mediterranean.",
+                log2: "Diplomatic talks stalled in Vienna.",
+                log3: "Unusual encrypted traffic spike detected."
+            },
+            he: {
+                system_status: "סטטוס מערכת",
+                defcon: "רמת כוננות",
+                intel: "ערוץ מודיעין",
+                active: "פעיל",
+                satellites: "לוויינים",
+                tactical_map: "מפה טקטית",
+                risk_probability: "הסתברות למלחמה",
+                live_intel: "מודיעין זמן אמת",
+                disclaimer: "הנתונים מבוססים על מודלים הסתברותיים של בינה מלאכותית. לא ייעוץ צבאי רשמי.",
+                log1: "זוהה מטוס תדלוק אמריקאי מעל הים התיכון.",
+                log2: "השיחות הדיפלומטיות בוינה נקלעו למבוי סתום.",
+                log3: "זוהתה עלייה חריגה בתעבורת רשת מוצפנת."
+            },
+            ru: {
+                system_status: "СТАТУС СИСТЕМЫ",
+                defcon: "УРОВЕНЬ ГОТОВНОСТИ",
+                intel: "КАНАЛ РАЗВЕДКИ",
+                active: "АКТИВЕН",
+                satellites: "СПУТНИКИ",
+                tactical_map: "ТАКТИЧЕСКАЯ КАРТА",
+                risk_probability: "ВЕРОЯТНОСТЬ ВОЙНЫ",
+                live_intel: "ЖИВАЯ РАЗВЕДКА",
+                disclaimer: "Данные основаны на вероятностных моделях ИИ. Не является официальным советом.",
+                log1: "Самолет-заправщик ВВС США обнаружен над Средиземным морем.",
+                log2: "Дипломатические переговоры в Вене зашли в тупик.",
+                log3: "Обнаружен необычный всплеск зашифрованного трафика."
+            }
+        };
+
+        let currentLang = 'en';
+
+        // Function to switch language
+        function setLang(lang) {
+            currentLang = lang;
             
-            aiEl.innerText = aiTxt;
-        });
-    }
+            // Update Buttons Visuals
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active'); // Note: In production add strict checking
 
-    function updateGauge(ring, valId, statId, val) {
-        document.getElementById(valId).innerText = val + "%";
-        // Circumference 251 (r=40)
-        const offset = 251 - (251 * val) / 100;
-        document.getElementById(ring).style.strokeDashoffset = offset;
-        
-        let color = '#30d158'; let txt = dict[currentLang].status_routine;
-        if(val > 50) { color = '#ff9f0a'; txt = dict[currentLang].status_elevated; }
-        if(val > 80) { color = '#ff453a'; txt = dict[currentLang].status_crit; }
-        
-        const stat = document.getElementById(statId);
-        stat.innerText = txt; stat.style.color = color;
-        document.getElementById(ring).style.stroke = color;
-    }
+            // Update Direction (RTL for Hebrew)
+            if (lang === 'he') {
+                document.body.classList.add('rtl');
+            } else {
+                document.body.classList.remove('rtl');
+            }
 
-    // --- 4. CHARTS ---
-    function initCharts() {
-        Chart.defaults.scale.grid.display = false;
-        Chart.defaults.scale.ticks.display = false;
-        cards.forEach(c => {
-            const ctx = document.getElementById(`chart_${c.id}`).getContext('2d');
-            let data = Array.from({length:30}, () => 50 + Math.random()*40); // High values
-            new Chart(ctx, {
-                type: 'line',
-                data: { labels: Array(30).fill(''), datasets: [{data:data, borderColor: c.color, borderWidth:2, pointRadius:0, fill:false, tension:0.4}] },
-                options: { responsive:true, maintainAspectRatio:false, plugins:{legend:false}, scales:{x:{display:false},y:{display:false}} }
+            // Update Text Content
+            document.querySelectorAll('[data-key]').forEach(el => {
+                const key = el.getAttribute('data-key');
+                if (translations[lang][key]) {
+                    el.innerText = translations[lang][key];
+                }
             });
-        });
-    }
 
-    init();
-</script>
+            // Refresh logs instantly to match language
+            renderLogs();
+        }
+
+        // Simulate Live Logs
+        const logContainer = document.getElementById('logFeed');
+        
+        function renderLogs() {
+            logContainer.innerHTML = '';
+            const t = translations[currentLang];
+            const logs = [
+                { time: '14:02', text: t.log1 },
+                { time: '13:58', text: t.log2 },
+                { time: '13:45', text: t.log3 },
+                { time: '13:30', text: "System calibration complete." }, // Generic
+                { time: '13:15', text: "Signal acquired: Sector 7." }
+            ];
+
+            logs.forEach(log => {
+                const div = document.createElement('div');
+                div.className = 'log-entry';
+                div.innerHTML = `<span class="timestamp">[${log.time}]</span> ${log.text}`;
+                logContainer.appendChild(div);
+            });
+        }
+
+        // Initialize
+        renderLogs();
+
+    </script>
 </body>
 </html>
