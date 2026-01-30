@@ -12,7 +12,7 @@
             --bg: #050505;      /* Void Black */
             --panel: #0f1215;
             --text-dim: #888;
-            --modal-bg: rgba(10, 15, 10, 0.95);
+            --hover-row: #1a221a;
         }
 
         * { box-sizing: border-box; }
@@ -44,38 +44,25 @@
             justify-content: space-between;
             align-items: center;
             padding: 15px 20px;
-            background: rgba(0, 20, 0, 0.9);
+            background: rgba(0, 20, 0, 0.95);
             border-bottom: 1px solid var(--primary);
             backdrop-filter: blur(5px);
             z-index: 1000;
+            position: sticky; top: 0;
         }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
+        .brand { display: flex; align-items: center; gap: 15px; }
         .radar-logo {
-            width: 40px;
-            height: 40px;
-            border: 2px solid var(--primary);
-            border-radius: 50%;
-            position: relative;
+            width: 40px; height: 40px; border: 2px solid var(--primary);
+            border-radius: 50%; position: relative;
             background: radial-gradient(circle, rgba(0,255,65,0.1), transparent);
         }
-
         .radar-sweep {
-            position: absolute;
-            width: 50%;
-            height: 50%;
+            position: absolute; width: 50%; height: 50%;
             background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.5));
-            top: 0; left: 0;
-            transform-origin: bottom right;
-            animation: sweep 2s infinite linear;
-            border-radius: 100% 0 0 0;
+            top: 0; left: 0; transform-origin: bottom right;
+            animation: sweep 2s infinite linear; border-radius: 100% 0 0 0;
         }
-
         @keyframes sweep { to { transform: rotate(360deg); } }
 
         .title-group h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
@@ -96,60 +83,51 @@
         }
         .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
 
-        /* --- MAIN GRID --- */
+        /* --- LAYOUT --- */
         main {
-            flex: 1;
-            padding: 20px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            max-width: 1400px;
-            margin: 0 auto;
-            width: 100%;
+            flex: 1; padding: 20px; display: grid; grid-template-columns: 1fr 1.2fr;
+            gap: 20px; max-width: 1400px; margin: 0 auto; width: 100%;
         }
-
         @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
 
         .card {
-            background: var(--panel);
-            border: 1px solid #333;
-            padding: 20px;
-            border-radius: 4px;
-            position: relative;
+            background: var(--panel); border: 1px solid #333; padding: 20px;
+            border-radius: 4px; position: relative;
         }
         .card h2 {
-            margin-top: 0;
-            border-bottom: 1px solid #333;
-            padding-bottom: 10px;
-            font-size: 1.1rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;
+            font-size: 1.1rem; color: var(--text-dim); text-transform: uppercase;
+            display: flex; justify-content: space-between; align-items: center;
         }
 
-        /* Info Icon Style */
-        .info-icon {
+        /* --- SCORE --- */
+        .score-container { text-align: center; padding: 20px; }
+        .big-score { font-size: 6rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,65,0.4); }
+
+        /* --- PARAMETERS LIST --- */
+        .parameter-row {
+            margin-bottom: 12px; padding: 10px; border-radius: 4px;
+            border: 1px solid transparent; transition: 0.2s; cursor: pointer;
+        }
+        .parameter-row:hover {
+            background: var(--hover-row);
+            border-color: #333;
+        }
+        
+        .param-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; align-items: center; }
+        
+        .param-label { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+        .link-icon { font-size: 0.7rem; opacity: 0.5; }
+        
+        .info-btn {
             display: inline-flex; align-items: center; justify-content: center;
             width: 18px; height: 18px; border: 1px solid var(--text-dim);
             color: var(--text-dim); border-radius: 50%; font-size: 0.7rem;
-            cursor: pointer; margin-left: 8px; transition: 0.2s;
+            cursor: pointer; transition: 0.2s; z-index: 5;
         }
-        .info-icon:hover { color: var(--primary); border-color: var(--primary); box-shadow: 0 0 5px var(--primary); }
+        .info-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,65,0.1); }
 
-        /* --- BIG SCORE GAUGE --- */
-        .score-container { text-align: center; padding: 20px; }
-        .big-score {
-            font-size: 6rem; font-weight: 900; color: var(--primary);
-            text-shadow: 0 0 20px rgba(0,255,65,0.4);
-        }
-
-        /* --- PARAMETERS --- */
-        .parameter-row { margin-bottom: 18px; }
-        .param-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; align-items: center; }
-        .param-label { display: flex; align-items: center; }
-        .progress-bg { background: #222; height: 8px; width: 100%; border-radius: 4px; overflow: hidden; }
+        .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; }
         .progress-fill {
             height: 100%; width: 0%;
             background: linear-gradient(90deg, var(--primary), var(--warning));
@@ -159,46 +137,30 @@
         /* --- MODAL --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); backdrop-filter: blur(3px);
+            background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
             z-index: 2000; display: none; align-items: center; justify-content: center;
         }
         .modal-overlay.open { display: flex; }
-        
         .modal-box {
-            background: var(--panel); border: 1px solid var(--primary);
-            width: 90%; max-width: 500px; padding: 25px;
-            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
-            position: relative; animation: slideIn 0.3s ease;
+            background: #111; border: 1px solid var(--primary); width: 90%; max-width: 500px;
+            padding: 25px; box-shadow: 0 0 40px rgba(0, 255, 65, 0.15); position: relative;
         }
-        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        
-        .modal-close {
-            position: absolute; top: 10px; right: 15px;
-            font-size: 1.5rem; cursor: pointer; color: var(--text-dim);
-        }
-        .modal-close:hover { color: var(--primary); }
-        
+        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; }
+        .modal-close:hover { color: #fff; }
         .modal-title { font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
-        .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ddd; }
-        .modal-content strong { color: var(--warning); }
-        .modal-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; color: #888; margin-top: 10px; border: 1px solid #444; }
+        .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ccc; }
+        .modal-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; color: var(--warning); margin-top: 10px; border: 1px solid #444; }
 
         /* --- FOOTER --- */
-        footer {
-            text-align: center; padding: 20px; font-size: 0.8rem; color: #555;
-            border-top: 1px solid #222; margin-top: auto; display: flex; flex-direction: column; gap: 10px;
-        }
+        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; }
         .share-btn {
             background: transparent; border: 1px solid var(--primary); color: var(--primary);
-            padding: 8px 20px; cursor: pointer; font-family: inherit; margin: 10px auto;
-            display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
+            padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px;
         }
-        .share-btn:hover { background: rgba(0, 255, 65, 0.1); box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
-
         .blink { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         .rtl { direction: rtl; }
-        .rtl .info-icon { margin-left: 0; margin-right: 8px; }
+        .rtl .param-label { gap: 8px; }
     </style>
 </head>
 <body>
@@ -210,14 +172,9 @@
                 <h1>WARADAR <span class="live-tag">LIVE</span></h1>
             </div>
         </div>
-
         <div class="top-controls">
             <div class="clock" id="clock">00:00:00</div>
-            
-            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-btn">
-                <span>☕</span> <span data-key="donate">Donate</span>
-            </a>
-
+            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="donate-btn"><span>☕</span> <span data-key="donate">Donate</span></a>
             <div class="lang-flags">
                 <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
                 <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
@@ -229,8 +186,8 @@
     <main>
         <div class="card">
             <h2>
-                <span data-key="escalation_probability">TOTAL RISK SCORE</span>
-                <span class="info-icon" onclick="openModal('general')">?</span>
+                <span data-key="escalation_probability">RISK SCORE</span>
+                <span class="info-btn" onclick="openModal('general', event)">?</span>
             </h2>
             <div class="score-container">
                 <div class="big-score" id="mainScore">--%</div>
@@ -239,7 +196,7 @@
                     <span id="statusText" style="color: var(--warning)">CALCULATING...</span>
                 </div>
                 <div style="font-size: 0.8rem; color: #666; margin-top: 20px;">
-                    <span data-key="last_update">LAST UPDATE:</span> <span id="lastUpdate">Checking...</span>
+                    <span data-key="click_hint">💡 TIP: Click any parameter to view the live source data.</span>
                 </div>
                 <div id="multiplierBadge" style="display:none; margin-top:15px; color: var(--danger); font-size: 0.8rem; border: 1px solid var(--danger); padding: 5px; display: inline-block;">
                     ⚠ ESCALATION MULTIPLIER ACTIVE (+15%)
@@ -263,184 +220,147 @@
     </div>
 
     <footer>
-        <div>
-            <button class="share-btn" onclick="shareSite()">
-                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
-                <span data-key="share">Share</span>
-            </button>
+        <button class="share-btn" onclick="shareSite()">
+            <span data-key="share">Share Status</span>
+        </button>
+        <div class="disclaimer-box" style="opacity: 0.7; margin-top:10px;">
+            <span data-key="disclaimer_short">Open-source intel aggregation. Not official military advice.</span>
         </div>
-        <div class="disclaimer-box" style="opacity: 0.7;">
-            <span data-key="disclaimer_short">Open-source intel. Not official military advice.</span>
-        </div>
-        <div style="margin-top: 10px; color: #444;">
-            Created by <strong style="color: #666;">Idan Biton</strong>
-        </div>
+        <div style="margin-top: 10px; color: #444;">Created by <strong style="color: #666;">Idan Biton</strong></div>
     </footer>
 
     <script>
-        // --- DATA & CONTENT ---
-        // Configuration of the 6 signals
+        // --- CONFIGURATION ---
+        // Weights now sum to 100% with new parameters included
         const signalsConfig = [
-            { id: 'news', weight: 0.25, baseVal: 45 },
-            { id: 'aviation', weight: 0.20, baseVal: 30 },
-            { id: 'tankers', weight: 0.15, baseVal: 65 },
-            { id: 'market', weight: 0.20, baseVal: 55 },
-            { id: 'pentagon', weight: 0.10, baseVal: 20 },
-            { id: 'weather', weight: 0.10, baseVal: 80 }
+            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 45 },
+            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 30 },
+            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 65 }, // General map for simulation
+            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 55 },
+            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 60 }, // NEW
+            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 70 }, // NEW
+            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 40 }, // NEW
+            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 20 },
+            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80 }
         ];
 
-        // Text Content
+        // --- CONTENT DICTIONARY ---
         const content = {
             en: {
                 donate: "Donate",
                 escalation_probability: "TOTAL RISK SCORE",
                 status: "RISK LEVEL:",
-                last_update: "LAST UPDATE:",
-                risk_parameters: "LIVE SIGNALS",
-                share: "SHARE",
-                disclaimer_short: "Statistical data only. Use at your own discretion.",
+                click_hint: "💡 TIP: Click any parameter to view the live source data.",
+                risk_parameters: "LIVE SIGNALS & SOURCES",
+                share: "Share Status",
+                disclaimer_short: "Statistical aggregation. Use at your own discretion.",
                 
                 // Labels
                 l_news: "News Intelligence",
-                l_aviation: "Civil Aviation",
-                l_tankers: "Military Tankers",
+                l_aviation: "Civil Aviation (Iran)",
+                l_tankers: "US Tanker Activity",
                 l_market: "Prediction Markets",
+                l_financial: "Global Markets (Oil/BTC)",
+                l_social: "Social Intel / OSINT",
+                l_traffic: "Tehran Traffic Flow",
                 l_pentagon: "Pentagon Activity",
                 l_weather: "Weather (Tehran)",
 
-                // Modal Content (Exact Text from Prompt)
-                m_general_title: "How We Calculate Risk",
-                m_general_desc: `
-                    <strong>Total Risk = Weighted Sum of 6 Signals</strong><br><br>
-                    • <strong>News Intel (25%):</strong> Breaking news with critical keywords increases risk.<br>
-                    • <strong>Civil Aviation (20%):</strong> Fewer flights over Iran = airlines avoiding = higher risk.<br>
-                    • <strong>Military Tankers (15%):</strong> More US tankers in the region = higher risk.<br>
-                    • <strong>Market Odds (20%):</strong> Prediction market betting odds for strike within 7 days.<br>
-                    • <strong>Pentagon Activity (10%):</strong> Unusual late-night activity near Pentagon = higher risk.<br>
-                    • <strong>Weather (10%):</strong> Clear skies in Tehran = favorable for operations = higher risk.<br><br>
-                    <strong>Escalation Multiplier:</strong> If 3+ signals are elevated (>30%), total gets a 15% boost.<br><br>
-                    <strong>Risk Levels:</strong><br>
-                    • 0-30% = Low<br>
-                    • 31-60% = Elevated<br>
-                    • 61-85% = High
-                `,
-                m_news_desc: `
-                    Scans BBC World and Al Jazeera for Iran-related news.<br><br>
-                    <strong>What we look for:</strong> Headlines containing "strike", "attack", "military", "missile", "war", "imminent"<br><br>
-                    <strong>How it works:</strong> More critical articles = higher risk. The ratio of alarming headlines to total coverage drives the score.<br>
-                    <div class="modal-tag">Weight: 25%</div>
-                `,
-                m_aviation_desc: `
-                    Tracks commercial flights over Iranian airspace via OpenSky Network.<br><br>
-                    <strong>Why it matters:</strong> Airlines avoid conflict zones. When flights drop, it often signals that carriers have intelligence suggesting danger.<br><br>
-                    <strong>How it works:</strong> Fewer aircraft = higher risk. Normal traffic (~100+ planes) = low risk.<br>
-                    <div class="modal-tag">Weight: 20%</div>
-                `,
-                m_tankers_desc: `
-                    Monitors US Air Force refueling aircraft in the Middle East.<br><br>
-                    <strong>Why it matters:</strong> Tankers (KC-135, KC-46) enable fighters and bombers to operate far from base. A surge in tanker activity often precedes military operations.<br><br>
-                    <strong>How it works:</strong> More tankers detected = higher risk.<br>
-                    <div class="modal-tag">Weight: 15%</div>
-                `,
-                m_pentagon_desc: `
-                    Monitors activity patterns near the Pentagon.<br><br>
-                    <strong>Why it matters:</strong> Unusual late-night or weekend activity can indicate crisis planning sessions.<br><br>
-                    <strong>How it works:</strong> Normal business hours = low risk. Elevated activity at odd hours = higher risk.<br>
-                    <div class="modal-tag">Weight: 10%</div>
-                `,
-                m_market_desc: `
-                    Real-money betting odds on "US or Israel strike Iran" within 7 days.<br>
-                    Source: Polymarket<br><br>
-                    <strong>Why it matters:</strong> When people bet real money, they research carefully. Market odds aggregate the wisdom of thousands of informed traders.<br>
-                    <div class="modal-tag">Weight: 20%</div>
-                `,
-                m_weather_desc: `
-                    Current weather in Tehran, Iran.<br><br>
-                    <strong>Why it matters:</strong> Military operations favor clear skies for visibility and precision targeting. Poor weather provides natural cover.<br><br>
-                    <strong>How it works:</strong> Clear skies = higher risk. Cloudy/poor visibility = lower risk.<br>
-                    <div class="modal-tag">Weight: 10%</div>
-                `
+                // Descriptions
+                m_general_title: "Risk Calculation Methodology",
+                m_general_desc: "We aggregate 9 distinct signals. Clicking any signal in the list will open the live data source (Google Maps, FlightRadar, TradingView, etc.).<br><br>The score is a weighted average of all active monitors.",
+                
+                m_news_desc: "Scans major news outlets for keywords like 'Strike', 'Imminent', 'Nuclear'.<br><strong>Source:</strong> Google News Aggregation.",
+                m_aviation_desc: "Civilian flight volume over Iran. Low volume indicates airlines fear conflict.<br><strong>Source:</strong> FlightRadar24.",
+                m_tankers_desc: "Presence of KC-135/KC-46 refueling tankers suggests air force readiness.<br><strong>Source:</strong> FlightRadar24.",
+                m_market_desc: "Betting odds on war within 7 days.<br><strong>Source:</strong> Polymarket.",
+                m_financial_desc: "<strong>Financial Impact (15%):</strong><br>Monitors Brent Crude Oil, Dollar Index (DXY), and Bitcoin.<br>War typically spikes Oil/Gold and drops stocks. Bitcoin acts as a volatility gauge.",
+                m_social_desc: "<strong>Social Intel (10%):</strong><br>Real-time scraper of X (Twitter) and Telegram for unverified ground reports before they hit mainstream news.",
+                m_traffic_desc: "<strong>Traffic Index (5%):</strong><br>Analyzes Google Maps traffic data in Tehran. Heavy outflow = panic/evacuation. Empty streets = bunkers/martial law.",
+                m_pentagon_desc: "Traffic/Activity levels around US Defense Dept HQ.",
+                m_weather_desc: "Visibility conditions for airstrikes."
             },
             he: {
                 donate: "תרומה",
                 escalation_probability: "ציון סיכון כולל",
                 status: "רמת סיכון:",
-                last_update: "עדכון אחרון:",
-                risk_parameters: "אותות חיים",
-                share: "שתף",
-                disclaimer_short: "נתונים סטטיסטיים בלבד. השימוש באחריותך.",
-                
+                click_hint: "💡 טיפ: לחץ על כל פרמטר כדי לפתוח את מקור המידע בזמן אמת.",
+                risk_parameters: "אותות ומקורות מידע",
+                share: "שתף סטטוס",
+                disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
+
                 l_news: "מודיעין חדשותי",
-                l_aviation: "תעופה אזרחית",
-                l_tankers: "מכליות צבאיות",
+                l_aviation: "תעופה אזרחית (איראן)",
+                l_tankers: "מכליות צבאיות (ארה״ב)",
                 l_market: "שוקי חיזוי",
+                l_financial: "שווקים פיננסיים (נפט/ביטקוין)",
+                l_social: "מודיעין רשתות (X/טלגרם)",
+                l_traffic: "עומסי תנועה בטהרן",
                 l_pentagon: "פעילות בפנטגון",
                 l_weather: "מזג אוויר (טהרן)",
 
-                m_general_title: "כיצד אנו מחשבים סיכון?",
-                m_general_desc: `
-                    <strong>סיכון כולל = שקלול של 6 אותות</strong><br><br>
-                    • <strong>חדשות (25%):</strong> מילות מפתח קריטיות בכותרות.<br>
-                    • <strong>תעופה (20%):</strong> פחות טיסות מעל איראן = סיכון גבוה.<br>
-                    • <strong>מכליות (15%):</strong> ריבוי מתדלקים אמריקאים באזור.<br>
-                    • <strong>שוקי חיזוי (20%):</strong> יחסי הימורים על תקיפה ב-7 ימים.<br>
-                    • <strong>פנטגון (10%):</strong> פעילות לילית חריגה במטה ארה״ב.<br>
-                    • <strong>מזג אוויר (10%):</strong> שמיים נקיים בטהרן = נוח לתקיפה.<br><br>
-                    <strong>מכפיל אסקלציה:</strong> אם 3+ מדדים גבוהים, הציון מקבל בונוס 15%.
-                `,
-                m_news_desc: "סריקת BBC ואל-ג'זירה. יחס גבוה של כותרות המכילות 'מלחמה', 'תקיפה' או 'טילים' מעלה את הסיכון.",
-                m_aviation_desc: "מעקב אחר טיסות מסחריות (OpenSky). ירידה בכמות הטיסות מעידה שחברות התעופה חוששות מסיכון.",
-                m_tankers_desc: "מעקב אחר מטוסי תדלוק (KC-135). עליה בפעילות מאפשרת למטוסי קרב לפעול רחוק מהבסיס.",
-                m_pentagon_desc: "ניתוח דפוסי פעילות סביב הפנטגון. פעילות בשעות לילה מאוחרות מעידה על תכנון חירום.",
-                m_market_desc: "סיכויי הימורים בכסף אמיתי (Polymarket) על תקיפה בטווח של 7 ימים.",
-                m_weather_desc: "מזג אוויר בטהרן. שמיים נקיים מעלים את הסיכון לפעילות אווירית מדויקת."
+                m_general_title: "שיטת חישוב הסיכון",
+                m_general_desc: "האלגוריתם משקלל 9 מקורות מידע. לחיצה על כל שורה ברשימה תפתח את האתר המקורי (גוגל מפות, FlightRadar וכו').",
+                
+                m_news_desc: "סריקת כותרות באתרי חדשות מובילים למילות מפתח קריטיות.<br><strong>מקור:</strong> Google News.",
+                m_aviation_desc: "נפח טיסות מסחריות מעל איראן. נפח נמוך מעיד על חשש מתקיפה.<br><strong>מקור:</strong> FlightRadar24.",
+                m_tankers_desc: "נוכחות מתדלקים אוויריים מעידה על מוכנות לתקיפה לטווח רחוק.<br><strong>מקור:</strong> מעקב תעופתי.",
+                m_market_desc: "סיכויי הימורים על מלחמה ב-7 ימים הקרובים.<br><strong>מקור:</strong> Polymarket.",
+                m_financial_desc: "<strong>השפעת שווקים (15%):</strong><br>ניתוח מחיר נפט (Brent), מדד הדולר וביטקוין. מלחמה מקפיצה את הנפט והזהב.",
+                m_social_desc: "<strong>מודיעין רשתות (10%):</strong><br>ניטור בזמן אמת של טוויטר (X) וטלגרם לדיווחים מהשטח לפני הגעתם לתקשורת הממוסדת.",
+                m_traffic_desc: "<strong>מדד תנועה (5%):</strong><br>ניתוח עומסים בטהרן דרך גוגל מפות. יציאה המונית מהעיר = פאניקה. רחובות ריקים = משטר צבאי.",
+                m_pentagon_desc: "רמות פעילות סביב מטה משרד ההגנה האמריקאי.",
+                m_weather_desc: "תנאי ראות לתקיפה אווירית."
             },
             ru: {
                 donate: "Пожертвовать",
                 escalation_probability: "ОБЩИЙ РИСК",
                 status: "УРОВЕНЬ РИСКА:",
-                last_update: "ОБНОВЛЕНО:",
-                risk_parameters: "СИГНАЛЫ",
+                click_hint: "💡 СОВЕТ: Нажмите на параметр, чтобы открыть источник данных.",
+                risk_parameters: "СИГНАЛЫ И ИСТОЧНИКИ",
                 share: "Поделиться",
-                disclaimer_short: "Только статистика. Не является официальным советом.",
-                
+                disclaimer_short: "Статистическая агрегация. Не официальный совет.",
+
                 l_news: "Анализ новостей",
-                l_aviation: "Гражданская авиация",
+                l_aviation: "Авиация (Иран)",
                 l_tankers: "Военные танкеры",
                 l_market: "Рынки прогнозов",
+                l_financial: "Финансы (Нефть/BTC)",
+                l_social: "Соцсети (OSINT)",
+                l_traffic: "Трафик в Тегеране",
                 l_pentagon: "Активность Пентагона",
                 l_weather: "Погода (Тегеран)",
+
+                m_general_title: "Методология",
+                m_general_desc: "Мы используем 9 сигналов. Нажмите на любой сигнал, чтобы открыть источник (Google Maps, FlightRadar и т.д.).",
                 
-                m_general_title: "Как мы считаем риск",
-                m_general_desc: "Взвешенная сумма 6 сигналов: Новости, Авиация, Танкеры, Рынки, Пентагон, Погода.",
-                m_news_desc: "Сканирование заголовков на наличие слов 'война', 'атака'.",
-                m_aviation_desc: "Меньше гражданских рейсов над Ираном = выше риск.",
-                m_tankers_desc: "Активность заправщиков ВВС США в регионе.",
-                m_pentagon_desc: "Необычная ночная активность в Пентагоне.",
-                m_market_desc: "Ставки на реальные деньги на удар в течение 7 дней.",
-                m_weather_desc: "Ясное небо над Тегераном благоприятно для операций."
+                m_news_desc: "Мониторинг заголовков новостей.",
+                m_aviation_desc: "Объем гражданских рейсов над Ираном.",
+                m_tankers_desc: "Активность заправщиков ВВС США.",
+                m_market_desc: "Ставки на войну в течение 7 дней.",
+                m_financial_desc: "<strong>Рынки (15%):</strong> Нефть, Доллар, Биткойн. Война повышает цены на нефть.",
+                m_social_desc: "<strong>Соцсети (10%):</strong> Мониторинг Twitter и Telegram на предмет сообщений с мест.",
+                m_traffic_desc: "<strong>Трафик (5%):</strong> Google Maps пробки в Тегеране.",
+                m_pentagon_desc: "Активность вокруг Пентагона.",
+                m_weather_desc: "Погодные условия для авиаударов."
             }
         };
 
         let currentLang = 'en';
 
-        // --- CORE LOGIC ---
+        // --- LOGIC ---
         function updateClock() {
-            const now = new Date();
-            document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
         }
         setInterval(updateClock, 1000);
 
-        // Simulation State
         let signalValues = {}; 
         
         function simulateData() {
             let totalWeightedScore = 0;
-            let elevatedCount = 0; // Count signals > 30%
+            let elevatedCount = 0;
 
-            // Initialize or slight randomize
             signalsConfig.forEach(sig => {
-                // Determine value (Mock simulation with slight random flux)
                 if (!signalValues[sig.id]) signalValues[sig.id] = sig.baseVal;
                 
                 const flux = (Math.random() * 6) - 3; 
@@ -448,48 +368,33 @@
                 val = Math.max(0, Math.min(100, val));
                 signalValues[sig.id] = val;
 
-                // Add to total
                 totalWeightedScore += (val * sig.weight);
-
-                // Check for multiplier condition
                 if (val > 30) elevatedCount++;
             });
 
-            // Escalation Multiplier Logic
-            const multiplierBadge = document.getElementById('multiplierBadge');
-            if (elevatedCount >= 3) {
-                totalWeightedScore = totalWeightedScore * 1.15; // 15% Boost
-                multiplierBadge.style.display = "inline-block";
+            if (elevatedCount >= 4) { // Tweak threshold for 9 params
+                totalWeightedScore = totalWeightedScore * 1.15;
+                document.getElementById('multiplierBadge').style.display = "inline-block";
             } else {
-                multiplierBadge.style.display = "none";
+                document.getElementById('multiplierBadge').style.display = "none";
             }
 
-            // Cap at 100
             totalWeightedScore = Math.min(100, totalWeightedScore);
-
             updateUI(totalWeightedScore);
         }
 
         function updateUI(score) {
-            // Main Score
             const scoreEl = document.getElementById('mainScore');
             scoreEl.innerText = score.toFixed(1) + '%';
             
-            // Risk Level
-            let color = '#00ff41'; // Low
-            let status = 'LOW';
-            if(score > 30) { color = '#ffb700'; status = 'ELEVATED'; } // Updated per prompt
-            if(score > 60) { color = '#ff3333'; status = 'HIGH'; }     // Updated per prompt
+            let color = '#00ff41'; let status = 'LOW';
+            if(score > 30) { color = '#ffb700'; status = 'ELEVATED'; }
+            if(score > 60) { color = '#ff3333'; status = 'HIGH'; }
             
             scoreEl.style.color = color;
-            const statusEl = document.getElementById('statusText');
-            statusEl.innerText = status;
-            statusEl.style.color = color;
-
-            // Timestamp
-            document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
-
-            // Render Parameters
+            document.getElementById('statusText').innerText = status;
+            document.getElementById('statusText').style.color = color;
+            
             renderParams();
         }
 
@@ -507,11 +412,15 @@
 
                 const row = document.createElement('div');
                 row.className = 'parameter-row';
+                // Add click listener for the URL
+                row.onclick = () => window.open(sig.url, '_blank');
+                row.title = "Click to open live data source";
+
                 row.innerHTML = `
                     <div class="param-header">
                         <div class="param-label">
-                            ${label}
-                            <span class="info-icon" onclick="openModal('${sig.id}')">i</span>
+                            <span style="font-size:1.1em">🔗</span> ${label} 
+                            <span class="info-btn" onclick="openModal('${sig.id}', event)">i</span>
                         </div>
                         <span>${val.toFixed(1)}%</span>
                     </div>
@@ -523,13 +432,13 @@
             });
         }
 
-        // --- MODAL LOGIC ---
-        function openModal(type) {
+        // --- MODAL ---
+        function openModal(type, event) {
+            event.stopPropagation(); // Prevents opening the link when clicking Info
             const modal = document.getElementById('infoModal');
             const titleEl = document.getElementById('mTitle');
             const contentEl = document.getElementById('mContent');
             
-            // Determine Title & Content
             if (type === 'general') {
                 titleEl.innerText = content[currentLang].m_general_title;
                 contentEl.innerHTML = content[currentLang].m_general_desc;
@@ -537,7 +446,6 @@
                 titleEl.innerText = content[currentLang][`l_${type}`];
                 contentEl.innerHTML = content[currentLang][`m_${type}_desc`];
             }
-
             modal.classList.add('open');
         }
 
@@ -547,43 +455,27 @@
             }
         }
 
-        // --- SHARE LOGIC ---
-        async function shareSite() {
-            const shareData = {
-                title: 'WARADAR - US/Iran Risk Monitor',
-                text: 'Current Escalation Risk: ' + document.getElementById('mainScore').innerText,
-                url: window.location.href
-            };
-
+        function shareSite() {
+            const url = window.location.href;
             if (navigator.share) {
-                try {
-                    await navigator.share(shareData);
-                } catch (err) {
-                    console.log('Error sharing:', err);
-                }
+                navigator.share({ title: 'WARADAR', text: 'Risk Score: ' + document.getElementById('mainScore').innerText, url: url });
             } else {
-                // Fallback for desktop
-                alert("URL copied to clipboard!");
-                navigator.clipboard.writeText(window.location.href);
+                alert("Link copied!");
+                navigator.clipboard.writeText(url);
             }
         }
 
-        // --- LANGUAGE SWITCHER ---
         function setLang(lang) {
             currentLang = lang;
             document.querySelectorAll('.flag').forEach(f => f.classList.remove('active'));
             event.currentTarget.classList.add('active');
-
             if(lang === 'he') document.body.classList.add('rtl');
             else document.body.classList.remove('rtl');
-
-            // Update static text
+            
             document.querySelectorAll('[data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
                 if(content[lang][key]) el.innerText = content[lang][key];
             });
-
-            // Re-render dynamic components
             renderParams();
         }
 
