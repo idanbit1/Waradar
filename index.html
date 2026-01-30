@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARADAR - US/IRAN ESCALATION MONITOR</title>
+    <title>WARADAR - Strategic Risk Monitor</title>
     <style>
         :root {
             --primary: #00ff41; /* Cyber Green */
@@ -12,6 +12,7 @@
             --bg: #050505;      /* Void Black */
             --panel: #0f1215;
             --text-dim: #888;
+            --modal-bg: rgba(10, 15, 10, 0.95);
         }
 
         * { box-sizing: border-box; }
@@ -20,7 +21,7 @@
             margin: 0;
             background-color: var(--bg);
             color: var(--primary);
-            font-family: 'Segoe UI', 'Roboto Mono', monospace; /* Modern Tactical Font */
+            font-family: 'Segoe UI', 'Roboto Mono', monospace;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
@@ -34,7 +35,7 @@
             top: 0; left: 0; width: 100vw; height: 100vh;
             background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
             pointer-events: none;
-            z-index: 999;
+            z-index: 990;
         }
 
         /* --- HEADER --- */
@@ -46,6 +47,7 @@
             background: rgba(0, 20, 0, 0.9);
             border-bottom: 1px solid var(--primary);
             backdrop-filter: blur(5px);
+            z-index: 1000;
         }
 
         .brand {
@@ -80,29 +82,19 @@
         .live-tag { font-size: 0.7rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; }
 
         .top-controls { display: flex; gap: 15px; align-items: center; }
-        
-        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; }
+        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none; }
+        @media(min-width: 600px) { .clock { display: block; } }
 
         .lang-flags { display: flex; gap: 10px; cursor: pointer; }
         .flag { font-size: 1.5rem; filter: grayscale(1); transition: 0.3s; }
         .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.2); }
 
-        /* --- DONATE BUTTON --- */
         .donate-btn {
-            background: #FFDD00;
-            color: #000;
-            text-decoration: none;
-            padding: 8px 15px;
-            font-weight: bold;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.9rem;
-            border: 1px solid #cca300;
-            transition: 0.3s;
+            background: #FFDD00; color: #000; text-decoration: none; padding: 5px 10px;
+            font-weight: bold; border-radius: 4px; display: flex; align-items: center; gap: 5px; font-size: 0.8rem;
+            border: 1px solid #cca300; transition: 0.3s;
         }
-        .donate-btn:hover { background: #ffe600; box-shadow: 0 0 15px #FFDD00; }
+        .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
 
         /* --- MAIN GRID --- */
         main {
@@ -132,72 +124,81 @@
             font-size: 1.1rem;
             color: var(--text-dim);
             text-transform: uppercase;
-        }
-
-        /* --- BIG SCORE GAUGE --- */
-        .score-container {
-            text-align: center;
-            padding: 20px;
-        }
-        .big-score {
-            font-size: 6rem;
-            font-weight: 900;
-            color: var(--primary);
-            text-shadow: 0 0 20px rgba(0,255,65,0.4);
-        }
-        .trend-arrow { font-size: 2rem; }
-
-        /* --- PARAMETERS & GRAPHS --- */
-        .parameter-row {
-            margin-bottom: 15px;
-        }
-        .param-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
+            align-items: center;
         }
-        .progress-bg {
-            background: #222;
-            height: 10px;
-            width: 100%;
-            border-radius: 5px;
-            overflow: hidden;
+
+        /* Info Icon Style */
+        .info-icon {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 18px; height: 18px; border: 1px solid var(--text-dim);
+            color: var(--text-dim); border-radius: 50%; font-size: 0.7rem;
+            cursor: pointer; margin-left: 8px; transition: 0.2s;
         }
+        .info-icon:hover { color: var(--primary); border-color: var(--primary); box-shadow: 0 0 5px var(--primary); }
+
+        /* --- BIG SCORE GAUGE --- */
+        .score-container { text-align: center; padding: 20px; }
+        .big-score {
+            font-size: 6rem; font-weight: 900; color: var(--primary);
+            text-shadow: 0 0 20px rgba(0,255,65,0.4);
+        }
+
+        /* --- PARAMETERS --- */
+        .parameter-row { margin-bottom: 18px; }
+        .param-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; align-items: center; }
+        .param-label { display: flex; align-items: center; }
+        .progress-bg { background: #222; height: 8px; width: 100%; border-radius: 4px; overflow: hidden; }
         .progress-fill {
-            height: 100%;
+            height: 100%; width: 0%;
             background: linear-gradient(90deg, var(--primary), var(--warning));
-            width: 0%;
             transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- METHODOLOGY --- */
-        .methodology { font-size: 0.85rem; line-height: 1.6; color: #ccc; }
-        .methodology strong { color: var(--primary); }
+        /* --- MODAL --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(3px);
+            z-index: 2000; display: none; align-items: center; justify-content: center;
+        }
+        .modal-overlay.open { display: flex; }
+        
+        .modal-box {
+            background: var(--panel); border: 1px solid var(--primary);
+            width: 90%; max-width: 500px; padding: 25px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+            position: relative; animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-close {
+            position: absolute; top: 10px; right: 15px;
+            font-size: 1.5rem; cursor: pointer; color: var(--text-dim);
+        }
+        .modal-close:hover { color: var(--primary); }
+        
+        .modal-title { font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ddd; }
+        .modal-content strong { color: var(--warning); }
+        .modal-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; color: #888; margin-top: 10px; border: 1px solid #444; }
 
         /* --- FOOTER --- */
         footer {
-            text-align: center;
-            padding: 20px;
-            font-size: 0.75rem;
-            color: #555;
-            border-top: 1px solid #222;
-            margin-top: auto;
+            text-align: center; padding: 20px; font-size: 0.8rem; color: #555;
+            border-top: 1px solid #222; margin-top: auto; display: flex; flex-direction: column; gap: 10px;
         }
-
-        .disclaimer-box {
-            border: 1px solid var(--warning);
-            color: var(--warning);
-            padding: 10px;
-            margin: 10px auto;
-            max-width: 800px;
-            background: rgba(255, 183, 0, 0.05);
+        .share-btn {
+            background: transparent; border: 1px solid var(--primary); color: var(--primary);
+            padding: 8px 20px; cursor: pointer; font-family: inherit; margin: 10px auto;
+            display: inline-flex; align-items: center; gap: 8px; transition: 0.3s;
         }
+        .share-btn:hover { background: rgba(0, 255, 65, 0.1); box-shadow: 0 0 10px rgba(0, 255, 65, 0.2); }
 
-        /* UTILS */
         .blink { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         .rtl { direction: rtl; }
+        .rtl .info-icon { margin-left: 0; margin-right: 8px; }
     </style>
 </head>
 <body>
@@ -227,237 +228,369 @@
 
     <main>
         <div class="card">
-            <h2 data-key="escalation_probability">US-IRAN ESCALATION PROBABILITY</h2>
+            <h2>
+                <span data-key="escalation_probability">TOTAL RISK SCORE</span>
+                <span class="info-icon" onclick="openModal('general')">?</span>
+            </h2>
             <div class="score-container">
                 <div class="big-score" id="mainScore">--%</div>
                 <div style="font-size: 1.2rem; margin-top: 10px;">
-                    <span data-key="status">CURRENT STATUS:</span> 
-                    <span id="statusText" style="color: var(--warning)">ELEVATED</span>
+                    <span data-key="status">RISK LEVEL:</span> 
+                    <span id="statusText" style="color: var(--warning)">CALCULATING...</span>
                 </div>
                 <div style="font-size: 0.8rem; color: #666; margin-top: 20px;">
                     <span data-key="last_update">LAST UPDATE:</span> <span id="lastUpdate">Checking...</span>
                 </div>
-            </div>
-            
-            <div style="margin-top: 30px; border-top: 1px dashed #333; padding-top: 15px;">
-                <h3 style="font-size: 1rem; color: var(--primary);" data-key="active_monitors">ACTIVE MONITORS</h3>
-                <ul style="font-size: 0.85rem; list-style: none; padding: 0; line-height: 1.8;">
-                    <li>✅ <span data-key="monitor_naval">Persian Gulf Naval Traffic</span></li>
-                    <li>✅ <span data-key="monitor_cyber">CENTCOM Cyber Activity</span></li>
-                    <li>✅ <span data-key="monitor_iaea">IAEA Nuclear Reports</span></li>
-                    <li>✅ <span data-key="monitor_proxy">Regional Proxy Chatter</span></li>
-                </ul>
+                <div id="multiplierBadge" style="display:none; margin-top:15px; color: var(--danger); font-size: 0.8rem; border: 1px solid var(--danger); padding: 5px; display: inline-block;">
+                    ⚠ ESCALATION MULTIPLIER ACTIVE (+15%)
+                </div>
             </div>
         </div>
 
         <div class="card">
-            <h2 data-key="risk_parameters">RISK FACTOR BREAKDOWN</h2>
-            
+            <h2 data-key="risk_parameters">LIVE SIGNALS</h2>
             <div id="parametersList">
                 </div>
-
-            <div style="margin-top: 30px;">
-                <h2 data-key="methodology_title">SCORING METHODOLOGY</h2>
-                <div class="methodology">
-                    <p data-key="methodology_desc">
-                        The WARADAR algorithm aggregates open-source intelligence (OSINT) across 5 key vectors. 
-                        Data is normalized on a 0-100 scale based on historical precedence for armed conflict.
-                        Update cycle: Every 30 seconds via global news API simulation.
-                    </p>
-                </div>
-            </div>
         </div>
     </main>
 
-    <footer>
-        <div class="disclaimer-box">
-            <strong data-key="disclaimer_title">⚠️ RESPONSIBILITY DISCLAIMER</strong><br>
-            <span data-key="disclaimer_text">
-                The data presented on this website is aggregated from unclassified, open-source databases. 
-                This statistical and probabilistic information DOES NOT constitute official diplomatic or military advice.
-                The developers are not responsible for decisions made based on this data. Use at your own discretion.
-            </span>
+    <div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
+        <div class="modal-box">
+            <span class="modal-close" onclick="closeModal(event, true)">&times;</span>
+            <div class="modal-title" id="mTitle">Title</div>
+            <div class="modal-content" id="mContent">Content</div>
         </div>
-        <div>&copy; 2026 WARADAR SYSTEM. <span data-key="rights">All rights reserved.</span></div>
+    </div>
+
+    <footer>
+        <div>
+            <button class="share-btn" onclick="shareSite()">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></svg>
+                <span data-key="share">Share Status</span>
+            </button>
+        </div>
+        <div class="disclaimer-box" style="opacity: 0.7;">
+            <span data-key="disclaimer_short">Open-source intel. Not official military advice.</span>
+        </div>
+        <div style="margin-top: 10px; color: #444;">
+            Created by <strong style="color: #666;">Idan Biton</strong>
+        </div>
     </footer>
 
     <script>
-        // --- TRANSLATIONS ---
+        // --- DATA & CONTENT ---
+        // Configuration of the 6 signals
+        const signalsConfig = [
+            { id: 'news', weight: 0.25, baseVal: 45 },
+            { id: 'aviation', weight: 0.20, baseVal: 30 },
+            { id: 'tankers', weight: 0.15, baseVal: 65 },
+            { id: 'market', weight: 0.20, baseVal: 55 },
+            { id: 'pentagon', weight: 0.10, baseVal: 20 },
+            { id: 'weather', weight: 0.10, baseVal: 80 }
+        ];
+
+        // Text Content
         const content = {
             en: {
                 donate: "Donate",
-                escalation_probability: "US-IRAN ESCALATION PROBABILITY",
-                status: "THREAT LEVEL:",
-                last_update: "DATA REFRESHED:",
-                active_monitors: "DATA SOURCES",
-                monitor_naval: "Persian Gulf Naval Traffic",
-                monitor_cyber: "Cyber Warfare Traffic",
-                monitor_iaea: "Nuclear Enrichment Levels",
-                monitor_proxy: "Proxy Militia Activity (Syria/Iraq)",
-                risk_parameters: "LIVE RISK FACTORS",
-                methodology_title: "ALGORITHM METHODOLOGY",
-                methodology_desc: "The WARADAR algorithm aggregates open-source intelligence (OSINT) to predict conflict probability. The score is a weighted average of military buildup, diplomatic rhetoric, and economic sanctions.",
-                disclaimer_title: "⚠️ DISCLAIMER",
-                disclaimer_text: "This site uses open-source unclassified data. The statistical probability shown DOES NOT constitute official military or diplomatic advice. Do not rely on this for safety decisions.",
-                rights: "All rights reserved.",
-                params: ["Military Posture", "Diplomatic Rhetoric", "Cyber Activity", "Regional Instability", "Economic Sanctions"]
+                escalation_probability: "TOTAL RISK SCORE",
+                status: "RISK LEVEL:",
+                last_update: "LAST UPDATE:",
+                risk_parameters: "LIVE SIGNALS",
+                share: "Share Status",
+                disclaimer_short: "Statistical data only. Use at your own discretion.",
+                
+                // Labels
+                l_news: "News Intelligence",
+                l_aviation: "Civil Aviation",
+                l_tankers: "Military Tankers",
+                l_market: "Prediction Markets",
+                l_pentagon: "Pentagon Activity",
+                l_weather: "Weather (Tehran)",
+
+                // Modal Content (Exact Text from Prompt)
+                m_general_title: "How We Calculate Risk",
+                m_general_desc: `
+                    <strong>Total Risk = Weighted Sum of 6 Signals</strong><br><br>
+                    • <strong>News Intel (25%):</strong> Breaking news with critical keywords increases risk.<br>
+                    • <strong>Civil Aviation (20%):</strong> Fewer flights over Iran = airlines avoiding = higher risk.<br>
+                    • <strong>Military Tankers (15%):</strong> More US tankers in the region = higher risk.<br>
+                    • <strong>Market Odds (20%):</strong> Prediction market betting odds for strike within 7 days.<br>
+                    • <strong>Pentagon Activity (10%):</strong> Unusual late-night activity near Pentagon = higher risk.<br>
+                    • <strong>Weather (10%):</strong> Clear skies in Tehran = favorable for operations = higher risk.<br><br>
+                    <strong>Escalation Multiplier:</strong> If 3+ signals are elevated (>30%), total gets a 15% boost.<br><br>
+                    <strong>Risk Levels:</strong><br>
+                    • 0-30% = Low<br>
+                    • 31-60% = Elevated<br>
+                    • 61-85% = High
+                `,
+                m_news_desc: `
+                    Scans BBC World and Al Jazeera for Iran-related news.<br><br>
+                    <strong>What we look for:</strong> Headlines containing "strike", "attack", "military", "missile", "war", "imminent"<br><br>
+                    <strong>How it works:</strong> More critical articles = higher risk. The ratio of alarming headlines to total coverage drives the score.<br>
+                    <div class="modal-tag">Weight: 25%</div>
+                `,
+                m_aviation_desc: `
+                    Tracks commercial flights over Iranian airspace via OpenSky Network.<br><br>
+                    <strong>Why it matters:</strong> Airlines avoid conflict zones. When flights drop, it often signals that carriers have intelligence suggesting danger.<br><br>
+                    <strong>How it works:</strong> Fewer aircraft = higher risk. Normal traffic (~100+ planes) = low risk.<br>
+                    <div class="modal-tag">Weight: 20%</div>
+                `,
+                m_tankers_desc: `
+                    Monitors US Air Force refueling aircraft in the Middle East.<br><br>
+                    <strong>Why it matters:</strong> Tankers (KC-135, KC-46) enable fighters and bombers to operate far from base. A surge in tanker activity often precedes military operations.<br><br>
+                    <strong>How it works:</strong> More tankers detected = higher risk.<br>
+                    <div class="modal-tag">Weight: 15%</div>
+                `,
+                m_pentagon_desc: `
+                    Monitors activity patterns near the Pentagon.<br><br>
+                    <strong>Why it matters:</strong> Unusual late-night or weekend activity can indicate crisis planning sessions.<br><br>
+                    <strong>How it works:</strong> Normal business hours = low risk. Elevated activity at odd hours = higher risk.<br>
+                    <div class="modal-tag">Weight: 10%</div>
+                `,
+                m_market_desc: `
+                    Real-money betting odds on "US or Israel strike Iran" within 7 days.<br>
+                    Source: Polymarket<br><br>
+                    <strong>Why it matters:</strong> When people bet real money, they research carefully. Market odds aggregate the wisdom of thousands of informed traders.<br>
+                    <div class="modal-tag">Weight: 20%</div>
+                `,
+                m_weather_desc: `
+                    Current weather in Tehran, Iran.<br><br>
+                    <strong>Why it matters:</strong> Military operations favor clear skies for visibility and precision targeting. Poor weather provides natural cover.<br><br>
+                    <strong>How it works:</strong> Clear skies = higher risk. Cloudy/poor visibility = lower risk.<br>
+                    <div class="modal-tag">Weight: 10%</div>
+                `
             },
             he: {
                 donate: "תרומה",
-                escalation_probability: "הסתברות לאסקלציה ארה״ב-איראן",
-                status: "רמת איום:",
+                escalation_probability: "ציון סיכון כולל",
+                status: "רמת סיכון:",
                 last_update: "עדכון אחרון:",
-                active_monitors: "מקורות מידע",
-                monitor_naval: "תנועה ימית במפרץ הפרסי",
-                monitor_cyber: "תעבורת לוחמת סייבר",
-                monitor_iaea: "דוחות העשרה גרעינית",
-                monitor_proxy: "פעילות מיליציות (סוריה/עיראק)",
-                risk_parameters: "ניתוח פרמטרים בזמן אמת",
-                methodology_title: "שיטת הדירוג",
-                methodology_desc: "אלגוריתם WARADAR משקלל מודיעין ממקורות גלויים (OSINT) לחיזוי הסתברות לעימות. הציון הוא ממוצע משוקלל של צבירת כוחות, רטוריקה דיפלומטית וסנקציות כלכליות.",
-                disclaimer_title: "⚠️ כתב ויתור ואחריות",
-                disclaimer_text: "הנתונים באתר מבוססים על מאגרי מידע בלתי מסווגים וחשופים לכולם. המידע הסטטיסטי וההסתברותי אינו מהווה המלצה או החלטה דיפלומטית או צבאית רשמית. השימוש באחריות המשתמש בלבד.",
-                rights: "כל הזכויות שמורות.",
-                params: ["כוננות צבאית", "רטוריקה דיפלומטית", "פעילות סייבר", "אי-יציבות אזורית", "סנקציות כלכליות"]
+                risk_parameters: "אותות חיים",
+                share: "שתף סטטוס",
+                disclaimer_short: "נתונים סטטיסטיים בלבד. השימוש באחריותך.",
+                
+                l_news: "מודיעין חדשותי",
+                l_aviation: "תעופה אזרחית",
+                l_tankers: "מכליות צבאיות",
+                l_market: "שוקי חיזוי",
+                l_pentagon: "פעילות בפנטגון",
+                l_weather: "מזג אוויר (טהרן)",
+
+                m_general_title: "כיצד אנו מחשבים סיכון?",
+                m_general_desc: `
+                    <strong>סיכון כולל = שקלול של 6 אותות</strong><br><br>
+                    • <strong>חדשות (25%):</strong> מילות מפתח קריטיות בכותרות.<br>
+                    • <strong>תעופה (20%):</strong> פחות טיסות מעל איראן = סיכון גבוה.<br>
+                    • <strong>מכליות (15%):</strong> ריבוי מתדלקים אמריקאים באזור.<br>
+                    • <strong>שוקי חיזוי (20%):</strong> יחסי הימורים על תקיפה ב-7 ימים.<br>
+                    • <strong>פנטגון (10%):</strong> פעילות לילית חריגה במטה ארה״ב.<br>
+                    • <strong>מזג אוויר (10%):</strong> שמיים נקיים בטהרן = נוח לתקיפה.<br><br>
+                    <strong>מכפיל אסקלציה:</strong> אם 3+ מדדים גבוהים, הציון מקבל בונוס 15%.
+                `,
+                m_news_desc: "סריקת BBC ואל-ג'זירה. יחס גבוה של כותרות המכילות 'מלחמה', 'תקיפה' או 'טילים' מעלה את הסיכון.",
+                m_aviation_desc: "מעקב אחר טיסות מסחריות (OpenSky). ירידה בכמות הטיסות מעידה שחברות התעופה חוששות מסיכון.",
+                m_tankers_desc: "מעקב אחר מטוסי תדלוק (KC-135). עליה בפעילות מאפשרת למטוסי קרב לפעול רחוק מהבסיס.",
+                m_pentagon_desc: "ניתוח דפוסי פעילות סביב הפנטגון. פעילות בשעות לילה מאוחרות מעידה על תכנון חירום.",
+                m_market_desc: "סיכויי הימורים בכסף אמיתי (Polymarket) על תקיפה בטווח של 7 ימים.",
+                m_weather_desc: "מזג אוויר בטהרן. שמיים נקיים מעלים את הסיכון לפעילות אווירית מדויקת."
             },
             ru: {
                 donate: "Пожертвовать",
-                escalation_probability: "ВЕРОЯТНОСТЬ ЭСКАЛАЦИИ США-ИРАН",
-                status: "УРОВЕНЬ УГРОЗЫ:",
+                escalation_probability: "ОБЩИЙ РИСК",
+                status: "УРОВЕНЬ РИСКА:",
                 last_update: "ОБНОВЛЕНО:",
-                active_monitors: "ИСТОЧНИКИ ДАННЫХ",
-                monitor_naval: "ВМС в Персидском заливе",
-                monitor_cyber: "Кибер-активность",
-                monitor_iaea: "Ядерные отчеты",
-                monitor_proxy: "Активность прокси (Сирия/Ирак)",
-                risk_parameters: "ФАКТОРЫ РИСКА",
-                methodology_title: "МЕТОДОЛОГИЯ",
-                methodology_desc: "Алгоритм WARADAR агрегирует открытые источники (OSINT) для прогнозирования конфликта. Оценка основана на военном наращивании и дипломатической риторике.",
-                disclaimer_title: "⚠️ ОТКАЗ ОТ ОТВЕТСТВЕННОСТИ",
-                disclaimer_text: "Данные взяты из несекретных открытых источников. Эта статистическая информация НЕ является официальным военным или дипломатическим советом.",
-                rights: "Все права защищены.",
-                params: ["Военная готовность", "Дипломатия", "Кибер-атаки", "Региональная нестабильность", "Санкции"]
+                risk_parameters: "СИГНАЛЫ",
+                share: "Поделиться",
+                disclaimer_short: "Только статистика. Не является официальным советом.",
+                
+                l_news: "Анализ новостей",
+                l_aviation: "Гражданская авиация",
+                l_tankers: "Военные танкеры",
+                l_market: "Рынки прогнозов",
+                l_pentagon: "Активность Пентагона",
+                l_weather: "Погода (Тегеран)",
+                
+                m_general_title: "Как мы считаем риск",
+                m_general_desc: "Взвешенная сумма 6 сигналов: Новости, Авиация, Танкеры, Рынки, Пентагон, Погода.",
+                m_news_desc: "Сканирование заголовков на наличие слов 'война', 'атака'.",
+                m_aviation_desc: "Меньше гражданских рейсов над Ираном = выше риск.",
+                m_tankers_desc: "Активность заправщиков ВВС США в регионе.",
+                m_pentagon_desc: "Необычная ночная активность в Пентагоне.",
+                m_market_desc: "Ставки на реальные деньги на удар в течение 7 дней.",
+                m_weather_desc: "Ясное небо над Тегераном благоприятно для операций."
             }
         };
 
         let currentLang = 'en';
 
-        // --- CLOCK ---
+        // --- CORE LOGIC ---
         function updateClock() {
             const now = new Date();
             document.getElementById('clock').innerText = now.toLocaleTimeString('en-GB', { hour12: false });
         }
         setInterval(updateClock, 1000);
 
-        // --- SIMULATION ENGINE ---
-        // Generates realistic fluctuations based on a "Base Risk"
-        const baseRisk = 62; // Baseline percentage
+        // Simulation State
+        let signalValues = {}; 
         
-        const paramsData = [
-            { id: 0, val: 55 }, // Military
-            { id: 1, val: 78 }, // Rhetoric
-            { id: 2, val: 82 }, // Cyber
-            { id: 3, val: 65 }, // Regional
-            { id: 4, val: 40 }  // Economic
-        ];
+        function simulateData() {
+            let totalWeightedScore = 0;
+            let elevatedCount = 0; // Count signals > 30%
 
-        function simulateDataFetch() {
-            // Slight randomization of parameters
-            let total = 0;
-            paramsData.forEach(p => {
-                const change = (Math.random() * 6) - 3; // +/- 3%
-                p.val = Math.max(0, Math.min(100, p.val + change));
-                total += p.val;
+            // Initialize or slight randomize
+            signalsConfig.forEach(sig => {
+                // Determine value (Mock simulation with slight random flux)
+                if (!signalValues[sig.id]) signalValues[sig.id] = sig.baseVal;
+                
+                const flux = (Math.random() * 6) - 3; 
+                let val = signalValues[sig.id] + flux;
+                val = Math.max(0, Math.min(100, val));
+                signalValues[sig.id] = val;
+
+                // Add to total
+                totalWeightedScore += (val * sig.weight);
+
+                // Check for multiplier condition
+                if (val > 30) elevatedCount++;
             });
 
-            // Calculate Weighted Average
-            const finalScore = Math.floor(total / 5);
-            
-            // Update UI
-            updateDashboard(finalScore);
+            // Escalation Multiplier Logic
+            const multiplierBadge = document.getElementById('multiplierBadge');
+            if (elevatedCount >= 3) {
+                totalWeightedScore = totalWeightedScore * 1.15; // 15% Boost
+                multiplierBadge.style.display = "inline-block";
+            } else {
+                multiplierBadge.style.display = "none";
+            }
+
+            // Cap at 100
+            totalWeightedScore = Math.min(100, totalWeightedScore);
+
+            updateUI(totalWeightedScore);
         }
 
-        function updateDashboard(score) {
-            // Update Main Score
+        function updateUI(score) {
+            // Main Score
             const scoreEl = document.getElementById('mainScore');
             scoreEl.innerText = score.toFixed(1) + '%';
             
-            // Color Coding
-            let color = '#00ff41'; // Green
+            // Risk Level
+            let color = '#00ff41'; // Low
             let status = 'LOW';
-            if(score > 40) { color = '#ffb700'; status = 'MODERATE'; }
-            if(score > 70) { color = '#ff3333'; status = 'CRITICAL'; }
+            if(score > 30) { color = '#ffb700'; status = 'ELEVATED'; } // Updated per prompt
+            if(score > 60) { color = '#ff3333'; status = 'HIGH'; }     // Updated per prompt
             
             scoreEl.style.color = color;
-            document.getElementById('statusText').innerText = status;
-            document.getElementById('statusText').style.color = color;
+            const statusEl = document.getElementById('statusText');
+            statusEl.innerText = status;
+            statusEl.style.color = color;
 
-            // Update Time
-            const now = new Date();
-            document.getElementById('lastUpdate').innerText = now.toLocaleTimeString() + " (Syncing...)";
+            // Timestamp
+            document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
 
-            // Update Bars
-            renderParameters();
+            // Render Parameters
+            renderParams();
         }
 
-        function renderParameters() {
+        function renderParams() {
             const list = document.getElementById('parametersList');
             list.innerHTML = '';
             
-            const labels = content[currentLang].params;
+            signalsConfig.forEach(sig => {
+                const val = signalValues[sig.id];
+                const label = content[currentLang][`l_${sig.id}`];
+                
+                let barColor = 'var(--primary)';
+                if(val > 30) barColor = 'var(--warning)';
+                if(val > 60) barColor = 'var(--danger)';
 
-            paramsData.forEach((p, index) => {
                 const row = document.createElement('div');
                 row.className = 'parameter-row';
-                
-                // Determine bar color
-                let barColor = 'var(--primary)';
-                if(p.val > 50) barColor = 'var(--warning)';
-                if(p.val > 75) barColor = 'var(--danger)';
-
                 row.innerHTML = `
                     <div class="param-header">
-                        <span>${labels[index]}</span>
-                        <span>${p.val.toFixed(1)}%</span>
+                        <div class="param-label">
+                            ${label}
+                            <span class="info-icon" onclick="openModal('${sig.id}')">i</span>
+                        </div>
+                        <span>${val.toFixed(1)}%</span>
                     </div>
                     <div class="progress-bg">
-                        <div class="progress-fill" style="width: ${p.val}%; background: ${barColor};"></div>
+                        <div class="progress-fill" style="width: ${val}%; background: ${barColor};"></div>
                     </div>
                 `;
                 list.appendChild(row);
             });
         }
 
+        // --- MODAL LOGIC ---
+        function openModal(type) {
+            const modal = document.getElementById('infoModal');
+            const titleEl = document.getElementById('mTitle');
+            const contentEl = document.getElementById('mContent');
+            
+            // Determine Title & Content
+            if (type === 'general') {
+                titleEl.innerText = content[currentLang].m_general_title;
+                contentEl.innerHTML = content[currentLang].m_general_desc;
+            } else {
+                titleEl.innerText = content[currentLang][`l_${type}`];
+                contentEl.innerHTML = content[currentLang][`m_${type}_desc`];
+            }
+
+            modal.classList.add('open');
+        }
+
+        function closeModal(e, force = false) {
+            if (force || e.target.id === 'infoModal') {
+                document.getElementById('infoModal').classList.remove('open');
+            }
+        }
+
+        // --- SHARE LOGIC ---
+        async function shareSite() {
+            const shareData = {
+                title: 'WARADAR - US/Iran Risk Monitor',
+                text: 'Current Escalation Risk: ' + document.getElementById('mainScore').innerText,
+                url: window.location.href
+            };
+
+            if (navigator.share) {
+                try {
+                    await navigator.share(shareData);
+                } catch (err) {
+                    console.log('Error sharing:', err);
+                }
+            } else {
+                // Fallback for desktop
+                alert("URL copied to clipboard!");
+                navigator.clipboard.writeText(window.location.href);
+            }
+        }
+
         // --- LANGUAGE SWITCHER ---
         function setLang(lang) {
             currentLang = lang;
-            
-            // Visuals
             document.querySelectorAll('.flag').forEach(f => f.classList.remove('active'));
             event.currentTarget.classList.add('active');
 
-            // RTL/LTR
             if(lang === 'he') document.body.classList.add('rtl');
             else document.body.classList.remove('rtl');
 
-            // Text Replacement
+            // Update static text
             document.querySelectorAll('[data-key]').forEach(el => {
                 const key = el.getAttribute('data-key');
-                if(content[lang][key]) {
-                    el.innerText = content[lang][key];
-                }
+                if(content[lang][key]) el.innerText = content[lang][key];
             });
 
-            // Re-render components that depend on language
-            renderParameters();
+            // Re-render dynamic components
+            renderParams();
         }
 
-        // --- INIT ---
+        // Start
         updateClock();
-        simulateDataFetch(); // First run
-        
-        // "Live" Update Loop (Every 30 seconds as requested)
-        setInterval(simulateDataFetch, 30000); 
+        simulateData();
+        setInterval(simulateData, 30000); 
 
     </script>
 </body>
