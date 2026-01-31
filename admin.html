@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WARADAR ADMIN</title>
+    <style>
+        body { 
+            background: #000; color: #00ff41; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px; margin: 0;
+        }
+        h1 { font-size: 1.5rem; text-align: center; border-bottom: 1px solid #333; padding-bottom: 15px; margin-bottom: 20px; letter-spacing: 2px; }
+        
+        label { display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem; }
+        input, select, textarea { 
+            width: 100%; padding: 12px; background: #111; border: 1px solid #333; 
+            color: white; font-size: 16px; /* מונע זום באייפון */
+            border-radius: 8px; margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background: #FFDD00; color: black; border: none; 
+            padding: 15px; width: 100%; border-radius: 8px;
+            font-weight: bold; font-size: 1.1rem; margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(255, 221, 0, 0.3);
+        }
+        
+        .status { 
+            margin-top: 20px; padding: 15px; border-radius: 8px; 
+            text-align: center; font-weight: bold; display: none; 
+        }
+        .success { background: rgba(0, 255, 65, 0.1); color: #00ff41; border: 1px solid #00ff41; }
+        .error { background: rgba(255, 51, 51, 0.1); color: #ff3333; border: 1px solid #ff3333; }
+    </style>
+</head>
+<body>
+
+    <h1>WARADAR CONTROL</h1>
+
+    <label>🔒8335234916:AAG_BTCGx4GT9NgIYyoh9xr9L46Hn3uR5eI :</label>
+    <input type="password" id="botToken" placeholder="הדבק את הטוקן מה-BotFather">
+
+    <label>📊 ציון סיכון (%):</label>
+    <input type="number" id="riskScore" inputmode="numeric" placeholder="למשל: 65">
+
+    <label>⚠️ רמת איום:</label>
+    <select id="riskLevel">
+        <option value="LOW 🟢">LOW 🟢</option>
+        <option value="ELEVATED 🟠">ELEVATED 🟠</option>
+        <option value="HIGH 🔴">HIGH 🔴</option>
+        <option value="CRITICAL ☢️">CRITICAL ☢️</option>
+    </select>
+
+    <label>📈 מגמה:</label>
+    <select id="trend">
+        <option value="Stable ➖">Stable ➖ (יציב)</option>
+        <option value="Increasing 📈">Increasing 📈 (עולה)</option>
+        <option value="Decreasing 📉">Decreasing 📉 (יורד)</option>
+    </select>
+
+    <label>📝 הערת מודיעין (אופציונלי):</label>
+    <textarea id="intelNote" rows="3" placeholder="טקסט חופשי לעדכון..."></textarea>
+
+    <button onclick="sendUpdate()">🚀 שלח לערוץ</button>
+
+    <div id="statusMsg" class="status"></div>
+
+    <script>
+        // שם הערוץ שלך קבוע בקוד
+        const CHANNEL_ID = "@waradarlive"; 
+
+        async function sendUpdate() {
+            const token = document.getElementById('botToken').value;
+            const score = document.getElementById('riskScore').value;
+            const level = document.getElementById('riskLevel').value;
+            const trend = document.getElementById('trend').value;
+            const note = document.getElementById('intelNote').value;
+            const statusDiv = document.getElementById('statusMsg');
+
+            // שמירת הטוקן בזיכרון המכשיר כדי שלא תצטרך להקליד כל פעם
+            if(token) localStorage.setItem('waradar_token', token);
+
+            if (!token || !score) {
+                alert("חסר טוקן או ציון!");
+                return;
+            }
+
+            let message = `🚨 *WARADAR ALERT SYSTEM* 🚨\n`;
+            message += `➖➖➖➖➖➖➖➖➖➖\n`;
+            message += `📊 *Risk Score:* \`${score}%\`\n`;
+            message += `⚠️ *Threat Level:* ${level}\n`;
+            message += `📉 *Trend:* ${trend}\n\n`;
+            
+            if (note) {
+                message += `📝 *Intel Update:*\n_${note}_\n\n`;
+            }
+
+            message += `🔗 [Live Dashboard](https://idanbit1.github.io/Waradar/#)\n`;
+            message += `➖➖➖➖➖➖➖➖➖➖`;
+
+            statusDiv.style.display = 'block';
+            statusDiv.innerText = "שולח...";
+            statusDiv.className = 'status';
+
+            try {
+                const url = `https://api.telegram.org/bot${token}/sendMessage`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: CHANNEL_ID,
+                        text: message,
+                        parse_mode: 'Markdown',
+                        disable_web_page_preview: false
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.ok) {
+                    statusDiv.innerText = "✅ נשלח בהצלחה!";
+                    statusDiv.className = 'status success';
+                } else {
+                    statusDiv.innerText = "❌ שגיאה: " + data.description;
+                    statusDiv.className = 'status error';
+                }
+            } catch (error) {
+                statusDiv.innerText = "❌ שגיאת תקשורת";
+                statusDiv.className = 'status error';
+            }
+        }
+
+        // טעינה אוטומטית של הטוקן אם הוא נשמר בעבר
+        window.onload = function() {
+            const savedToken = localStorage.getItem('waradar_token');
+            if(savedToken) document.getElementById('botToken').value = savedToken;
+        }
+    </script>
+</body>
+</html>
