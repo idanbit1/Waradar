@@ -133,7 +133,6 @@
 
             let total = 0;
             let htmlList = "";
-            let generatedParams = [];
 
             BASE_CONFIG.forEach(p => {
                 const drift = (Math.random() * 8) - 4;
@@ -172,8 +171,8 @@
             document.getElementById('displayLevel').style.color = data.color;
             document.getElementById('reportCard').style.borderColor = data.color;
 
-            // הכנת הטקסט לוואטסאפ
-            const waText = `*WARADAR INTEL UPDATE* 📡\n\n📊 *Escalation Risk:* ${data.score}%\n⚠️ *Level:* ${data.level}\n🕒 *Time:* ${timeStr}\n\nלצפייה בדשבורד המלא:\https://idanbit1.github.io/Waradar/;
+            // --- תיקון השגיאה בקישור לוואטסאפ ---
+            const waText = `*WARADAR INTEL UPDATE* 📡\n\n📊 *Escalation Risk:* ${data.score}%\n⚠️ *Level:* ${data.level}\n🕒 *Time:* ${timeStr}\n\nלצפייה בדשבורד המלא:\nhttps://idanbit1.github.io/Waradar/`;
             document.getElementById('whatsappText').value = waText;
         }
 
@@ -202,7 +201,8 @@
                 formData.append('chat_id', CHANNEL_ID);
                 formData.append('photo', blob, 'status.png');
                 
-                const caption = `🚨 *WARADAR UPDATE*\n📊 Escalation Risk: ${data.score}%\n⚠️ Level: ${data.level}\n🔗 [Live Dashboard](hytps://idanbit1.github.io/waradar/)`;
+                // --- תיקון השגיאה בקישור לטלגרם ---
+                const caption = `🚨 *WARADAR UPDATE*\n📊 Escalation Risk: ${data.score}%\n⚠️ Level: ${data.level}\n🔗 [Live Dashboard](https://idanbit1.github.io/Waradar/)`;
                 formData.append('caption', caption);
                 formData.append('parse_mode', 'Markdown');
 
