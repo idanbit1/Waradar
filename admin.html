@@ -12,24 +12,31 @@
             padding: 20px; margin: 0;
         }
         
-        /* --- עיצוב כרטיס הדיווח (מה שיצולם לתמונה) --- */
+        /* --- עיצוב כרטיס הדיווח --- */
         #reportCard {
             background: #0f1215; border: 2px solid #00ff41; padding: 20px;
             border-radius: 10px; margin-bottom: 20px; max-width: 500px; margin: 0 auto;
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            font-family: 'Segoe UI', sans-serif;
         }
         .report-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
         .radar-icon { width: 30px; height: 30px; border: 2px solid #00ff41; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,65,0.2), transparent); }
-        .big-score { font-size: 4rem; font-weight: 900; text-align: center; margin: 10px 0; text-shadow: 0 0 15px rgba(0,255,65,0.5); }
-        .param-list { font-size: 0.9rem; color: #ccc; }
-        .param-item { display: flex; justify-content: space-between; margin-bottom: 5px; border-bottom: 1px dashed #333; padding-bottom: 2px; }
+        
+        /* אזור הציון המרכזי */
+        .score-box { text-align: center; margin: 15px 0; }
+        .score-label { color: #888; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+        .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; text-shadow: 0 0 15px rgba(0,255,65,0.5); }
+        .update-time { font-size: 0.8rem; color: #666; margin-top: 5px; font-family: monospace; }
+
+        .param-list { font-size: 0.9rem; color: #ccc; margin-top: 20px; }
+        .param-item { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dashed #333; padding-bottom: 4px; }
 
         /* --- בקרי שליטה --- */
         .controls { max-width: 500px; margin: 20px auto; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
         h1 { text-align: center; margin: 0 0 20px 0; font-size: 1.2rem; letter-spacing: 2px; }
         
         label { display: block; margin-top: 10px; color: #888; font-size: 0.9rem; }
-        input, select { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        input { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
         
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
@@ -38,10 +45,11 @@
         .btn-auto { background: #FFDD00; color: black; }
         .btn-auto.active { background: #ff3333; color: white; animation: pulse 2s infinite; }
         
+        .btn-reset { background: transparent; border: 1px solid #333; color: #555; font-size: 0.8rem; padding: 5px; margin-top: 10px; width: 100%; }
+
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 51, 51, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); } }
 
         .status { text-align: center; margin-top: 10px; font-size: 0.9rem; min-height: 20px; }
-        .hidden { display: none; }
     </style>
 </head>
 <body>
@@ -51,14 +59,19 @@
             <div style="font-weight:bold; font-size:1.2rem;">WARADAR INTEL</div>
             <div class="radar-icon"></div>
         </div>
-        <div style="text-align:center; color:#ffb700; letter-spacing:1px; margin-bottom:5px;">CURRENT RISK PROBABILITY</div>
-        <div class="big-score" id="displayScore">65%</div>
-        <div style="text-align:center; font-weight:bold; margin-bottom:20px; color:#ff3333;" id="displayLevel">HIGH 🔴</div>
+        
+        <div class="score-box">
+            <div class="score-label">US/IRAN ESCALATION PROBABILITY</div>
+            <div class="big-score" id="displayScore">--%</div>
+            <div class="update-time" id="lastUpdateDisplay">Waiting for data...</div>
+            <div style="font-weight:bold; margin-top:10px; font-size:1.2rem;" id="displayLevel">--</div>
+        </div>
         
         <div class="param-list" id="paramListDisplay">
             </div>
-        <div style="margin-top:15px; font-size:0.7rem; text-align:center; color:#666;">
-            LIVE MONITORING | WARADAR
+        
+        <div style="margin-top:20px; font-size:0.7rem; text-align:center; color:#555; border-top:1px solid #222; padding-top:10px;">
+            LIVE MONITORING | USSTRIKERADAR.COM
         </div>
     </div>
 
@@ -69,36 +82,61 @@
         <input type="password" id="botToken" placeholder="הדבק טוקן כאן">
         
         <div class="btn-group">
-            <button class="btn-manual" onclick="sendNow()">📸 צלם ושלח ידני</button>
-            <button class="btn-auto" id="autoBtn" onclick="toggleAutoPilot()">🤖 הפעל טייס אוטומטי (1h)</button>
+            <button class="btn-manual" onclick="sendNow(true)">📸 עדכון ושלח (כפוי)</button>
+            <button class="btn-auto" id="autoBtn" onclick="toggleAutoPilot()">🤖 טייס אוטומטי (1h)</button>
         </div>
+        
+        <button class="btn-reset" onclick="resetData()">🔄 איפוס נתונים ידני (Force Refresh)</button>
 
-        <div class="status" id="statusMsg">מוכן לפעולה</div>
+        <div class="status" id="statusMsg">המערכת מוכנה</div>
         <div class="status" id="timerMsg" style="color: #FFDD00;"></div>
     </div>
 
     <script>
-        const CHANNEL_ID = "@waradarlive"; // וודא שזה שם הערוץ שלך
+        const CHANNEL_ID = "@waradarlive"; 
+        const UPDATE_INTERVAL_MINUTES = 30; // זמן מינימלי בין שינויי נתונים
+
+        // ערכי בסיס חדשים - משקפים רגיעה יחסית (סביב 35%-45%)
+        const BASE_CONFIG = [
+            { name: "News Intel", base: 35 }, 
+            { name: "Aviation", base: 30 },
+            { name: "Tankers", base: 50 },  // עדיין יש נוכחות
+            { name: "Markets", base: 40 },
+            { name: "Oil/BTC", base: 45 }, 
+            { name: "Cyber/Social", base: 55 } // ברשת תמיד יש רעש
+        ];
+
         let autoInterval = null;
         let countdownInterval = null;
 
-        // --- 1. סימולציית נתונים (אותו מנוע כמו באתר) ---
-        function simulateData() {
-            const params = [
-                { name: "News Intel", val: 45 }, { name: "Aviation", val: 30 },
-                { name: "Tankers", val: 65 }, { name: "Markets", val: 55 },
-                { name: "Oil/BTC", val: 60 }, { name: "Cyber/Social", val: 70 }
-            ];
+        // --- 1. מנוע נתונים חכם (Smart Data Engine) ---
+        function getSmartData(forceUpdate = false) {
+            const now = Date.now();
+            const storedString = localStorage.getItem('waradar_smart_data');
+            let storedData = storedString ? JSON.parse(storedString) : null;
+
+            // בדיקה: האם עברו 30 דקות? או האם לחצו "כפה עדכון"?
+            if (!forceUpdate && storedData && (now - storedData.timestamp < UPDATE_INTERVAL_MINUTES * 60 * 1000)) {
+                console.log("Using cached data (Under 30 mins)");
+                renderData(storedData.payload, storedData.displayTime);
+                return storedData.payload;
+            }
+
+            console.log("Generating NEW data...");
             
+            // חישוב נתונים חדשים עם סטייה קלה (Drift)
             let total = 0;
             let htmlList = "";
+            let generatedParams = [];
 
-            params.forEach(p => {
-                const flux = (Math.random() * 10) - 5;
-                let val = Math.floor(Math.max(0, Math.min(100, p.val + flux)));
+            BASE_CONFIG.forEach(p => {
+                // סטייה קטנה של +/- 4% כדי לשמור על יציבות
+                const drift = (Math.random() * 8) - 4;
+                let val = Math.floor(Math.max(10, Math.min(95, p.base + drift)));
                 total += val;
                 
-                // עיצוב הרשימה לצילום
+                generatedParams.push({ name: p.name, val: val });
+
                 htmlList += `
                     <div class="param-item">
                         <span>${p.name}</span>
@@ -107,52 +145,76 @@
                 `;
             });
 
-            const finalScore = Math.floor(total / params.length);
+            const finalScore = Math.floor(total / BASE_CONFIG.length);
             
-            // עדכון התצוגה הגרפית
-            document.getElementById('displayScore').innerText = finalScore + "%";
-            document.getElementById('paramListDisplay').innerHTML = htmlList;
-            
+            // קביעת צבע ורמה
             let level = "LOW 🟢";
-            let color = "#00ff41";
-            if(finalScore > 30) { level = "ELEVATED 🟠"; color = "#ffb700"; }
-            if(finalScore > 60) { level = "HIGH 🔴"; color = "#ff3333"; }
-            
-            const levelEl = document.getElementById('displayLevel');
-            levelEl.innerText = level;
-            levelEl.style.color = color;
-            document.getElementById('displayScore').style.color = color;
-            document.getElementById('reportCard').style.borderColor = color;
+            let color = "#00ff41"; 
+            if(finalScore > 35) { level = "ELEVATED 🟠"; color = "#ffb700"; }
+            if(finalScore > 65) { level = "HIGH 🔴"; color = "#ff3333"; }
 
-            return { score: finalScore, level: level };
+            // יצירת זמן עדכון יפה (14:30)
+            const dateObj = new Date();
+            const displayTime = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+            const payload = {
+                score: finalScore,
+                level: level,
+                color: color,
+                html: htmlList,
+                params: generatedParams
+            };
+
+            // שמירה בזיכרון
+            localStorage.setItem('waradar_smart_data', JSON.stringify({
+                timestamp: now,
+                displayTime: displayTime,
+                payload: payload
+            }));
+
+            renderData(payload, displayTime);
+            return payload;
         }
 
-        // --- 2. פונקציית צילום ושליחה לטלגרם ---
-        async function sendNow() {
+        // --- 2. הצגת הנתונים על המסך ---
+        function renderData(data, timeStr) {
+            document.getElementById('displayScore').innerText = data.score + "%";
+            document.getElementById('paramListDisplay').innerHTML = data.html;
+            document.getElementById('displayLevel').innerText = data.level;
+            document.getElementById('lastUpdateDisplay').innerText = `Last Updated: ${timeStr}`;
+
+            // צבעים
+            document.getElementById('displayScore').style.color = data.color;
+            document.getElementById('displayLevel').style.color = data.color;
+            document.getElementById('reportCard').style.borderColor = data.color;
+        }
+
+        // --- 3. צילום ושליחה ---
+        async function sendNow(force = false) {
             const token = document.getElementById('botToken').value;
             if(!token) { alert("חסר טוקן!"); return; }
-            localStorage.setItem('waradar_token', token); // שמירה לעתיד
+            localStorage.setItem('waradar_token', token);
 
             const statusDiv = document.getElementById('statusMsg');
-            statusDiv.innerText = "מעבד נתונים ומצלם מסך...";
+            statusDiv.innerText = "מעבד נתונים...";
 
-            // 1. רענון נתונים
-            const data = simulateData();
+            // קבלת נתונים (חדשים או מהזיכרון)
+            const data = getSmartData(force);
 
-            // 2. צילום ה-DIV שנקרא reportCard
+            // צילום
+            statusDiv.innerText = "מצלם מסך...";
             const canvas = await html2canvas(document.getElementById('reportCard'), {
                 backgroundColor: "#050505",
-                scale: 2 // איכות גבוהה
+                scale: 2
             });
 
-            // 3. המרה לקובץ ושליחה
+            // המרה ושליחה
             canvas.toBlob(async function(blob) {
                 const formData = new FormData();
                 formData.append('chat_id', CHANNEL_ID);
                 formData.append('photo', blob, 'status.png');
                 
-                // הטקסט שיתלווה לתמונה
-                const caption = `🚨 *WARADAR AUTO-UPDATE*\n📊 Score: ${data.score}%\n⚠️ Level: ${data.level}\n🔗 [Live Dashboard](https://idanbit1.github.io/Waradar/)`;
+                const caption = `🚨 *WARADAR UPDATE*\n📊 Escalation Risk: ${data.score}%\n⚠️ Level: ${data.level}\n🔗 [Live Dashboard](https://usstrikeradar.com/)`;
                 formData.append('caption', caption);
                 formData.append('parse_mode', 'Markdown');
 
@@ -166,9 +228,9 @@
                     const resData = await response.json();
                     
                     if(resData.ok) {
-                        statusDiv.innerText = "✅ נשלח בהצלחה: " + new Date().toLocaleTimeString();
+                        statusDiv.innerText = "✅ נשלח: " + new Date().toLocaleTimeString();
                     } else {
-                        statusDiv.innerText = "❌ שגיאה: " + resData.description;
+                        statusDiv.innerText = "❌ שגיאה בטלגרם";
                     }
                 } catch (e) {
                     statusDiv.innerText = "❌ שגיאת תקשורת";
@@ -176,52 +238,53 @@
             });
         }
 
-        // --- 3. טייס אוטומטי ---
+        // --- כפתור איפוס ---
+        function resetData() {
+            localStorage.removeItem('waradar_smart_data');
+            getSmartData(true); // מייצר חדש
+            document.getElementById('statusMsg').innerText = "הנתונים אופסו וחושבו מחדש.";
+        }
+
+        // --- טייס אוטומטי ---
         function toggleAutoPilot() {
             const btn = document.getElementById('autoBtn');
             const timerMsg = document.getElementById('timerMsg');
             
             if (autoInterval) {
-                // כיבוי
                 clearInterval(autoInterval);
                 clearInterval(countdownInterval);
                 autoInterval = null;
                 btn.classList.remove('active');
-                btn.innerText = "🤖 הפעל טייס אוטומטי (1h)";
+                btn.innerText = "🤖 טייס אוטומטי (1h)";
                 timerMsg.innerText = "";
             } else {
-                // הפעלה
                 const token = document.getElementById('botToken').value;
-                if(!token) { alert("יש להזין טוקן לפני הפעלה אוטומטית"); return; }
+                if(!token) { alert("הזן טוקן!"); return; }
                 
-                sendNow(); // שליחה ראשונה מיידית
+                sendNow(false); // שליחה רגילה (לא כפויה)
                 
-                // טיימר לשעה (3600000 מילישניות)
-                let timeLeft = 3600; // שניות
-                
+                let timeLeft = 3600;
                 autoInterval = setInterval(() => {
-                    sendNow();
-                    timeLeft = 3600; // איפוס טיימר
-                }, 3600000);
+                    sendNow(false); // יבדוק אם עברו 30 דקות ויעדכן אם צריך
+                    timeLeft = 3600;
+                }, 3600000); // כל שעה
 
-                // טיימר ויזואלי למסך
                 countdownInterval = setInterval(() => {
                     timeLeft--;
                     const m = Math.floor(timeLeft / 60);
                     const s = timeLeft % 60;
-                    timerMsg.innerText = `עדכון הבא בעוד: ${m}:${s < 10 ? '0'+s : s}`;
+                    timerMsg.innerText = `דיווח הבא בעוד: ${m}:${s < 10 ? '0'+s : s}`;
                 }, 1000);
 
                 btn.classList.add('active');
-                btn.innerText = "⏹ עצור טייס אוטומטי";
+                btn.innerText = "⏹ עצור אוטומציה";
             }
         }
 
-        // טעינת טוקן בטעינה
         window.onload = () => {
             const saved = localStorage.getItem('waradar_token');
             if(saved) document.getElementById('botToken').value = saved;
-            simulateData(); // הצגה ראשונית
+            getSmartData(false); // טעינה ראשונית מהזיכרון
         }
     </script>
 </body>
