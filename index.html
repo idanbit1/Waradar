@@ -10,6 +10,7 @@
             --warning: #ffb700; /* Alert Orange */
             --danger: #ff3333;  /* War Red */
             --telegram: #0088cc; /* Telegram Blue */
+            --whatsapp: #25D366; /* WhatsApp Green */
             --bg: #050505;      /* Void Black */
             --panel: #0f1215;
             --text-dim: #888;
@@ -69,25 +70,29 @@
         .title-group h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
         .live-tag { font-size: 0.7rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; }
 
-        .top-controls { display: flex; gap: 10px; align-items: center; }
+        .top-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
         .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none; margin-right: 10px; }
-        @media(min-width: 700px) { .clock { display: block; } }
+        @media(min-width: 800px) { .clock { display: block; } }
 
-        .lang-flags { display: flex; gap: 8px; cursor: pointer; margin-left: 5px; }
-        .flag { font-size: 1.5rem; filter: grayscale(1); transition: 0.3s; }
-        .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.2); }
+        .lang-flags { display: flex; gap: 5px; cursor: pointer; margin-left: 5px; }
+        .flag { font-size: 1.4rem; filter: grayscale(1); transition: 0.3s; }
+        .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.1); }
 
         /* Buttons */
         .btn {
-            text-decoration: none; padding: 5px 12px; font-weight: bold; border-radius: 4px; 
-            display: flex; align-items: center; gap: 6px; font-size: 0.8rem; transition: 0.3s;
+            text-decoration: none; padding: 6px 10px; font-weight: bold; border-radius: 4px; 
+            display: flex; align-items: center; gap: 5px; font-size: 0.75rem; transition: 0.3s;
         }
         .donate-btn { background: #FFDD00; color: #000; border: 1px solid #cca300; }
         .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
 
         .telegram-btn { background: transparent; color: var(--telegram); border: 1px solid var(--telegram); }
         .telegram-btn:hover { background: rgba(0, 136, 204, 0.2); box-shadow: 0 0 10px var(--telegram); }
-        .telegram-icon { width: 14px; height: 14px; fill: currentColor; }
+        
+        .whatsapp-btn { background: transparent; color: var(--whatsapp); border: 1px solid var(--whatsapp); }
+        .whatsapp-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 10px var(--whatsapp); }
+
+        .btn-icon { width: 14px; height: 14px; fill: currentColor; }
 
         /* --- LAYOUT --- */
         main {
@@ -108,19 +113,12 @@
 
         /* --- SCORE & CHART --- */
         .score-container { text-align: center; padding: 10px; margin-bottom: 20px; }
-        
-        /* New Styles for Score Label and Time */
         .score-label { font-size: 0.9rem; color: #888; letter-spacing: 2px; margin-bottom: 5px; font-weight: bold; }
         .update-time-display { font-size: 0.85rem; color: #666; margin-top: 5px; font-family: monospace; }
-        
         .big-score { font-size: 5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,65,0.4); line-height: 1; }
         
-        /* Stock Graph Canvas */
         .history-section {
-            margin-top: auto;
-            border-top: 1px dashed #333;
-            padding-top: 15px;
-            position: relative;
+            margin-top: auto; border-top: 1px dashed #333; padding-top: 15px; position: relative;
         }
         canvas#trendChart { width: 100%; height: 150px; margin-top: 10px; display: block; }
         .chart-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #666; margin-top: 5px; padding: 0 5px; }
@@ -128,16 +126,12 @@
         /* --- PARAMETERS LIST --- */
         .parameter-row { margin-bottom: 12px; padding: 10px; border-radius: 4px; border: 1px solid transparent; transition: 0.2s; cursor: pointer; }
         .parameter-row:hover { background: var(--hover-row); border-color: #333; }
-        
         .param-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; align-items: center; }
         .param-label { display: flex; align-items: center; gap: 10px; font-weight: bold; }
-        
         .param-icon { width: 20px; height: 20px; fill: var(--primary); opacity: 0.8; transition: 0.3s; }
         .parameter-row:hover .param-icon { transform: scale(1.1); opacity: 1; }
-
         .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid var(--text-dim); color: var(--text-dim); border-radius: 50%; font-size: 0.7rem; cursor: pointer; transition: 0.2s; z-index: 5; margin-left: auto; }
         .info-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,65,0.1); }
-
         .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--warning)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
@@ -153,6 +147,7 @@
         /* --- FOOTER --- */
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; }
         .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; }
+        .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
         .blink { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         .rtl { direction: rtl; }
@@ -172,9 +167,14 @@
         <div class="top-controls">
             <div class="clock" id="clock">00:00:00</div>
             
+            <a href="PUT_YOUR_WHATSAPP_LINK_HERE" target="_blank" class="btn whatsapp-btn">
+                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                <span>WhatsApp</span>
+            </a>
+
             <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn">
-                <svg class="telegram-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                <span data-key="telegram">Join</span>
+                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                <span>Telegram</span>
             </a>
 
             <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn"><span>☕</span> <span data-key="donate">Donate</span></a>
@@ -195,16 +195,12 @@
             </h2>
             <div class="score-container">
                 <div class="score-label" data-key="score_label">US/IRAN ESCALATION PROBABILITY</div>
-                
                 <div class="big-score" id="mainScore">--%</div>
-                
                 <div class="update-time-display" id="lastUpdateTime">Loading...</div>
-
                 <div style="font-size: 1.2rem; margin-top: 10px;">
                     <span data-key="status">RISK LEVEL:</span> 
                     <span id="statusText" style="color: var(--warning)">CALCULATING...</span>
                 </div>
-                
                 <div id="multiplierBadge" style="display:none; margin-top:15px; color: var(--danger); font-size: 0.8rem; border: 1px solid var(--danger); padding: 5px; display: inline-block;">
                     ⚠ ESCALATION MULTIPLIER ACTIVE
                 </div>
@@ -246,11 +242,16 @@
         <button class="share-btn" onclick="shareSite()">
             <span data-key="share">Share Status</span>
         </button>
-        <div style="margin-top: 10px;">
+        
+        <div class="social-links">
+            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" style="color: var(--whatsapp); text-decoration: none; font-size: 0.9rem;">
+                📢 WhatsApp
+            </a>
             <a href="https://t.me/waradarlive" target="_blank" style="color: var(--telegram); text-decoration: none; font-size: 0.9rem;">
-                📢 <span data-key="telegram_footer">Join our Telegram Channel</span>
+                📢 Telegram
             </a>
         </div>
+
         <div class="disclaimer-box" style="opacity: 0.7; margin-top:10px;">
             <span data-key="disclaimer_short">Open-source intel aggregation. Not official military advice.</span>
         </div>
@@ -271,8 +272,6 @@
             weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
         };
 
-        // --- CALIBRATED CONFIGURATION (CALM/REALISTIC) ---
-        // ערכי בסיס מונמכים כדי לשקף רגיעה יחסית
         const signalsConfig = [
             { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 35, icon: icons.news },
             { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 30, icon: icons.aviation },
@@ -285,15 +284,12 @@
             { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80, icon: icons.weather }
         ];
 
-        // --- FIXED HISTORICAL DATA ---
         const historyPoints = [35, 42, 58, 52, 60]; 
 
-        // --- CONTENT DICTIONARY ---
         const content = {
             en: {
                 donate: "Donate",
                 telegram: "Channel",
-                telegram_footer: "Join our Telegram Channel",
                 risk_title: "RISK SCORE",
                 score_label: "US/IRAN ESCALATION PROBABILITY",
                 status: "RISK LEVEL:",
@@ -316,7 +312,6 @@
                 
                 m_general_title: "Risk Calculation",
                 m_general_desc: "We aggregate 9 distinct signals to calculate the probability of conflict.<br><br><strong>Why these weights?</strong><br>• News (20%) & Markets (15%) are leading indicators.<br>• Aviation (15%) reflects insurance risk.<br>• Tankers (10%) reflect logistical readiness.<br>The graph shows a fixed 7-day trend analysis.",
-                
                 m_news_desc: "Scans major news outlets for keywords like 'Strike', 'Imminent'.",
                 m_aviation_desc: "Civilian flight volume over Iran. Low volume = High Risk.",
                 m_tankers_desc: "Presence of KC-135/KC-46 refueling tankers.",
@@ -330,7 +325,6 @@
             he: {
                 donate: "תרומה",
                 telegram: "ערוץ",
-                telegram_footer: "הצטרפו לערוץ הטלגרם שלנו",
                 risk_title: "ציון סיכון",
                 score_label: "הסתברות להסלמה: ארה״ב / איראן",
                 status: "רמת סיכון:",
@@ -340,7 +334,7 @@
                 disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
                 trend_title: "מגמת סיכון (7 ימים)",
                 updated_at: "עדכון אחרון:",
-
+                
                 l_news: "מודיעין חדשותי",
                 l_aviation: "תעופה אזרחית",
                 l_tankers: "מכליות צבאיות",
@@ -350,10 +344,9 @@
                 l_traffic: "תנועה בטהרן",
                 l_pentagon: "פעילות בפנטגון",
                 l_weather: "מזג אוויר",
-
+                
                 m_general_title: "שיטת חישוב",
                 m_general_desc: "האלגוריתם משקלל 9 מקורות. הגרף מציג מגמה קבועה של 7 הימים האחרונים ומתעדכן בזמן אמת בנקודה האחרונה בלבד.",
-                
                 m_news_desc: "סריקת כותרות באתרי חדשות מובילים.",
                 m_aviation_desc: "נפח טיסות מסחריות מעל איראן.",
                 m_tankers_desc: "נוכחות מתדלקים אוויריים.",
@@ -367,7 +360,6 @@
             ru: {
                 donate: "Пожертвовать",
                 telegram: "Канал",
-                telegram_footer: "Присоединяйтесь к каналу",
                 risk_title: "ОБЩИЙ РИСК",
                 score_label: "ВЕРОЯТНОСТЬ ЭСКАЛАЦИИ США/ИРАН",
                 status: "УРОВЕНЬ РИСКА:",
@@ -377,7 +369,7 @@
                 disclaimer_short: "Статистическая агрегация. Не официальный совет.",
                 trend_title: "ТРЕНД (7 ДНЕЙ)",
                 updated_at: "Обновлено:",
-
+                
                 l_news: "Анализ новостей",
                 l_aviation: "Авиация",
                 l_tankers: "Военные танкеры",
@@ -387,10 +379,9 @@
                 l_traffic: "Трафик Тегеран",
                 l_pentagon: "Пентагон",
                 l_weather: "Погода",
-
+                
                 m_general_title: "Методология",
                 m_general_desc: "Агрегация 9 сигналов. График показывает фиксированный тренд за 7 дней.",
-                
                 m_news_desc: "Мониторинг заголовков новостей.",
                 m_aviation_desc: "Объем гражданских рейсов.",
                 m_tankers_desc: "Активность заправщиков.",
@@ -414,24 +405,21 @@
         // --- SMART DATA ENGINE (PERSISTENCE & LOGIC) ---
         function getSmartData() {
             const now = Date.now();
-            const UPDATE_INTERVAL = 30 * 60 * 1000; // 30 דקות
+            const UPDATE_INTERVAL = 30 * 60 * 1000; // 30 minutes
             
-            // נסיון לטעון מהזיכרון
             const storedString = localStorage.getItem('waradar_index_data');
             let storedData = storedString ? JSON.parse(storedString) : null;
 
-            // אם יש נתונים והם בני פחות מ-30 דקות, השתמש בהם
             if (storedData && (now - storedData.timestamp < UPDATE_INTERVAL)) {
                 return storedData.payload;
             }
 
-            // אחרת, חשב נתונים חדשים
             let totalWeightedScore = 0;
             let elevatedCount = 0;
             let signalValues = {};
 
             signalsConfig.forEach(sig => {
-                const flux = (Math.random() * 8) - 4; // תנודה קלה
+                const flux = (Math.random() * 8) - 4; 
                 let val = Math.floor(Math.max(10, Math.min(95, sig.baseVal + flux)));
                 
                 signalValues[sig.id] = val;
@@ -439,14 +427,12 @@
                 if (val > 50) elevatedCount++;
             });
 
-            // Escalation Logic
             if (elevatedCount >= 4) { 
                 totalWeightedScore = totalWeightedScore * 1.15;
             }
 
             let finalScore = Math.min(100, Math.floor(totalWeightedScore));
             
-            // זמן עדכון לתצוגה
             const updateTimeStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
             const payload = {
@@ -456,7 +442,6 @@
                 updateTime: updateTimeStr
             };
 
-            // שמירה
             localStorage.setItem('waradar_index_data', JSON.stringify({
                 timestamp: now,
                 payload: payload
@@ -468,15 +453,12 @@
         function renderUI() {
             const data = getSmartData();
             
-            // Main Score
             const scoreEl = document.getElementById('mainScore');
             scoreEl.innerText = data.score + '%';
             
-            // Update Time
             const timeLabel = content[currentLang].updated_at;
             document.getElementById('lastUpdateTime').innerText = `${timeLabel} ${data.updateTime}`;
 
-            // Levels
             let color = '#00ff41'; let status = 'LOW';
             if(data.score > 35) { color = '#ffb700'; status = 'ELEVATED'; }
             if(data.score > 65) { color = '#ff3333'; status = 'HIGH'; }
@@ -485,10 +467,8 @@
             document.getElementById('statusText').innerText = status;
             document.getElementById('statusText').style.color = color;
 
-            // Multiplier Badge
             document.getElementById('multiplierBadge').style.display = data.multiplier ? "inline-block" : "none";
 
-            // Render Parameters List
             const list = document.getElementById('parametersList');
             list.innerHTML = '';
             
@@ -525,21 +505,18 @@
             drawStockChart(data.score);
         }
 
-        // --- STOCK GRAPH LOGIC ---
         function drawStockChart(currentValue) {
             const canvas = document.getElementById('trendChart');
             const ctx = canvas.getContext('2d');
             const width = canvas.width = canvas.offsetWidth;
             const height = canvas.height = canvas.offsetHeight;
 
-            // Combine fixed history + current live value
             const dataPoints = [...historyPoints, currentValue];
             const pointCount = dataPoints.length;
             const stepX = width / (pointCount - 1);
 
             ctx.clearRect(0, 0, width, height);
 
-            // Create Gradient
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
             gradient.addColorStop(0, "rgba(0, 255, 65, 0.4)");
             gradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");
@@ -548,7 +525,6 @@
             if(currentValue > 35) strokeColor = '#ffb700';
             if(currentValue > 65) strokeColor = '#ff3333';
 
-            // Draw Area
             ctx.beginPath();
             ctx.moveTo(0, height);
             dataPoints.forEach((val, index) => {
@@ -561,7 +537,6 @@
             ctx.fillStyle = gradient;
             ctx.fill();
 
-            // Draw Line
             ctx.beginPath();
             ctx.strokeStyle = strokeColor;
             ctx.lineWidth = 3;
@@ -574,7 +549,6 @@
             });
             ctx.stroke();
 
-            // Draw Points
             dataPoints.forEach((val, index) => {
                 const x = index * stepX;
                 const y = height - (val / 100 * height);
@@ -585,7 +559,6 @@
             });
         }
 
-        // --- MODAL & SHARE ---
         function openModal(type, event) {
             event.stopPropagation();
             const modal = document.getElementById('infoModal');
@@ -632,10 +605,8 @@
             renderUI();
         }
 
-        // Start
         updateClock();
         renderUI();
-        // Check for expiration every minute
         setInterval(renderUI, 60000); 
 
     </script>
