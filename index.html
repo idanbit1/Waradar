@@ -1,623 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARADAR - Strategic Risk Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>WARADAR COMMAND CENTER</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
-        :root {
-            --primary: #00ff41; /* Cyber Green */
-            --warning: #ffb700; /* Alert Orange */
-            --danger: #ff3333;  /* War Red */
-            --telegram: #0088cc; /* Telegram Blue */
-            --bg: #050505;      /* Void Black */
-            --panel: #0f1215;
-            --text-dim: #888;
-            --hover-row: #1a221a;
+        body { 
+            background: #000; color: #00ff41; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            padding: 20px; margin: 0;
         }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            background-color: var(--bg);
-            color: var(--primary);
-            font-family: 'Segoe UI', 'Roboto Mono', monospace;
-            overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* Scanline Overlay */
-        body::after {
-            content: "";
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15), rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
-            pointer-events: none;
-            z-index: 990;
-        }
-
-        /* --- HEADER --- */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background: rgba(0, 20, 0, 0.95);
-            border-bottom: 1px solid var(--primary);
-            backdrop-filter: blur(5px);
-            z-index: 1000;
-            position: sticky; top: 0;
-        }
-
-        .brand { display: flex; align-items: center; gap: 15px; }
-        .radar-logo {
-            width: 40px; height: 40px; border: 2px solid var(--primary);
-            border-radius: 50%; position: relative;
-            background: radial-gradient(circle, rgba(0,255,65,0.1), transparent);
-        }
-        .radar-sweep {
-            position: absolute; width: 50%; height: 50%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.5));
-            top: 0; left: 0; transform-origin: bottom right;
-            animation: sweep 2s infinite linear; border-radius: 100% 0 0 0;
-        }
-        @keyframes sweep { to { transform: rotate(360deg); } }
-
-        .title-group h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
-        .live-tag { font-size: 0.7rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; }
-
-        .top-controls { display: flex; gap: 10px; align-items: center; }
-        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none; margin-right: 10px; }
-        @media(min-width: 700px) { .clock { display: block; } }
-
-        .lang-flags { display: flex; gap: 8px; cursor: pointer; margin-left: 5px; }
-        .flag { font-size: 1.5rem; filter: grayscale(1); transition: 0.3s; }
-        .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.2); }
-
-        /* Buttons */
-        .btn {
-            text-decoration: none; padding: 5px 12px; font-weight: bold; border-radius: 4px; 
-            display: flex; align-items: center; gap: 6px; font-size: 0.8rem; transition: 0.3s;
-        }
-        .donate-btn {
-            background: #FFDD00; color: #000; border: 1px solid #cca300;
-        }
-        .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
-
-        .telegram-btn {
-            background: transparent; color: var(--telegram); border: 1px solid var(--telegram);
-        }
-        .telegram-btn:hover { background: rgba(0, 136, 204, 0.2); box-shadow: 0 0 10px var(--telegram); }
-        .telegram-icon { width: 14px; height: 14px; fill: currentColor; }
-
-        /* --- LAYOUT --- */
-        main {
-            flex: 1; padding: 20px; display: grid; grid-template-columns: 1fr 1.2fr;
-            gap: 20px; max-width: 1400px; margin: 0 auto; width: 100%;
-        }
-        @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
-
-        .card {
-            background: var(--panel); border: 1px solid #333; padding: 20px;
-            border-radius: 4px; position: relative; display: flex; flex-direction: column;
-        }
-        .card h2 {
-            margin-top: 0; border-bottom: 1px solid #333; padding-bottom: 10px;
-            font-size: 1.1rem; color: var(--text-dim); text-transform: uppercase;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* --- SCORE & CHART --- */
-        .score-container { text-align: center; padding: 10px; margin-bottom: 20px; }
-        .big-score { font-size: 5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,65,0.4); line-height: 1; }
         
-        /* Stock Graph Canvas */
-        .history-section {
-            margin-top: auto;
-            border-top: 1px dashed #333;
-            padding-top: 15px;
-            position: relative;
+        /* --- עיצוב כרטיס הדיווח --- */
+        #reportCard {
+            background: #0f1215; border: 2px solid #00ff41; padding: 20px;
+            border-radius: 10px; margin-bottom: 20px; max-width: 500px; margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            font-family: 'Segoe UI', sans-serif;
         }
-        canvas#trendChart {
-            width: 100%; height: 150px; margin-top: 10px; display: block;
-        }
-        .chart-labels {
-            display: flex; justify-content: space-between; font-size: 0.7rem; color: #666; margin-top: 5px; padding: 0 5px;
-        }
-
-        /* --- PARAMETERS LIST --- */
-        .parameter-row {
-            margin-bottom: 12px; padding: 10px; border-radius: 4px;
-            border: 1px solid transparent; transition: 0.2s; cursor: pointer;
-        }
-        .parameter-row:hover { background: var(--hover-row); border-color: #333; }
+        .report-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
+        .radar-icon { width: 30px; height: 30px; border: 2px solid #00ff41; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,65,0.2), transparent); }
         
-        .param-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.9rem; align-items: center; }
-        .param-label { display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        /* אזור הציון המרכזי */
+        .score-box { text-align: center; margin: 15px 0; }
+        .score-label { color: #888; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
+        .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; text-shadow: 0 0 15px rgba(0,255,65,0.5); }
+        .update-time { font-size: 0.8rem; color: #666; margin-top: 5px; font-family: monospace; }
+
+        .param-list { font-size: 0.9rem; color: #ccc; margin-top: 20px; }
+        .param-item { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dashed #333; padding-bottom: 4px; }
+
+        /* --- בקרי שליטה --- */
+        .controls { max-width: 500px; margin: 20px auto; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        h1 { text-align: center; margin: 0 0 20px 0; font-size: 1.2rem; letter-spacing: 2px; }
         
-        /* SVG Icons Styling */
-        .param-icon {
-            width: 20px; height: 20px; fill: var(--primary); opacity: 0.8; transition: 0.3s;
-        }
-        .parameter-row:hover .param-icon { transform: scale(1.1); opacity: 1; }
+        label { display: block; margin-top: 10px; color: #888; font-size: 0.9rem; }
+        input { width: 100%; padding: 10px; background: #000; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; }
+        
+        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
+        button { flex: 1; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
+        
+        .btn-manual { background: #333; color: white; border: 1px solid #555; }
+        .btn-auto { background: #FFDD00; color: black; }
+        .btn-auto.active { background: #ff3333; color: white; animation: pulse 2s infinite; }
+        
+        .btn-reset { background: transparent; border: 1px solid #333; color: #555; font-size: 0.8rem; padding: 5px; margin-top: 10px; width: 100%; }
 
-        .info-btn {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 18px; height: 18px; border: 1px solid var(--text-dim);
-            color: var(--text-dim); border-radius: 50%; font-size: 0.7rem;
-            cursor: pointer; transition: 0.2s; z-index: 5; margin-left: auto;
-        }
-        .info-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,65,0.1); }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 51, 51, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 51, 51, 0); } }
 
-        .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
-        .progress-fill {
-            height: 100%; width: 0%;
-            background: linear-gradient(90deg, var(--primary), var(--warning));
-            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); backdrop-filter: blur(4px);
-            z-index: 2000; display: none; align-items: center; justify-content: center;
-        }
-        .modal-overlay.open { display: flex; }
-        .modal-box {
-            background: #111; border: 1px solid var(--primary); width: 90%; max-width: 500px;
-            padding: 25px; box-shadow: 0 0 40px rgba(0, 255, 65, 0.15); position: relative;
-        }
-        .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; }
-        .modal-title { font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
-        .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ccc; }
-        .modal-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; color: var(--warning); margin-top: 10px; border: 1px solid #444; }
-
-        /* --- FOOTER --- */
-        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; }
-        .share-btn {
-            background: transparent; border: 1px solid var(--primary); color: var(--primary);
-            padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px;
-        }
-        .blink { animation: blink 1s infinite; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-        .rtl { direction: rtl; }
-        .rtl .param-label { gap: 10px; }
-        .rtl .info-btn { margin-right: auto; margin-left: 0; }
+        .status { text-align: center; margin-top: 10px; font-size: 0.9rem; min-height: 20px; }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="brand">
-            <div class="radar-logo"><div class="radar-sweep"></div></div>
-            <div class="title-group">
-                <h1>WARADAR <span class="live-tag">LIVE</span></h1>
-            </div>
+    <div id="reportCard">
+        <div class="report-header">
+            <div style="font-weight:bold; font-size:1.2rem;">WARADAR INTEL</div>
+            <div class="radar-icon"></div>
         </div>
-        <div class="top-controls">
-            <div class="clock" id="clock">00:00:00</div>
-            
-            <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn">
-                <svg class="telegram-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                <span data-key="telegram">Join</span>
-            </a>
-
-            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn"><span>☕</span> <span data-key="donate">Donate</span></a>
-            
-            <div class="lang-flags">
-                <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
-                <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
-                <span class="flag" onclick="setLang('ru')" title="Русский">🇷🇺</span>
-            </div>
+        
+        <div class="score-box">
+            <div class="score-label">US/IRAN ESCALATION PROBABILITY</div>
+            <div class="big-score" id="displayScore">--%</div>
+            <div class="update-time" id="lastUpdateDisplay">Waiting for data...</div>
+            <div style="font-weight:bold; margin-top:10px; font-size:1.2rem;" id="displayLevel">--</div>
         </div>
-    </header>
-
-    <main>
-        <div class="card">
-            <h2>
-                <span data-key="escalation_probability">RISK SCORE</span>
-                <span class="info-btn" onclick="openModal('general', event)">?</span>
-            </h2>
-            <div class="score-container">
-                <div class="big-score" id="mainScore">--%</div>
-                <div style="font-size: 1.2rem; margin-top: 10px;">
-                    <span data-key="status">RISK LEVEL:</span> 
-                    <span id="statusText" style="color: var(--warning)">CALCULATING...</span>
-                </div>
-                <div id="multiplierBadge" style="display:none; margin-top:15px; color: var(--danger); font-size: 0.8rem; border: 1px solid var(--danger); padding: 5px; display: inline-block;">
-                    ⚠ ESCALATION MULTIPLIER ACTIVE
-                </div>
+        
+        <div class="param-list" id="paramListDisplay">
             </div>
-
-            <div class="history-section">
-                <h3 style="font-size: 0.8rem; color: #888; margin: 0 0 5px 0; text-transform:uppercase;" data-key="trend_title">7-Day Risk Trend</h3>
-                <canvas id="trendChart"></canvas>
-                <div class="chart-labels">
-                    <span>-7d</span>
-                    <span>-48h</span>
-                    <span>-24h</span>
-                    <span>-12h</span>
-                    <span>-3h</span>
-                    <span class="blink">LIVE</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <h2 data-key="risk_parameters">LIVE SIGNALS</h2>
-            <div id="parametersList">
-                </div>
-            <div style="margin-top: 15px; font-size: 0.8rem; color: #666; text-align: center;">
-                <span data-key="click_hint">💡 TIP: Click any signal to verify source data</span>
-            </div>
-        </div>
-    </main>
-
-    <div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
-        <div class="modal-box">
-            <span class="modal-close" onclick="closeModal(event, true)">×</span>
-            <div class="modal-title" id="mTitle">Title</div>
-            <div class="modal-content" id="mContent">Content</div>
+        
+        <div style="margin-top:20px; font-size:0.7rem; text-align:center; color:#555; border-top:1px solid #222; padding-top:10px;">
+            LIVE MONITORING | USSTRIKERADAR.COM
         </div>
     </div>
 
-    <footer>
-        <button class="share-btn" onclick="shareSite()">
-            <span data-key="share">Share Status</span>
-        </button>
-        <div style="margin-top: 10px;">
-            <a href="https://t.me/waradarlive" target="_blank" style="color: var(--telegram); text-decoration: none; font-size: 0.9rem;">
-                📢 <span data-key="telegram_footer">Join our Telegram Channel</span>
-            </a>
+    <div class="controls">
+        <h1>COMMAND CENTER</h1>
+        
+        <label>Bot Token:</label>
+        <input type="password" id="botToken" placeholder="הדבק טוקן כאן">
+        
+        <div class="btn-group">
+            <button class="btn-manual" onclick="sendNow(true)">📸 עדכון ושלח (כפוי)</button>
+            <button class="btn-auto" id="autoBtn" onclick="toggleAutoPilot()">🤖 טייס אוטומטי (1h)</button>
         </div>
-        <div class="disclaimer-box" style="opacity: 0.7; margin-top:10px;">
-            <span data-key="disclaimer_short">Open-source intel aggregation. Not official military advice.</span>
-        </div>
-        <div style="margin-top: 10px; color: #444;">Created by <strong style="color: #666;">Idan Biton</strong></div>
-    </footer>
+        
+        <button class="btn-reset" onclick="resetData()">🔄 איפוס נתונים ידני (Force Refresh)</button>
+
+        <div class="status" id="statusMsg">המערכת מוכנה</div>
+        <div class="status" id="timerMsg" style="color: #FFDD00;"></div>
+    </div>
 
     <script>
-        // --- ICONS (SVG) ---
-        const icons = {
-            news: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>',
-            aviation: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg>',
-            tankers: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M12 2L2 22h20L12 2zm0 3.5L18.5 19H5.5L12 5.5z"/></svg>',
-            market: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/></svg>',
-            financial: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>',
-            social: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>',
-            traffic: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.85 7h10.29l1.08 3.11H5.77L6.85 7zM19 17H5v-5h14v5z"/></svg>',
-            pentagon: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M12 2L2 9l4 13h12l4-13-10-7zm0 3.5L18.5 10l-2.5 8h-8L5.5 10 12 5.5z"/></svg>',
-            weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
-        };
+        const CHANNEL_ID = "@waradarlive"; 
+        const UPDATE_INTERVAL_MINUTES = 30; // זמן מינימלי בין שינויי נתונים
 
-        // --- CONFIGURATION ---
-        const signalsConfig = [
-            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 45, icon: icons.news },
-            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 30, icon: icons.aviation },
-            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 55, icon: icons.market },
-            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 60, icon: icons.financial },
-            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 65, icon: icons.tankers },
-            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 70, icon: icons.social },
-            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 40, icon: icons.traffic },
-            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 20, icon: icons.pentagon },
-            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80, icon: icons.weather }
+        // ערכי בסיס חדשים - משקפים רגיעה יחסית (סביב 35%-45%)
+        const BASE_CONFIG = [
+            { name: "News Intel", base: 35 }, 
+            { name: "Aviation", base: 30 },
+            { name: "Tankers", base: 50 },  // עדיין יש נוכחות
+            { name: "Markets", base: 40 },
+            { name: "Oil/BTC", base: 45 }, 
+            { name: "Cyber/Social", base: 55 } // ברשת תמיד יש רעש
         ];
 
-        // --- FIXED HISTORICAL DATA ---
-        const historyPoints = [35, 42, 58, 52, 60]; 
+        let autoInterval = null;
+        let countdownInterval = null;
 
-        // --- CONTENT DICTIONARY ---
-        const content = {
-            en: {
-                donate: "Donate",
-                telegram: "Channel",
-                telegram_footer: "Join our Telegram Channel",
-                escalation_probability: "TOTAL RISK SCORE",
-                status: "RISK LEVEL:",
-                click_hint: "💡 TIP: Click any signal to verify source data",
-                risk_parameters: "LIVE SIGNALS & SOURCES",
-                share: "Share Status",
-                disclaimer_short: "Statistical aggregation. Use at your own discretion.",
-                trend_title: "7-Day Risk Trend",
-                
-                l_news: "News Intelligence",
-                l_aviation: "Civil Aviation",
-                l_tankers: "US Tanker Activity",
-                l_market: "Prediction Markets",
-                l_financial: "Global Markets",
-                l_social: "Social Intel / OSINT",
-                l_traffic: "Tehran Traffic",
-                l_pentagon: "Pentagon Activity",
-                l_weather: "Weather (Tehran)",
-                
-                m_general_title: "Risk Calculation",
-                m_general_desc: "We aggregate 9 distinct signals to calculate the probability of conflict.<br><br><strong>Why these weights?</strong><br>• News (20%) & Markets (15%) are leading indicators.<br>• Aviation (15%) reflects insurance risk.<br>• Tankers (10%) reflect logistical readiness.<br>The graph shows a fixed 7-day trend analysis.",
-                
-                m_news_desc: "Scans major news outlets for keywords like 'Strike', 'Imminent'.",
-                m_aviation_desc: "Civilian flight volume over Iran. Low volume = High Risk.",
-                m_tankers_desc: "Presence of KC-135/KC-46 refueling tankers.",
-                m_market_desc: "Betting odds on war within 7 days.",
-                m_financial_desc: "Brent Crude Oil, DXY, and Bitcoin volatility.",
-                m_social_desc: "Real-time scraper of X (Twitter) and Telegram.",
-                m_traffic_desc: "Google Maps traffic data in Tehran.",
-                m_pentagon_desc: "Activity levels around US Defense Dept HQ.",
-                m_weather_desc: "Visibility conditions for airstrikes."
-            },
-            he: {
-                donate: "תרומה",
-                telegram: "ערוץ",
-                telegram_footer: "הצטרפו לערוץ הטלגרם שלנו",
-                escalation_probability: "ציון סיכון כולל",
-                status: "רמת סיכון:",
-                click_hint: "💡 טיפ: לחץ על כל פרמטר כדי לפתוח את מקור המידע",
-                risk_parameters: "אותות ומקורות מידע",
-                share: "שתף סטטוס",
-                disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
-                trend_title: "מגמת סיכון (7 ימים)",
+        // --- 1. מנוע נתונים חכם (Smart Data Engine) ---
+        function getSmartData(forceUpdate = false) {
+            const now = Date.now();
+            const storedString = localStorage.getItem('waradar_smart_data');
+            let storedData = storedString ? JSON.parse(storedString) : null;
 
-                l_news: "מודיעין חדשותי",
-                l_aviation: "תעופה אזרחית",
-                l_tankers: "מכליות צבאיות",
-                l_market: "שוקי חיזוי",
-                l_financial: "שווקים פיננסיים",
-                l_social: "מודיעין רשתות",
-                l_traffic: "תנועה בטהרן",
-                l_pentagon: "פעילות בפנטגון",
-                l_weather: "מזג אוויר",
-
-                m_general_title: "שיטת חישוב",
-                m_general_desc: "האלגוריתם משקלל 9 מקורות. הגרף מציג מגמה קבועה של 7 הימים האחרונים ומתעדכן בזמן אמת בנקודה האחרונה בלבד.",
-                
-                m_news_desc: "סריקת כותרות באתרי חדשות מובילים.",
-                m_aviation_desc: "נפח טיסות מסחריות מעל איראן.",
-                m_tankers_desc: "נוכחות מתדלקים אוויריים.",
-                m_market_desc: "סיכויי הימורים על מלחמה.",
-                m_financial_desc: "ניתוח מחיר נפט, דולר וביטקוין.",
-                m_social_desc: "ניטור טוויטר וטלגרם.",
-                m_traffic_desc: "מדד עומסים בטהרן.",
-                m_pentagon_desc: "פעילות סביב הפנטגון.",
-                m_weather_desc: "תנאי ראות לתקיפה."
-            },
-            ru: {
-                donate: "Пожертвовать",
-                telegram: "Канал",
-                telegram_footer: "Присоединяйтесь к каналу",
-                escalation_probability: "ОБЩИЙ РИСК",
-                status: "УРОВЕНЬ РИСКА:",
-                click_hint: "💡 СОВЕТ: Нажмите на параметр для просмотра источника",
-                risk_parameters: "СИГНАЛЫ И ИСТОЧНИКИ",
-                share: "Поделиться",
-                disclaimer_short: "Статистическая агрегация. Не официальный совет.",
-                trend_title: "ТРЕНД (7 ДНЕЙ)",
-
-                l_news: "Анализ новостей",
-                l_aviation: "Авиация",
-                l_tankers: "Военные танкеры",
-                l_market: "Рынки прогнозов",
-                l_financial: "Финансы",
-                l_social: "Соцсети",
-                l_traffic: "Трафик Тегеран",
-                l_pentagon: "Пентагон",
-                l_weather: "Погода",
-
-                m_general_title: "Методология",
-                m_general_desc: "Агрегация 9 сигналов. График показывает фиксированный тренд за 7 дней.",
-                
-                m_news_desc: "Мониторинг заголовков новостей.",
-                m_aviation_desc: "Объем гражданских рейсов.",
-                m_tankers_desc: "Активность заправщиков.",
-                m_market_desc: "Ставки на войну.",
-                m_financial_desc: "Нефть, Доллар, Биткойн.",
-                m_social_desc: "Мониторинг Twitter и Telegram.",
-                m_traffic_desc: "Пробки в Тегеране.",
-                m_pentagon_desc: "Активность Пентагона.",
-                m_weather_desc: "Погодные условия."
-            }
-        };
-
-        let currentLang = 'en';
-        let signalValues = {}; 
-        let currentTotalScore = 0;
-
-        // --- LOGIC ---
-        function updateClock() {
-            document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
-        }
-        setInterval(updateClock, 1000);
-        
-        function simulateData() {
-            let totalWeightedScore = 0;
-            let elevatedCount = 0;
-
-            signalsConfig.forEach(sig => {
-                if (!signalValues[sig.id]) signalValues[sig.id] = sig.baseVal;
-                const flux = (Math.random() * 6) - 3; 
-                let val = signalValues[sig.id] + flux;
-                val = Math.max(0, Math.min(100, val));
-                signalValues[sig.id] = val;
-
-                totalWeightedScore += (val * sig.weight);
-                if (val > 30) elevatedCount++;
-            });
-
-            if (elevatedCount >= 4) { 
-                totalWeightedScore = totalWeightedScore * 1.15;
-                document.getElementById('multiplierBadge').style.display = "inline-block";
-            } else {
-                document.getElementById('multiplierBadge').style.display = "none";
+            // בדיקה: האם עברו 30 דקות? או האם לחצו "כפה עדכון"?
+            if (!forceUpdate && storedData && (now - storedData.timestamp < UPDATE_INTERVAL_MINUTES * 60 * 1000)) {
+                console.log("Using cached data (Under 30 mins)");
+                renderData(storedData.payload, storedData.displayTime);
+                return storedData.payload;
             }
 
-            currentTotalScore = Math.min(100, totalWeightedScore);
-            updateUI(currentTotalScore);
-            drawStockChart(currentTotalScore);
-        }
+            console.log("Generating NEW data...");
+            
+            // חישוב נתונים חדשים עם סטייה קלה (Drift)
+            let total = 0;
+            let htmlList = "";
+            let generatedParams = [];
 
-        function updateUI(score) {
-            const scoreEl = document.getElementById('mainScore');
-            scoreEl.innerText = score.toFixed(1) + '%';
-            
-            let color = '#00ff41'; let status = 'LOW';
-            if(score > 30) { color = '#ffb700'; status = 'ELEVATED'; }
-            if(score > 60) { color = '#ff3333'; status = 'HIGH'; }
-            
-            scoreEl.style.color = color;
-            document.getElementById('statusText').innerText = status;
-            document.getElementById('statusText').style.color = color;
-            
-            renderParams();
-        }
-
-        function renderParams() {
-            const list = document.getElementById('parametersList');
-            list.innerHTML = '';
-            
-            signalsConfig.forEach(sig => {
-                const val = signalValues[sig.id];
-                const label = content[currentLang][`l_${sig.id}`];
+            BASE_CONFIG.forEach(p => {
+                // סטייה קטנה של +/- 4% כדי לשמור על יציבות
+                const drift = (Math.random() * 8) - 4;
+                let val = Math.floor(Math.max(10, Math.min(95, p.base + drift)));
+                total += val;
                 
-                let barColor = 'var(--primary)';
-                if(val > 30) barColor = 'var(--warning)';
-                if(val > 60) barColor = 'var(--danger)';
+                generatedParams.push({ name: p.name, val: val });
 
-                const row = document.createElement('div');
-                row.className = 'parameter-row';
-                row.onclick = () => window.open(sig.url, '_blank');
-                row.title = "Click to open live data source";
-
-                row.innerHTML = `
-                    <div class="param-header">
-                        <div class="param-label">
-                            ${sig.icon} ${label} 
-                        </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span>${val.toFixed(1)}%</span>
-                            <span class="info-btn" onclick="openModal('${sig.id}', event)">i</span>
-                        </div>
-                    </div>
-                    <div class="progress-bg">
-                        <div class="progress-fill" style="width: ${val}%; background: ${barColor};"></div>
+                htmlList += `
+                    <div class="param-item">
+                        <span>${p.name}</span>
+                        <span style="color:${val > 50 ? '#ffb700' : '#00ff41'}">${val}%</span>
                     </div>
                 `;
-                list.appendChild(row);
+            });
+
+            const finalScore = Math.floor(total / BASE_CONFIG.length);
+            
+            // קביעת צבע ורמה
+            let level = "LOW 🟢";
+            let color = "#00ff41"; 
+            if(finalScore > 35) { level = "ELEVATED 🟠"; color = "#ffb700"; }
+            if(finalScore > 65) { level = "HIGH 🔴"; color = "#ff3333"; }
+
+            // יצירת זמן עדכון יפה (14:30)
+            const dateObj = new Date();
+            const displayTime = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+
+            const payload = {
+                score: finalScore,
+                level: level,
+                color: color,
+                html: htmlList,
+                params: generatedParams
+            };
+
+            // שמירה בזיכרון
+            localStorage.setItem('waradar_smart_data', JSON.stringify({
+                timestamp: now,
+                displayTime: displayTime,
+                payload: payload
+            }));
+
+            renderData(payload, displayTime);
+            return payload;
+        }
+
+        // --- 2. הצגת הנתונים על המסך ---
+        function renderData(data, timeStr) {
+            document.getElementById('displayScore').innerText = data.score + "%";
+            document.getElementById('paramListDisplay').innerHTML = data.html;
+            document.getElementById('displayLevel').innerText = data.level;
+            document.getElementById('lastUpdateDisplay').innerText = `Last Updated: ${timeStr}`;
+
+            // צבעים
+            document.getElementById('displayScore').style.color = data.color;
+            document.getElementById('displayLevel').style.color = data.color;
+            document.getElementById('reportCard').style.borderColor = data.color;
+        }
+
+        // --- 3. צילום ושליחה ---
+        async function sendNow(force = false) {
+            const token = document.getElementById('botToken').value;
+            if(!token) { alert("חסר טוקן!"); return; }
+            localStorage.setItem('waradar_token', token);
+
+            const statusDiv = document.getElementById('statusMsg');
+            statusDiv.innerText = "מעבד נתונים...";
+
+            // קבלת נתונים (חדשים או מהזיכרון)
+            const data = getSmartData(force);
+
+            // צילום
+            statusDiv.innerText = "מצלם מסך...";
+            const canvas = await html2canvas(document.getElementById('reportCard'), {
+                backgroundColor: "#050505",
+                scale: 2
+            });
+
+            // המרה ושליחה
+            canvas.toBlob(async function(blob) {
+                const formData = new FormData();
+                formData.append('chat_id', CHANNEL_ID);
+                formData.append('photo', blob, 'status.png');
+                
+                const caption = `🚨 *WARADAR UPDATE*\n📊 Escalation Risk: ${data.score}%\n⚠️ Level: ${data.level}\n🔗 [Live Dashboard](https://usstrikeradar.com/)`;
+                formData.append('caption', caption);
+                formData.append('parse_mode', 'Markdown');
+
+                statusDiv.innerText = "שולח לטלגרם...";
+
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    const resData = await response.json();
+                    
+                    if(resData.ok) {
+                        statusDiv.innerText = "✅ נשלח: " + new Date().toLocaleTimeString();
+                    } else {
+                        statusDiv.innerText = "❌ שגיאה בטלגרם";
+                    }
+                } catch (e) {
+                    statusDiv.innerText = "❌ שגיאת תקשורת";
+                }
             });
         }
 
-        // --- STOCK GRAPH LOGIC ---
-        function drawStockChart(currentValue) {
-            const canvas = document.getElementById('trendChart');
-            const ctx = canvas.getContext('2d');
-            const width = canvas.width = canvas.offsetWidth;
-            const height = canvas.height = canvas.offsetHeight;
-
-            // Combine fixed history + current live value
-            const dataPoints = [...historyPoints, currentValue];
-            const pointCount = dataPoints.length;
-            const stepX = width / (pointCount - 1);
-
-            ctx.clearRect(0, 0, width, height);
-
-            // Create Gradient
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, "rgba(0, 255, 65, 0.4)");
-            gradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");
-            
-            // If risk is high, change color
-            let strokeColor = '#00ff41';
-            if(currentValue > 30) strokeColor = '#ffb700';
-            if(currentValue > 60) strokeColor = '#ff3333';
-
-            // Draw Area
-            ctx.beginPath();
-            ctx.moveTo(0, height);
-            dataPoints.forEach((val, index) => {
-                const x = index * stepX;
-                const y = height - (val / 100 * height);
-                ctx.lineTo(x, y);
-            });
-            ctx.lineTo(width, height);
-            ctx.closePath();
-            ctx.fillStyle = gradient;
-            ctx.fill();
-
-            // Draw Line
-            ctx.beginPath();
-            ctx.strokeStyle = strokeColor;
-            ctx.lineWidth = 3;
-            ctx.lineJoin = 'round';
-            dataPoints.forEach((val, index) => {
-                const x = index * stepX;
-                const y = height - (val / 100 * height);
-                if (index === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-
-            // Draw Points
-            dataPoints.forEach((val, index) => {
-                const x = index * stepX;
-                const y = height - (val / 100 * height);
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, Math.PI * 2);
-                ctx.fillStyle = '#fff';
-                ctx.fill();
-            });
+        // --- כפתור איפוס ---
+        function resetData() {
+            localStorage.removeItem('waradar_smart_data');
+            getSmartData(true); // מייצר חדש
+            document.getElementById('statusMsg').innerText = "הנתונים אופסו וחושבו מחדש.";
         }
 
-        // --- MODAL & SHARE ---
-        function openModal(type, event) {
-            event.stopPropagation();
-            const modal = document.getElementById('infoModal');
-            const titleEl = document.getElementById('mTitle');
-            const contentEl = document.getElementById('mContent');
+        // --- טייס אוטומטי ---
+        function toggleAutoPilot() {
+            const btn = document.getElementById('autoBtn');
+            const timerMsg = document.getElementById('timerMsg');
             
-            if (type === 'general') {
-                titleEl.innerText = content[currentLang].m_general_title;
-                contentEl.innerHTML = content[currentLang].m_general_desc;
+            if (autoInterval) {
+                clearInterval(autoInterval);
+                clearInterval(countdownInterval);
+                autoInterval = null;
+                btn.classList.remove('active');
+                btn.innerText = "🤖 טייס אוטומטי (1h)";
+                timerMsg.innerText = "";
             } else {
-                titleEl.innerText = content[currentLang][`l_${type}`];
-                contentEl.innerHTML = content[currentLang][`m_${type}_desc`];
+                const token = document.getElementById('botToken').value;
+                if(!token) { alert("הזן טוקן!"); return; }
+                
+                sendNow(false); // שליחה רגילה (לא כפויה)
+                
+                let timeLeft = 3600;
+                autoInterval = setInterval(() => {
+                    sendNow(false); // יבדוק אם עברו 30 דקות ויעדכן אם צריך
+                    timeLeft = 3600;
+                }, 3600000); // כל שעה
+
+                countdownInterval = setInterval(() => {
+                    timeLeft--;
+                    const m = Math.floor(timeLeft / 60);
+                    const s = timeLeft % 60;
+                    timerMsg.innerText = `דיווח הבא בעוד: ${m}:${s < 10 ? '0'+s : s}`;
+                }, 1000);
+
+                btn.classList.add('active');
+                btn.innerText = "⏹ עצור אוטומציה";
             }
-            modal.classList.add('open');
         }
 
-        function closeModal(e, force = false) {
-            if (force || e.target.id === 'infoModal') {
-                document.getElementById('infoModal').classList.remove('open');
-            }
+        window.onload = () => {
+            const saved = localStorage.getItem('waradar_token');
+            if(saved) document.getElementById('botToken').value = saved;
+            getSmartData(false); // טעינה ראשונית מהזיכרון
         }
-
-        function shareSite() {
-            const url = window.location.href;
-            if (navigator.share) {
-                navigator.share({ title: 'WARADAR', text: 'Risk Score: ' + document.getElementById('mainScore').innerText, url: url });
-            } else {
-                alert("Link copied!");
-                navigator.clipboard.writeText(url);
-            }
-        }
-
-        function setLang(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.flag').forEach(f => f.classList.remove('active'));
-            event.currentTarget.classList.add('active');
-            if(lang === 'he') document.body.classList.add('rtl');
-            else document.body.classList.remove('rtl');
-            
-            document.querySelectorAll('[data-key]').forEach(el => {
-                const key = el.getAttribute('data-key');
-                if(content[lang][key]) el.innerText = content[lang][key];
-            });
-            renderParams();
-        }
-
-        // Start
-        updateClock();
-        simulateData();
-        setInterval(simulateData, 30000); 
-
     </script>
 </body>
 </html>
