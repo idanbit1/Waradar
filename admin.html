@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR CONTROL</title>
+    <title>WARADAR CONTROL v11</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         body { 
@@ -24,11 +24,13 @@
         
         .score-box { text-align: center; margin: 15px 0; }
         .score-label { color: #888; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
-        .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; text-shadow: 0 0 15px rgba(0,255,65,0.5); }
+        .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; text-shadow: 0 0 15px rgba(0,255,65,0.5); transition: 0.3s; }
         .update-time { font-size: 0.8rem; color: #666; margin-top: 5px; font-family: monospace; }
 
         .param-list { font-size: 0.9rem; color: #ccc; margin-top: 20px; }
         .param-item { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dashed #333; padding-bottom: 4px; }
+
+        .site-link { margin-top:20px; font-size:0.7rem; text-align:center; color:#555; border-top:1px solid #222; padding-top:10px; }
 
         /* --- בקרי שליטה --- */
         .controls { max-width: 500px; margin: 20px auto; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
@@ -39,11 +41,11 @@
         
         input[type="text"], input[type="password"], input[type="number"] { 
             width: 100%; padding: 12px; background: #000; border: 1px solid #444; 
-            color: #fff; border-radius: 5px; box-sizing: border-box; font-size: 1.1rem;
+            color: #fff; border-radius: 5px; box-sizing: border-box; font-size: 1.5rem; text-align: center;
         }
         
         /* אזור הקלט הראשי */
-        .input-highlight { border: 1px solid #00ff41 !important; background: rgba(0, 255, 65, 0.05) !important; }
+        .input-highlight { border: 1px solid #00ff41 !important; background: rgba(0, 255, 65, 0.05) !important; font-weight: bold; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
         button { flex: 1; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
@@ -56,7 +58,7 @@
         
         /* אזור העתקה לוואטסאפ */
         #whatsappArea { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; background: #080808; padding: 10px; border-radius: 5px;}
-        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #333; padding: 10px; font-family: monospace; height: 120px; box-sizing: border-box; }
+        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #333; padding: 10px; font-family: monospace; height: 120px; box-sizing: border-box; direction: ltr; }
     </style>
 </head>
 <body>
@@ -77,24 +79,24 @@
         <div class="param-list" id="paramListDisplay">
             </div>
         
-        <div style="margin-top:20px; font-size:0.7rem; text-align:center; color:#555; border-top:1px solid #222; padding-top:10px;">
-            LIVE MONITORING | WARADAR
+        <div class="site-link">
+            LIVE MONITORING | IDANBIT1.GITHUB.IO/WARADAR
         </div>
     </div>
 
     <div class="controls">
         <h1>WAR ROOM CONTROL</h1>
         
-        <label>🔒 Bot Token:</label>
-        <input type="password" id="botToken" placeholder="הדבק טוקן כאן (נשמר במכשיר)">
+        <label>🔒 Bot Token (חובה להזין פעם ראשונה):</label>
+        <input type="password" id="botToken" style="font-size: 1rem;" placeholder="הדבק טוקן כאן">
         
         <hr style="border-color: #333; margin: 20px 0;">
 
-        <label>🎯 ציון לסנכרון (מהאתר):</label>
-        <span class="sub-label">הזן את המספר שמופיע כרגע באינדקס (למשל 62)</span>
-        <input type="number" id="manualScore" class="input-highlight" placeholder="0-100" oninput="updatePreview()">
+        <label>🎯 ציון סיכון (0-100):</label>
+        <span class="sub-label">הקלד מספר כדי לעדכן את התצוגה למעלה</span>
+        <input type="number" id="manualScore" class="input-highlight" placeholder="למשל: 62" onkeyup="updatePreview()" onchange="updatePreview()">
         
-        <button class="btn-refresh" onclick="updateTimeOnly()">⌚ עדכן שעה בלבד (ללא שינוי ציון)</button>
+        <button class="btn-refresh" onclick="updateTimeOnly()">⌚ עדכן שעה בלבד</button>
 
         <div class="btn-group">
             <button class="btn-telegram" onclick="sendToTelegram()">
@@ -105,7 +107,7 @@
         <div class="status" id="statusMsg"></div>
 
         <div id="whatsappArea">
-            <label style="color:#25D366">✅ מוכן לוואטסאפ:</label>
+            <label style="color:#25D366">✅ טקסט מוכן לוואטסאפ:</label>
             <textarea id="whatsappText"></textarea>
             <button class="btn-whatsapp" onclick="copyAndOpenWhatsApp()">
                 📋 העתק ופתח ערוץ
@@ -115,46 +117,54 @@
 
     <script>
         const CHANNEL_ID = "@waradarlive"; 
+        const SITE_URL = "https://idanbit1.github.io/waradar/"; // כתובת האתר המעודכנת
         
-        // נתונים בסיסיים ליצירת פרמטרים "תואמים" לציון
         const PARAMS = [
             "News Intel", "Aviation", "Tankers", "Markets", "Oil/BTC", "Cyber/Social"
         ];
 
-        // --- 1. עדכון תצוגה בזמן אמת (כשאתה מקליד) ---
+        // --- 1. עדכון תצוגה בזמן אמת ---
         function updatePreview() {
             const scoreInput = document.getElementById('manualScore').value;
-            if(!scoreInput) return;
+            
+            // הגנה: אם אין מספר, לא לעשות כלום או להציג קו
+            if(!scoreInput) {
+                document.getElementById('displayScore').innerText = "--%";
+                return;
+            }
 
             const score = parseInt(scoreInput);
+            
+            // תאריך ושעה
             const dateObj = new Date();
             const timeStr = dateObj.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) + ' | ' + dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-            // 1. עדכון המספרים הגדולים
+            // עדכון ה-DOM
             document.getElementById('displayScore').innerText = score + "%";
             document.getElementById('lastUpdateDisplay').innerText = "Last Updated: " + timeStr;
 
-            // 2. חישוב רמה וצבע
+            // חישוב רמה וצבע
             let level = "LOW 🟢";
             let color = "#00ff41"; 
             if(score >= 56) { level = "ELEVATED 🟠"; color = "#ffb700"; }
             if(score >= 65) { level = "HIGH 🔴"; color = "#ff3333"; }
 
+            // החלת צבעים
             const levelEl = document.getElementById('displayLevel');
             levelEl.innerText = level;
             levelEl.style.color = color;
             document.getElementById('displayScore').style.color = color;
             document.getElementById('reportCard').style.borderColor = color;
 
-            // 3. יצירת פרמטרים ש"מסתדרים" עם הציון (כדי שיראה אמין)
+            // יצירת פרמטרים פיקטיביים שתואמים לציון
             let htmlList = "";
             PARAMS.forEach(name => {
-                // יוצר מספר אקראי קרוב לציון הראשי (+- 10)
-                const drift = Math.floor(Math.random() * 20) - 10; 
+                const drift = Math.floor(Math.random() * 16) - 8; // סטייה קלה
                 let pVal = Math.max(10, Math.min(99, score + drift));
                 
-                let pColor = pVal > 50 ? '#ffb700' : '#00ff41';
-                if(pVal > 75) pColor = '#ff3333';
+                let pColor = '#00ff41'; // ברירת מחדל ירוק
+                if(pVal > 50) pColor = '#ffb700'; // צהוב
+                if(pVal > 70) pColor = '#ff3333'; // אדום
 
                 htmlList += `
                     <div class="param-item">
@@ -164,13 +174,13 @@
             });
             document.getElementById('paramListDisplay').innerHTML = htmlList;
 
-            // 4. הכנת הטקסט לוואטסאפ ברקע
-            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nהפרמטרים והניתוח המלא בדשבורד:\https://idanbit1.github.io/Waradar/;
+            // עדכון הטקסט לוואטסאפ
+            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nלצפייה בדשבורד המלא:\n${SITE_URL}`;
             document.getElementById('whatsappText').value = waText;
         }
 
         function updateTimeOnly() {
-            updatePreview(); // פשוט מרענן עם המספר הקיים והשעה החדשה
+            updatePreview(); // מרענן עם הערך הקיים בשדה
         }
 
         // --- 2. שליחה לטלגרם ---
@@ -178,16 +188,16 @@
             const token = document.getElementById('botToken').value;
             const score = document.getElementById('manualScore').value;
             
-            if(!token) { alert("חסר טוקן!"); return; }
-            if(!score) { alert("לא הזנת ציון!"); return; }
+            if(!token) { alert("חובה להזין Bot Token!"); return; }
+            if(!score) { alert("חובה להזין ציון!"); return; }
             
-            localStorage.setItem('waradar_token', token); // שמירה לעתיד
+            localStorage.setItem('waradar_token', token); // שמירה
 
             const statusDiv = document.getElementById('statusMsg');
-            statusDiv.innerText = "📸 מצלם ושולח...";
+            statusDiv.innerText = "📸 מעבד תמונה ושולח...";
             statusDiv.style.color = "#fff";
 
-            // חשיפת אזור הוואטסאפ שיהיה מוכן
+            // חשיפת אזור הוואטסאפ
             document.getElementById('whatsappArea').style.display = 'block';
 
             // צילום
@@ -201,10 +211,10 @@
                 formData.append('chat_id', CHANNEL_ID);
                 formData.append('photo', blob, 'status.png');
                 
-                // הטקסט לטלגרם
-                const caption = document.getElementById('whatsappText').value + "\n\n🔗 [Live Dashboard](https://idanbit1.github.io/Waradar/)";
+                // הטקסט שילך לטלגרם
+                const telegramCaption = document.getElementById('whatsappText').value; // משתמשים באותו טקסט
                 
-                formData.append('caption', caption);
+                formData.append('caption', telegramCaption);
                 formData.append('parse_mode', 'Markdown');
 
                 try {
@@ -215,9 +225,8 @@
                     const resData = await response.json();
                     
                     if(resData.ok) {
-                        statusDiv.innerText = "✅ נשלח לטלגרם בהצלחה!";
+                        statusDiv.innerText = "✅ נשלח בהצלחה!";
                         statusDiv.style.color = "#00ff41";
-                        // גלילה למטה לוואטסאפ
                         document.getElementById('whatsappArea').scrollIntoView({behavior: "smooth"});
                     } else {
                         statusDiv.innerText = "❌ שגיאה: " + resData.description;
@@ -238,15 +247,14 @@
             navigator.clipboard.writeText(text.value).then(() => {
                 window.location.href = "https://whatsapp.com/channel/0029Vb7m8O46BIEjW2J5Yj2z"; 
             });
-            alert("הטקסט הועתק! כעת הדבק בערוץ.");
+            alert("הטקסט הועתק! הערוץ ייפתח כעת.");
         }
 
-        // טעינת טוקן בטעינה
+        // טעינה ראשונית
         window.onload = () => {
             const saved = localStorage.getItem('waradar_token');
             if(saved) document.getElementById('botToken').value = saved;
-            // אתחול ראשוני עם ערך ברירת מחדל
-            updatePreview();
+            // לא מפעילים updatePreview אוטומטית כדי לא להראות ערך ריק
         }
     </script>
 </body>
