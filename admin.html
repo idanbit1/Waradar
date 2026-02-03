@@ -78,7 +78,7 @@
             </div>
         
         <div style="margin-top:20px; font-size:0.7rem; text-align:center; color:#555; border-top:1px solid #222; padding-top:10px;">
-            LIVE MONITORING | USSTRIKERADAR.COM
+            LIVE MONITORING | WARADAR
         </div>
     </div>
 
@@ -165,7 +165,7 @@
             document.getElementById('paramListDisplay').innerHTML = htmlList;
 
             // 4. הכנת הטקסט לוואטסאפ ברקע
-            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nהפרמטרים והניתוח המלא בדשבורד:\nhttps://usstrikeradar.com`;
+            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nהפרמטרים והניתוח המלא בדשבורד:\https://idanbit1.github.io/waradar/;
             document.getElementById('whatsappText').value = waText;
         }
 
@@ -202,7 +202,7 @@
                 formData.append('photo', blob, 'status.png');
                 
                 // הטקסט לטלגרם
-                const caption = document.getElementById('whatsappText').value + "\n\n🔗 [Live Dashboard](https://usstrikeradar.com/)";
+                const caption = document.getElementById('whatsappText').value + "\n\n🔗 [Live Dashboard](hytps://idanbit1.github.io/waradar/)";
                 
                 formData.append('caption', caption);
                 formData.append('parse_mode', 'Markdown');
