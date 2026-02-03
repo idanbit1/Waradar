@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR CONTROL v11</title>
+    <title>WARADAR CONTROL v12</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         body { 
@@ -76,8 +76,7 @@
             <div style="font-weight:bold; margin-top:10px; font-size:1.2rem;" id="displayLevel">--</div>
         </div>
         
-        <div class="param-list" id="paramListDisplay">
-            </div>
+        <div class="param-list" id="paramListDisplay"></div>
         
         <div class="site-link">
             LIVE MONITORING | IDANBIT1.GITHUB.IO/WARADAR
@@ -117,71 +116,54 @@
 
     <script>
         const CHANNEL_ID = "@waradarlive"; 
-        const SITE_URL = "https://idanbit1.github.io/waradar/"; // כתובת האתר המעודכנת
+        // תיקון קריטי: קישור באותיות קטנות בלבד
+        const SITE_URL = "https://idanbit1.github.io/waradar/"; 
         
-        const PARAMS = [
-            "News Intel", "Aviation", "Tankers", "Markets", "Oil/BTC", "Cyber/Social"
-        ];
+        const PARAMS = ["News Intel", "Aviation", "Tankers", "Markets", "Oil/BTC", "Cyber/Social"];
 
         // --- 1. עדכון תצוגה בזמן אמת ---
         function updatePreview() {
             const scoreInput = document.getElementById('manualScore').value;
             
-            // הגנה: אם אין מספר, לא לעשות כלום או להציג קו
             if(!scoreInput) {
                 document.getElementById('displayScore').innerText = "--%";
                 return;
             }
 
             const score = parseInt(scoreInput);
-            
-            // תאריך ושעה
             const dateObj = new Date();
             const timeStr = dateObj.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) + ' | ' + dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
 
-            // עדכון ה-DOM
             document.getElementById('displayScore').innerText = score + "%";
             document.getElementById('lastUpdateDisplay').innerText = "Last Updated: " + timeStr;
 
-            // חישוב רמה וצבע
             let level = "LOW 🟢";
             let color = "#00ff41"; 
             if(score >= 56) { level = "ELEVATED 🟠"; color = "#ffb700"; }
             if(score >= 65) { level = "HIGH 🔴"; color = "#ff3333"; }
 
-            // החלת צבעים
             const levelEl = document.getElementById('displayLevel');
             levelEl.innerText = level;
             levelEl.style.color = color;
             document.getElementById('displayScore').style.color = color;
             document.getElementById('reportCard').style.borderColor = color;
 
-            // יצירת פרמטרים פיקטיביים שתואמים לציון
             let htmlList = "";
             PARAMS.forEach(name => {
-                const drift = Math.floor(Math.random() * 16) - 8; // סטייה קלה
+                const drift = Math.floor(Math.random() * 16) - 8; 
                 let pVal = Math.max(10, Math.min(99, score + drift));
-                
-                let pColor = '#00ff41'; // ברירת מחדל ירוק
-                if(pVal > 50) pColor = '#ffb700'; // צהוב
-                if(pVal > 70) pColor = '#ff3333'; // אדום
+                let pColor = pVal > 50 ? '#ffb700' : '#00ff41';
+                if(pVal > 70) pColor = '#ff3333';
 
-                htmlList += `
-                    <div class="param-item">
-                        <span>${name}</span>
-                        <span style="color:${pColor}">${pVal}%</span>
-                    </div>`;
+                htmlList += `<div class="param-item"><span>${name}</span><span style="color:${pColor}">${pVal}%</span></div>`;
             });
             document.getElementById('paramListDisplay').innerHTML = htmlList;
 
-            // עדכון הטקסט לוואטסאפ
             const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nלצפייה בדשבורד המלא:\n${SITE_URL}`;
             document.getElementById('whatsappText').value = waText;
         }
 
-        function updateTimeOnly() {
-            updatePreview(); // מרענן עם הערך הקיים בשדה
-        }
+        function updateTimeOnly() { updatePreview(); }
 
         // --- 2. שליחה לטלגרם ---
         async function sendToTelegram() {
@@ -191,16 +173,14 @@
             if(!token) { alert("חובה להזין Bot Token!"); return; }
             if(!score) { alert("חובה להזין ציון!"); return; }
             
-            localStorage.setItem('waradar_token', token); // שמירה
+            localStorage.setItem('waradar_token', token);
 
             const statusDiv = document.getElementById('statusMsg');
             statusDiv.innerText = "📸 מעבד תמונה ושולח...";
             statusDiv.style.color = "#fff";
 
-            // חשיפת אזור הוואטסאפ
             document.getElementById('whatsappArea').style.display = 'block';
 
-            // צילום
             const canvas = await html2canvas(document.getElementById('reportCard'), {
                 backgroundColor: "#0f1215",
                 scale: 2
@@ -211,9 +191,7 @@
                 formData.append('chat_id', CHANNEL_ID);
                 formData.append('photo', blob, 'status.png');
                 
-                // הטקסט שילך לטלגרם
-                const telegramCaption = document.getElementById('whatsappText').value; // משתמשים באותו טקסט
-                
+                const telegramCaption = document.getElementById('whatsappText').value; 
                 formData.append('caption', telegramCaption);
                 formData.append('parse_mode', 'Markdown');
 
@@ -238,23 +216,19 @@
             });
         }
 
-        // --- 3. העתקה לוואטסאפ ---
         function copyAndOpenWhatsApp() {
             const text = document.getElementById('whatsappText');
             text.select();
             text.setSelectionRange(0, 99999);
-            
             navigator.clipboard.writeText(text.value).then(() => {
                 window.location.href = "https://whatsapp.com/channel/0029Vb7m8O46BIEjW2J5Yj2z"; 
             });
             alert("הטקסט הועתק! הערוץ ייפתח כעת.");
         }
 
-        // טעינה ראשונית
         window.onload = () => {
             const saved = localStorage.getItem('waradar_token');
             if(saved) document.getElementById('botToken').value = saved;
-            // לא מפעילים updatePreview אוטומטית כדי לא להראות ערך ריק
         }
     </script>
 </body>
