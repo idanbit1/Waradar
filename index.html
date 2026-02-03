@@ -167,7 +167,7 @@
         <div class="top-controls">
             <div class="clock" id="clock">00:00:00</div>
             
-            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn">
+            <a href="https://whatsapp.com/channel/0029Vb7m8O46BIEjW2J5Yj2z" target="_blank" class="btn whatsapp-btn">
                 <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                 <span>WhatsApp</span>
             </a>
@@ -244,7 +244,7 @@
         </button>
         
         <div class="social-links">
-            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" style="color: var(--whatsapp); text-decoration: none; font-size: 0.9rem;">
+            <a href="https://whatsapp.com/channel/0029Vb7m8O46BIEjW2J5Yj2z" target="_blank" style="color: var(--whatsapp); text-decoration: none; font-size: 0.9rem;">
                 📢 WhatsApp
             </a>
             <a href="https://t.me/waradarlive" target="_blank" style="color: var(--telegram); text-decoration: none; font-size: 0.9rem;">
@@ -272,19 +272,21 @@
             weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
         };
 
+        // --- CALIBRATED CONFIGURATION (TARGET: 56%-67%) ---
+        // ערכי בסיס הועלו כדי להתקרב ל-60% בממוצע
         const signalsConfig = [
-            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 35, icon: icons.news },
-            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 30, icon: icons.aviation },
-            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 40, icon: icons.market },
-            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 45, icon: icons.financial },
-            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 50, icon: icons.tankers },
-            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 55, icon: icons.social },
-            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 40, icon: icons.traffic },
-            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 20, icon: icons.pentagon },
+            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 60, icon: icons.news },
+            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 55, icon: icons.aviation },
+            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 65, icon: icons.market },
+            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 70, icon: icons.financial },
+            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 65, icon: icons.tankers },
+            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 65, icon: icons.social },
+            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 45, icon: icons.traffic },
+            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 30, icon: icons.pentagon },
             { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80, icon: icons.weather }
         ];
 
-        const historyPoints = [35, 42, 58, 52, 60]; 
+        const historyPoints = [50, 58, 62, 55, 63]; 
 
         const content = {
             en: {
@@ -402,10 +404,10 @@
         }
         setInterval(updateClock, 1000);
         
-        // --- SMART DATA ENGINE (PERSISTENCE & LOGIC) ---
+        // --- SMART DATA ENGINE ---
         function getSmartData() {
             const now = Date.now();
-            const UPDATE_INTERVAL = 30 * 60 * 1000; // 30 minutes
+            const UPDATE_INTERVAL = 15 * 60 * 1000; // 15 Minutes
             
             const storedString = localStorage.getItem('waradar_index_data');
             let storedData = storedString ? JSON.parse(storedString) : null;
@@ -424,22 +426,25 @@
                 
                 signalValues[sig.id] = val;
                 totalWeightedScore += (val * sig.weight);
-                if (val > 50) elevatedCount++;
+                if (val > 60) elevatedCount++;
             });
 
-            if (elevatedCount >= 4) { 
-                totalWeightedScore = totalWeightedScore * 1.15;
-            }
-
-            let finalScore = Math.min(100, Math.floor(totalWeightedScore));
+            // Target Range Logic: Force between 56% and 67%
+            let calculatedScore = Math.floor(totalWeightedScore);
+            // Strict clamping to requested range 56-67
+            let finalScore = Math.max(56, Math.min(67, calculatedScore));
             
-            const updateTimeStr = new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            // Format Date & Time
+            const dateObj = new Date();
+            const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+            const fullDateTime = `${dateStr} | ${timeStr}`;
 
             const payload = {
                 score: finalScore,
                 signals: signalValues,
-                multiplier: (elevatedCount >= 4),
-                updateTime: updateTimeStr
+                multiplier: (elevatedCount >= 4), // Logic remains but score is clamped
+                updateTime: fullDateTime
             };
 
             localStorage.setItem('waradar_index_data', JSON.stringify({
@@ -460,8 +465,9 @@
             document.getElementById('lastUpdateTime').innerText = `${timeLabel} ${data.updateTime}`;
 
             let color = '#00ff41'; let status = 'LOW';
-            if(data.score > 35) { color = '#ffb700'; status = 'ELEVATED'; }
-            if(data.score > 65) { color = '#ff3333'; status = 'HIGH'; }
+            // Adjusted status thresholds to match the forced range logic
+            if(data.score >= 56) { color = '#ffb700'; status = 'ELEVATED'; } 
+            if(data.score >= 65) { color = '#ff3333'; status = 'HIGH'; }
             
             scoreEl.style.color = color;
             document.getElementById('statusText').innerText = status;
@@ -522,8 +528,8 @@
             gradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");
             
             let strokeColor = '#00ff41';
-            if(currentValue > 35) strokeColor = '#ffb700';
-            if(currentValue > 65) strokeColor = '#ff3333';
+            if(currentValue >= 56) strokeColor = '#ffb700';
+            if(currentValue >= 65) strokeColor = '#ff3333';
 
             ctx.beginPath();
             ctx.moveTo(0, height);
@@ -607,7 +613,7 @@
 
         updateClock();
         renderUI();
-        setInterval(renderUI, 60000); 
+        setInterval(renderUI, 30000); 
 
     </script>
 </body>
