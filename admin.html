@@ -15,7 +15,7 @@
         /* --- כרטיס הדיווח (מה שמצולם) --- */
         #reportCard {
             background: #0f1215; border: 2px solid #00ff41; padding: 20px;
-            border-ruadius: 10px; margin-bottom: 20px; max-width: 500px; margin: 0 auto;
+            border-radius: 10px; margin-bottom: 20px; max-width: 500px; margin: 0 auto;
             box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
             font-family: 'Segoe UI', sans-serif;
         }
@@ -165,7 +165,7 @@
             document.getElementById('paramListDisplay').innerHTML = htmlList;
 
             // 4. הכנת הטקסט לוואטסאפ ברקע
-            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nהפרמטרים והניתוח המלא בדשבורד:\https://idanbit1.github.io/waradar/;
+            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nהפרמטרים והניתוח המלא בדשבורד:\https://idanbit1.github.io/Waradar/;
             document.getElementById('whatsappText').value = waText;
         }
 
@@ -202,7 +202,7 @@
                 formData.append('photo', blob, 'status.png');
                 
                 // הטקסט לטלגרם
-                const caption = document.getElementById('whatsappText').value + "\n\n🔗 [Live Dashboard](hytps://idanbit1.github.io/waradar/)";
+                const caption = document.getElementById('whatsappText').value + "\n\n🔗 [Live Dashboard](https://idanbit1.github.io/Waradar/)";
                 
                 formData.append('caption', caption);
                 formData.append('parse_mode', 'Markdown');
