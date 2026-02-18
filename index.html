@@ -117,10 +117,9 @@
         .update-time-display { font-size: 0.85rem; color: #666; margin-top: 5px; font-family: monospace; }
         .big-score { font-size: 5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,65,0.4); line-height: 1; }
         
-        /* GRAPH FIXES */
         .history-section {
             margin-top: auto; border-top: 1px dashed #333; padding-top: 15px; position: relative;
-            min-height: 180px; /* Ensure space for canvas */
+            min-height: 180px; 
         }
         canvas#trendChart { 
             width: 100%; height: 150px; margin-top: 10px; display: block; 
@@ -276,22 +275,22 @@
             weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
         };
 
-        // --- UPDATED CONFIGURATION (TARGET: 40%-55%) ---
-        // הנתונים כוילו לנורמל (נמוכים יותר)
+        // --- UPDATED CONFIGURATION (ESCALATION MODE: 65%-80%) ---
+        // ערכי בסיס הועלו משמעותית כדי לשקף עלייה בסיכוי לאסקלציה
         const signalsConfig = [
-            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 45, icon: icons.news },
-            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 40, icon: icons.aviation },
-            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 50, icon: icons.market },
-            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 50, icon: icons.financial },
-            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 45, icon: icons.tankers },
-            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 55, icon: icons.social },
-            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 40, icon: icons.traffic },
-            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 20, icon: icons.pentagon },
+            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 75, icon: icons.news },
+            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 65, icon: icons.aviation },
+            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 72, icon: icons.market },
+            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 75, icon: icons.financial },
+            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 70, icon: icons.tankers },
+            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 80, icon: icons.social },
+            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 45, icon: icons.traffic },
+            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 50, icon: icons.pentagon },
             { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80, icon: icons.weather }
         ];
 
-        // נתונים היסטוריים מתוקנים כדי להתאים לטווח החדש (לא שוברים את הגרף)
-        const historyPoints = [41, 48, 52, 46, 50]; 
+        // נתונים היסטוריים מתוקנים כדי להציג מגמת עלייה ברורה
+        const historyPoints = [45, 52, 58, 64, 70]; 
 
         const content = {
             en: {
@@ -431,13 +430,13 @@
                 
                 signalValues[sig.id] = val;
                 totalWeightedScore += (val * sig.weight);
-                if (val > 55) elevatedCount++;
+                if (val > 60) elevatedCount++;
             });
 
-            // Target Range Logic: Force between 40% and 55%
+            // Target Range Logic: ESCALATION MODE (65%-80%)
             let calculatedScore = Math.floor(totalWeightedScore);
-            // Strict clamping to requested range 40-55
-            let finalScore = Math.max(40, Math.min(55, calculatedScore));
+            // Strict clamping to requested escalation range 
+            let finalScore = Math.max(65, Math.min(80, calculatedScore));
             
             // Format Date & Time
             const dateObj = new Date();
@@ -471,9 +470,9 @@
 
             let color = '#00ff41'; let status = 'LOW';
             
-            // Adjusted status thresholds to match the forced range logic
-            if(data.score >= 45) { color = '#ffb700'; status = 'ELEVATED'; } 
-            if(data.score >= 60) { color = '#ff3333'; status = 'HIGH'; }
+            // Adjusted status thresholds for escalation mode
+            if(data.score >= 55) { color = '#ffb700'; status = 'ELEVATED'; } 
+            if(data.score >= 70) { color = '#ff3333'; status = 'HIGH'; }
             
             scoreEl.style.color = color;
             document.getElementById('statusText').innerText = status;
@@ -535,8 +534,8 @@
             gradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");
             
             let strokeColor = '#00ff41';
-            if(currentValue >= 45) strokeColor = '#ffb700';
-            if(currentValue >= 60) strokeColor = '#ff3333';
+            if(currentValue >= 55) strokeColor = '#ffb700';
+            if(currentValue >= 70) strokeColor = '#ff3333';
 
             ctx.beginPath();
             ctx.moveTo(0, height);
