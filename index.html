@@ -1,3 +1,8 @@
+זה קורה בגלל מנגנון ה"זיכרון" (Persistence) שבנינו קודם.
+הדפדפן שלך עדיין "זוכר" את הנתונים הנמוכים מלפני 10 דקות ומציג אותם כדי למנוע קפיצות, למרות שעדכנת את הקוד.
+כדי לתקן את זה מיד ולכפות על הדפדפן להציג את הנתונים הגבוהים עכשיו, שיניתי בקוד את "מפתח הזיכרון" (Cache Key). זה יגרום לדפדפן להתעלם מהנתונים הישנים ולחשב מחדש מיד.
+הנה גרסה 14.1 (Force Update).
+העתק והחלף את הקובץ. ברגע שתעלה אותו - הציון יקפוץ מיד לטווח הגבוה (65%-80%).
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -408,12 +413,13 @@
         }
         setInterval(updateClock, 1000);
         
-        // --- SMART DATA ENGINE ---
+        // --- SMART DATA ENGINE (KEY CHANGED TO FORCE UPDATE) ---
         function getSmartData() {
             const now = Date.now();
             const UPDATE_INTERVAL = 15 * 60 * 1000; // 15 Minutes
             
-            const storedString = localStorage.getItem('waradar_index_data');
+            // שינוי המפתח כדי לכפות איפוס זיכרון אצל הגולשים
+            const storedString = localStorage.getItem('waradar_v14_data');
             let storedData = storedString ? JSON.parse(storedString) : null;
 
             if (storedData && (now - storedData.timestamp < UPDATE_INTERVAL)) {
@@ -451,7 +457,8 @@
                 updateTime: fullDateTime
             };
 
-            localStorage.setItem('waradar_index_data', JSON.stringify({
+            // Saving to new key v14
+            localStorage.setItem('waradar_v14_data', JSON.stringify({
                 timestamp: now,
                 payload: payload
             }));
@@ -623,3 +630,5 @@
 
     </script>
 </body>
+</html>
+
