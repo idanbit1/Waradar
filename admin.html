@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR CONTROL v12</title>
+    <title>WARADAR ADMIN v15</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
     <style>
         body { 
@@ -12,7 +12,7 @@
             padding: 20px; margin: 0;
         }
         
-        /* --- כרטיס הדיווח (מה שמצולם) --- */
+        /* --- כרטיס הדיווח --- */
         #reportCard {
             background: #0f1215; border: 2px solid #00ff41; padding: 20px;
             border-radius: 10px; margin-bottom: 20px; max-width: 500px; margin: 0 auto;
@@ -44,7 +44,6 @@
             color: #fff; border-radius: 5px; box-sizing: border-box; font-size: 1.5rem; text-align: center;
         }
         
-        /* אזור הקלט הראשי */
         .input-highlight { border: 1px solid #00ff41 !important; background: rgba(0, 255, 65, 0.05) !important; font-weight: bold; }
 
         .btn-group { display: flex; gap: 10px; margin-top: 20px; }
@@ -56,7 +55,6 @@
 
         .status { text-align: center; margin-top: 10px; font-size: 0.9rem; min-height: 20px; color: #aaa; }
         
-        /* אזור העתקה לוואטסאפ */
         #whatsappArea { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; background: #080808; padding: 10px; border-radius: 5px;}
         textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #333; padding: 10px; font-family: monospace; height: 120px; box-sizing: border-box; direction: ltr; }
     </style>
@@ -86,14 +84,14 @@
     <div class="controls">
         <h1>WAR ROOM CONTROL</h1>
         
-        <label>🔒 Bot Token (חובה להזין פעם ראשונה):</label>
+        <label>🔒 Bot Token (הזן פעם אחת):</label>
         <input type="password" id="botToken" style="font-size: 1rem;" placeholder="הדבק טוקן כאן">
         
         <hr style="border-color: #333; margin: 20px 0;">
 
-        <label>🎯 ציון סיכון (0-100):</label>
-        <span class="sub-label">הקלד מספר כדי לעדכן את התצוגה למעלה</span>
-        <input type="number" id="manualScore" class="input-highlight" placeholder="למשל: 62" onkeyup="updatePreview()" onchange="updatePreview()">
+        <label>🎯 ציון נוכחי (0-100):</label>
+        <span class="sub-label">הזן את המספר שמופיע כרגע באתר</span>
+        <input type="number" id="manualScore" class="input-highlight" placeholder="למשל: 72" onkeyup="updatePreview()" onchange="updatePreview()">
         
         <button class="btn-refresh" onclick="updateTimeOnly()">⌚ עדכן שעה בלבד</button>
 
@@ -116,8 +114,8 @@
 
     <script>
         const CHANNEL_ID = "@waradarlive"; 
-        // תיקון קריטי: קישור באותיות קטנות בלבד
-        const SITE_URL = "https://idanbit1.github.io/waradar/"; 
+        // עדכון כתובת האתר עם אות גדולה כבקשתך
+        const SITE_URL = "https://idanbit1.github.io/Waradar/"; 
         
         const PARAMS = ["News Intel", "Aviation", "Tankers", "Markets", "Oil/BTC", "Cyber/Social"];
 
@@ -137,10 +135,11 @@
             document.getElementById('displayScore').innerText = score + "%";
             document.getElementById('lastUpdateDisplay').innerText = "Last Updated: " + timeStr;
 
+            // חישוב רמה וצבע - תואם למצב הסלמה
             let level = "LOW 🟢";
             let color = "#00ff41"; 
-            if(score >= 56) { level = "ELEVATED 🟠"; color = "#ffb700"; }
-            if(score >= 65) { level = "HIGH 🔴"; color = "#ff3333"; }
+            if(score >= 55) { level = "ELEVATED 🟠"; color = "#ffb700"; }
+            if(score >= 70) { level = "HIGH 🔴"; color = "#ff3333"; }
 
             const levelEl = document.getElementById('displayLevel');
             levelEl.innerText = level;
@@ -152,7 +151,8 @@
             PARAMS.forEach(name => {
                 const drift = Math.floor(Math.random() * 16) - 8; 
                 let pVal = Math.max(10, Math.min(99, score + drift));
-                let pColor = pVal > 50 ? '#ffb700' : '#00ff41';
+                let pColor = '#00ff41';
+                if(pVal > 55) pColor = '#ffb700';
                 if(pVal > 70) pColor = '#ff3333';
 
                 htmlList += `<div class="param-item"><span>${name}</span><span style="color:${pColor}">${pVal}%</span></div>`;
@@ -170,13 +170,13 @@
             const token = document.getElementById('botToken').value;
             const score = document.getElementById('manualScore').value;
             
-            if(!token) { alert("חובה להזין Bot Token!"); return; }
-            if(!score) { alert("חובה להזין ציון!"); return; }
+            if(!token) { alert("חסר טוקן!"); return; }
+            if(!score) { alert("חסר ציון!"); return; }
             
             localStorage.setItem('waradar_token', token);
 
             const statusDiv = document.getElementById('statusMsg');
-            statusDiv.innerText = "📸 מעבד תמונה ושולח...";
+            statusDiv.innerText = "📸 שולח...";
             statusDiv.style.color = "#fff";
 
             document.getElementById('whatsappArea').style.display = 'block';
@@ -203,7 +203,7 @@
                     const resData = await response.json();
                     
                     if(resData.ok) {
-                        statusDiv.innerText = "✅ נשלח בהצלחה!";
+                        statusDiv.innerText = "✅ נשלח!";
                         statusDiv.style.color = "#00ff41";
                         document.getElementById('whatsappArea').scrollIntoView({behavior: "smooth"});
                     } else {
@@ -211,7 +211,7 @@
                         statusDiv.style.color = "#ff3333";
                     }
                 } catch (e) {
-                    statusDiv.innerText = "❌ שגיאת תקשורת";
+                    statusDiv.innerText = "❌ תקשורת";
                 }
             });
         }
@@ -223,7 +223,7 @@
             navigator.clipboard.writeText(text.value).then(() => {
                 window.location.href = "https://whatsapp.com/channel/0029Vb7m8O46BIEjW2J5Yj2z"; 
             });
-            alert("הטקסט הועתק! הערוץ ייפתח כעת.");
+            alert("הועתק! פותח וואטסאפ...");
         }
 
         window.onload = () => {
