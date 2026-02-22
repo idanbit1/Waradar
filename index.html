@@ -39,24 +39,23 @@
             z-index: 990;
         }
 
-        /* --- HEADER REFINED (V19.1 - Better Buttons) --- */
+        /* --- HEADER REFINED (V19/20) --- */
         header {
             display: flex;
-            flex-direction: column; /* ברירת מחדל למובייל - שורות */
+            justify-content: space-between;
+            align-items: center;
             padding: 12px 20px;
             background: rgba(0, 20, 0, 0.95);
             border-bottom: 1px solid var(--danger); 
             backdrop-filter: blur(5px);
             z-index: 1000;
             position: sticky; top: 0;
-            gap: 15px; /* מרווח בין השורות במובייל */
         }
 
-        .header-main {
+        .header-left {
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            width: 100%;
+            gap: 15px; 
         }
 
         .brand { display: flex; align-items: center; gap: 10px; }
@@ -76,41 +75,27 @@
         .title-group h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
         .live-tag { font-size: 0.65rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; vertical-align: top;}
 
-        .header-controls {
+        .action-buttons {
             display: flex;
+            gap: 6px;
             align-items: center;
-            gap: 20px;
         }
 
-        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none;}
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; }
         .lang-flags { display: flex; gap: 5px; cursor: pointer; }
         .flag { font-size: 1.4rem; filter: grayscale(1); transition: 0.3s; }
         .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.1); }
 
-        /* --- BUTTONS --- */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            width: 100%;
-            justify-content: space-between;
-        }
-
         .btn {
-            text-decoration: none; 
-            padding: 10px 5px; /* שטח לחיצה גדול */
-            font-weight: bold; 
-            border-radius: 4px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; /* ממורכז */
-            gap: 6px; 
-            font-size: 0.85rem; 
-            transition: 0.3s;
-            position: relative; 
-            z-index: 1001; 
-            flex: 1; /* נמתח שווה בשווה */
-            text-align: center;
+            text-decoration: none; padding: 6px 10px; font-weight: bold; border-radius: 4px; 
+            display: flex; align-items: center; gap: 5px; font-size: 0.75rem; transition: 0.3s;
+            position: relative; z-index: 1001; white-space: nowrap;
         }
         .donate-btn { background: #FFDD00; color: #000; border: 1px solid #cca300; }
         .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
@@ -119,36 +104,16 @@
         .whatsapp-btn { background: transparent; color: var(--whatsapp); border: 1px solid var(--whatsapp); }
         .whatsapp-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 10px var(--whatsapp); }
 
-        .btn-icon { width: 16px; height: 16px; fill: currentColor; flex-shrink: 0;}
+        .btn-icon { width: 14px; height: 14px; fill: currentColor; }
 
-        /* תצוגה במסכים גדולים (מחשב/טאבלט אופקי) */
-        @media (min-width: 950px) {
-            header {
-                flex-direction: row; /* הכל בשורה אחת */
-                gap: 20px;
-            }
-            .header-main {
-                width: auto;
-                flex-shrink: 0;
-            }
-            .action-buttons {
-                width: auto;
-                flex: 1;
-                justify-content: center; /* הכפתורים יושבים באמצע */
-                gap: 15px;
-            }
-            .btn {
-                flex: initial; /* לא נמתחים סתם על מסך גדול */
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-            .clock { display: block; }
-        }
-
-        /* במובייל צר במיוחד, כדי שהטקסט לא יישבר */
-        @media (max-width: 400px) {
-            .btn { font-size: 0.75rem; padding: 8px 2px; }
-            .title-group h1 { font-size: 1.1rem; }
+        @media (max-width: 900px) {
+            header { padding: 10px; }
+            .clock { display: none; }
+            .btn span.btn-text { display: none; } 
+            .btn { padding: 6px; }
+            .btn-icon { width: 18px; height: 18px; }
+            .header-left { gap: 10px; }
+            .title-group h1 { font-size: 1.2rem; }
         }
 
         /* --- LAYOUT --- */
@@ -224,6 +189,20 @@
         .modal-title { font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
         .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ccc; }
 
+        /* --- VIEWS COUNTER CSS --- */
+        .views-counter {
+            margin: 15px auto;
+            padding: 8px 15px;
+            background: rgba(0,0,0,0.5);
+            border: 1px solid #333;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: #888;
+        }
+
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; position: relative; z-index: 1001;}
         .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px;}
         .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
@@ -237,7 +216,7 @@
 <body>
 
     <header>
-        <div class="header-main">
+        <div class="header-left">
             <div class="brand">
                 <div class="radar-logo"><div class="radar-sweep"></div></div>
                 <div class="title-group">
@@ -245,31 +224,30 @@
                 </div>
             </div>
             
-            <div class="header-controls">
-                <div class="clock" id="clock">00:00:00</div>
-                <div class="lang-flags">
-                    <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
-                    <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
-                    <span class="flag" onclick="setLang('ru')" title="Русский">🇷🇺</span>
-                </div>
+            <div class="action-buttons">
+                <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn" title="WhatsApp">
+                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    <span class="btn-text" data-key="whatsapp">WhatsApp</span>
+                </a>
+
+                <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn" title="Telegram">
+                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                    <span class="btn-text" data-key="telegram">Telegram</span>
+                </a>
+
+                <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn" title="Donate">
+                    <span>☕</span> <span class="btn-text" data-key="donate">Donate</span>
+                </a>
             </div>
         </div>
-
-        <div class="action-buttons">
-            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn" title="WhatsApp">
-                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                <span class="btn-text" data-key="whatsapp">WhatsApp</span>
-            </a>
-
-            <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn" title="Telegram">
-                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                <span class="btn-text" data-key="telegram">Telegram</span>
-            </a>
-
-            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn" title="Donate">
-                <span style="font-size: 1.1rem; line-height: 1;">☕</span> 
-                <span class="btn-text" data-key="donate">Donate</span>
-            </a>
+        
+        <div class="header-right">
+            <div class="clock" id="clock">00:00:00</div>
+            <div class="lang-flags">
+                <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
+                <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
+                <span class="flag" onclick="setLang('ru')" title="Русский">🇷🇺</span>
+            </div>
         </div>
     </header>
 
@@ -346,6 +324,12 @@
             </a>
         </div>
 
+        <div class="views-counter">
+            <span class="blink" style="color: var(--warning);">👁️</span> 
+            <span data-key="views_label">TOTAL VIEWS:</span> 
+            <strong id="visitorCount" style="color: var(--primary); font-family: monospace; font-size: 1.1rem;">---</strong>
+        </div>
+
         <div class="disclaimer-box" style="opacity: 0.7; margin-top:10px;">
             <span data-key="disclaimer_short">Open-source intel aggregation. Not official military advice.</span>
         </div>
@@ -385,7 +369,7 @@
                 risk_title: "RISK SCORE", score_label: "US/IRAN ESCALATION PROBABILITY", status: "RISK LEVEL:",
                 click_hint: "💡 TIP: Click any signal to verify source data", risk_parameters: "LIVE SIGNALS & SOURCES",
                 news_feed_title: "LIVE INTEL FEED", share: "Share Status", disclaimer_short: "Statistical aggregation. Not official military advice.",
-                trend_title: "7-Day Risk Trend", updated_at: "Last Updated:",
+                trend_title: "7-Day Risk Trend", updated_at: "Last Updated:", views_label: "TOTAL VIEWS:",
                 l_news: "News Intelligence", l_aviation: "Civil Aviation", l_tankers: "US Tanker Activity", l_market: "Prediction Markets",
                 l_financial: "Global Markets", l_social: "Social Intel / OSINT", l_traffic: "Tehran Traffic", l_pentagon: "Pentagon Pizza Index", l_weather: "Weather (Tehran)",
                 m_general_title: "Risk Calculation", m_general_desc: "Aggregating 9 signals to calculate conflict probability.",
@@ -400,7 +384,7 @@
                 risk_title: "ציון סיכון", score_label: "הסתברות להסלמה: ארה״ב / איראן", status: "רמת סיכון:",
                 click_hint: "💡 טיפ: לחץ על כל פרמטר לפתיחת מקור המידע", risk_parameters: "אותות ומקורות מידע",
                 news_feed_title: "עדכוני חדשות בזמן אמת", share: "שתף סטטוס", disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
-                trend_title: "מגמת סיכון (7 ימים)", updated_at: "עדכון אחרון:",
+                trend_title: "מגמת סיכון (7 ימים)", updated_at: "עדכון אחרון:", views_label: "סך הכל צפיות:",
                 l_news: "מודיעין חדשותי", l_aviation: "תעופה אזרחית", l_tankers: "מכליות צבאיות", l_market: "שוקי חיזוי",
                 l_financial: "שווקים פיננסיים", l_social: "מודיעין רשתות", l_traffic: "תנועה בטהרן", l_pentagon: "מדד הפיצה (פנטגון)", l_weather: "מזג אוויר",
                 m_general_title: "שיטת חישוב", m_general_desc: "האלגוריתם משקלל 9 מקורות סטטיסטיים.",
@@ -415,7 +399,7 @@
                 risk_title: "ОБЩИЙ РИСК", score_label: "ВЕРОЯТНОСТЬ ЭСКАЛАЦИИ США/ИРАН", status: "УРОВЕНЬ РИСКА:",
                 click_hint: "💡 СОВЕТ: Нажмите на параметр для просмотра источника", risk_parameters: "СИГНАЛЫ И ИСТОЧНИКИ",
                 news_feed_title: "ЖИВАЯ ЛЕНТА НОВОСТЕЙ", share: "Поделиться", disclaimer_short: "Статистическая агрегация.",
-                trend_title: "ТРЕНД (7 ДНЕЙ)", updated_at: "Обновлено:",
+                trend_title: "ТРЕНД (7 ДНЕЙ)", updated_at: "Обновлено:", views_label: "ВСЕГО ПРОСМОТРОВ:",
                 l_news: "Анализ новостей", l_aviation: "Авиация", l_tankers: "Военные танкеры", l_market: "Рынки прогнозов",
                 l_financial: "Финансы", l_social: "Соцсети", l_traffic: "Трафик Тегеран", l_pentagon: "Индекс Пиццы (Пентагон)", l_weather: "Погода",
                 m_general_title: "Методология", m_general_desc: "Агрегация 9 сигналов.",
@@ -475,6 +459,26 @@
                 }
             } catch (error) {
                 console.log("News Feed Error:", error);
+                const nl = document.getElementById('newsList');
+                if(nl) nl.innerHTML = "<p style='color:#666; padding:10px;'>Signal lost. Waiting for intel feed...</p>";
+            }
+        }
+
+        // --- GLOBAL VISITOR COUNTER LOGIC ---
+        async function initGlobalCounter() {
+            const counterEl = document.getElementById('visitorCount');
+            try {
+                // שימוש ב-API חינמי כדי לספור כניסות גלובליות מכל המשתמשים
+                const res = await fetch('https://api.counterapi.dev/v1/waradar_tracker_v20/visits/up');
+                const data = await res.json();
+                counterEl.innerText = data.count.toLocaleString();
+            } catch(e) {
+                console.log("Global counter API error, using fallback.");
+                // גיבוי מקומי במידה והשרת החינמי נופל
+                let count = localStorage.getItem('waradar_local_views') || 10452;
+                count = parseInt(count) + 1;
+                localStorage.setItem('waradar_local_views', count);
+                counterEl.innerText = count.toLocaleString();
             }
         }
 
@@ -484,10 +488,10 @@
             
             let storedData = null;
             try {
-                const storedString = localStorage.getItem('waradar_v19_1_data');
+                const storedString = localStorage.getItem('waradar_v19_data');
                 if(storedString) storedData = JSON.parse(storedString);
             } catch(e) {
-                localStorage.removeItem('waradar_v19_1_data');
+                localStorage.removeItem('waradar_v19_data');
             }
 
             if (storedData && storedData.timestamp && (now - storedData.timestamp < UPDATE_INTERVAL)) {
@@ -518,7 +522,7 @@
             };
 
             try {
-                localStorage.setItem('waradar_v19_1_data', JSON.stringify({ timestamp: now, payload: payload }));
+                localStorage.setItem('waradar_v19_data', JSON.stringify({ timestamp: now, payload: payload }));
             } catch(e){}
 
             return payload;
@@ -576,7 +580,9 @@
                     });
                 }
                 drawStockChart(data.score);
-            } catch(e) {}
+            } catch(e) {
+                console.log("Render error:", e);
+            }
         }
 
         function drawStockChart(currentValue) {
@@ -657,9 +663,9 @@
         function shareSite() {
             const url = window.location.href;
             if (navigator.share) {
-                navigator.share({ title: 'WARADAR', url: url }).catch(e => {});
+                navigator.share({ title: 'WARADAR', url: url }).catch(e => console.log(e));
             } else {
-                navigator.clipboard.writeText(url).then(()=> alert("Link copied!")).catch(e=>{});
+                navigator.clipboard.writeText(url).then(()=> alert("Link copied!")).catch(e=>console.log(e));
             }
         }
 
@@ -675,7 +681,7 @@
                 const key = el.getAttribute('data-key');
                 if(content[lang] && content[lang][key]) {
                     if(el.tagName === 'SPAN' && el.innerHTML.includes('<svg')) {
-                        // Protect
+                        // Protect SVGs
                     } else {
                         el.innerText = content[lang][key];
                     }
@@ -689,6 +695,7 @@
             updateClock();
             renderUI();
             fetchLiveNews();
+            initGlobalCounter(); // קריאה לפונקציית המונה בטעינת הדף
             setInterval(renderUI, 30000); 
             setInterval(fetchLiveNews, 300000); 
         });
