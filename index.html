@@ -39,23 +39,28 @@
             z-index: 990;
         }
 
+        /* --- HEADER REFINED (V19) --- */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 20px;
+            padding: 12px 20px;
             background: rgba(0, 20, 0, 0.95);
             border-bottom: 1px solid var(--danger); 
             backdrop-filter: blur(5px);
             z-index: 1000;
             position: sticky; top: 0;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
-        .brand { display: flex; align-items: center; gap: 15px; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* מרווח קטן ומהודק בין הכותרת לכפתורים */
+        }
+
+        .brand { display: flex; align-items: center; gap: 10px; }
         .radar-logo {
-            width: 40px; height: 40px; border: 2px solid var(--danger);
+            width: 35px; height: 35px; border: 2px solid var(--danger);
             border-radius: 50%; position: relative;
             background: radial-gradient(circle, rgba(255,51,51,0.2), transparent);
         }
@@ -67,21 +72,22 @@
         }
         @keyframes sweep { to { transform: rotate(360deg); } }
 
-        .title-group h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
-        .live-tag { font-size: 0.7rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; }
-
-        .top-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: flex-end; flex: 1; }
-        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none; }
-        @media(min-width: 800px) { .clock { display: block; } }
+        .title-group h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
+        .live-tag { font-size: 0.65rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; vertical-align: top;}
 
         .action-buttons {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             align-items: center;
-            flex-wrap: wrap;
-            justify-content: center;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; }
         .lang-flags { display: flex; gap: 5px; cursor: pointer; }
         .flag { font-size: 1.4rem; filter: grayscale(1); transition: 0.3s; }
         .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.1); }
@@ -89,19 +95,29 @@
         .btn {
             text-decoration: none; padding: 6px 10px; font-weight: bold; border-radius: 4px; 
             display: flex; align-items: center; gap: 5px; font-size: 0.75rem; transition: 0.3s;
-            position: relative; z-index: 1001; 
+            position: relative; z-index: 1001; white-space: nowrap;
         }
         .donate-btn { background: #FFDD00; color: #000; border: 1px solid #cca300; }
         .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
-
         .telegram-btn { background: transparent; color: var(--telegram); border: 1px solid var(--telegram); }
         .telegram-btn:hover { background: rgba(0, 136, 204, 0.2); box-shadow: 0 0 10px var(--telegram); }
-        
         .whatsapp-btn { background: transparent; color: var(--whatsapp); border: 1px solid var(--whatsapp); }
         .whatsapp-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 10px var(--whatsapp); }
 
         .btn-icon { width: 14px; height: 14px; fill: currentColor; }
 
+        /* התאמה למסכים קטנים כדי לשמור על שורה אחת */
+        @media (max-width: 900px) {
+            header { padding: 10px; }
+            .clock { display: none; }
+            .btn span.btn-text { display: none; } /* מסתיר את הטקסט, משאיר רק סמלים */
+            .btn { padding: 6px; }
+            .btn-icon { width: 18px; height: 18px; }
+            .header-left { gap: 10px; }
+            .title-group h1 { font-size: 1.2rem; }
+        }
+
+        /* --- LAYOUT --- */
         .content-wrapper {
             max-width: 1400px; margin: 0 auto; width: 100%; padding: 20px;
             display: flex; flex-direction: column; gap: 20px; flex: 1;
@@ -143,13 +159,29 @@
         .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--danger)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
+        /* --- LIVE NEWS FEED WITH IMAGES --- */
         .news-item {
-            display: flex; flex-direction: column; text-decoration: none; color: #ccc; 
-            padding: 12px 10px; border-bottom: 1px dashed #222; transition: 0.2s; position: relative; z-index: 1001;
+            display: flex; flex-direction: row; align-items: center; gap: 15px;
+            text-decoration: none; color: #ccc; padding: 12px 10px; 
+            border-bottom: 1px dashed #222; transition: 0.2s; position: relative; z-index: 1001;
         }
         .news-item:hover { background: #111; border-left: 3px solid var(--warning); padding-left: 17px; }
+        
+        .news-thumb {
+            width: 70px; height: 70px; border-radius: 6px; object-fit: cover;
+            border: 1px solid #333; flex-shrink: 0; background: #000;
+        }
+        .news-thumb-fallback {
+            width: 70px; height: 70px; border-radius: 6px; background: #111;
+            border: 1px solid #333; display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; flex-shrink: 0; color: #555;
+        }
+        .news-content-box {
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        
         .news-time { color: var(--warning); font-size: 0.75rem; font-family: monospace; margin-bottom: 5px; }
-        .news-title { font-size: 0.9rem; line-height: 1.4; }
+        .news-title { font-size: 0.9rem; line-height: 1.4; font-weight: bold;}
 
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; }
@@ -171,31 +203,33 @@
 <body>
 
     <header>
-        <div class="brand">
-            <div class="radar-logo"><div class="radar-sweep"></div></div>
-            <div class="title-group">
-                <h1>WARADAR <span class="live-tag">LIVE</span></h1>
+        <div class="header-left">
+            <div class="brand">
+                <div class="radar-logo"><div class="radar-sweep"></div></div>
+                <div class="title-group">
+                    <h1>WARADAR <span class="live-tag">LIVE</span></h1>
+                </div>
             </div>
-        </div>
-        <div class="top-controls">
-            <div class="clock" id="clock">00:00:00</div>
             
             <div class="action-buttons">
-                <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn">
+                <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn" title="WhatsApp">
                     <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                    <span data-key="whatsapp">WhatsApp</span>
+                    <span class="btn-text" data-key="whatsapp">WhatsApp</span>
                 </a>
 
-                <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn">
+                <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn" title="Telegram">
                     <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                    <span data-key="telegram">Telegram</span>
+                    <span class="btn-text" data-key="telegram">Telegram</span>
                 </a>
 
-                <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn">
-                    <span>☕</span> <span data-key="donate">Donate</span>
+                <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn" title="Donate">
+                    <span>☕</span> <span class="btn-text" data-key="donate">Donate</span>
                 </a>
             </div>
-            
+        </div>
+        
+        <div class="header-right">
+            <div class="clock" id="clock">00:00:00</div>
             <div class="lang-flags">
                 <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
                 <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
@@ -304,7 +338,8 @@
             { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 85, icon: icons.tankers },
             { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 88, icon: icons.social },
             { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 60, icon: icons.traffic },
-            { id: 'pentagon', weight: 0.05, url: 'https://twitter.com/search?q=Pentagon+Pizza+Index&f=live', baseVal: 75, icon: icons.pentagon },
+            // קישור הפנטגון תוקן והוחלף לאתר דשבורד:
+            { id: 'pentagon', weight: 0.05, url: 'https://pentagon-pizza.vercel.app/', baseVal: 75, icon: icons.pentagon },
             { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 85, icon: icons.weather }
         ];
 
@@ -323,7 +358,7 @@
                 m_news_desc: "Scans major news outlets for keywords.", m_aviation_desc: "Civilian flight volume over Iran.",
                 m_tankers_desc: "Presence of military refueling tankers.", m_market_desc: "Betting odds on war.",
                 m_financial_desc: "Brent Crude Oil and Bitcoin volatility.", m_social_desc: "Social media OSINT scraper.",
-                m_traffic_desc: "Google Maps traffic data in Tehran.", m_pentagon_desc: "OSINT tracking of late-night pizza deliveries to the Pentagon (Indicator of crisis management).",
+                m_traffic_desc: "Google Maps traffic data in Tehran.", m_pentagon_desc: "OSINT tracking of late-night pizza deliveries to the Pentagon.",
                 m_weather_desc: "Visibility conditions for airstrikes."
             },
             he: {
@@ -353,7 +388,7 @@
                 m_news_desc: "Мониторинг заголовков новостей.", m_aviation_desc: "Объем гражданских рейсов.",
                 m_tankers_desc: "Активность заправщиков.", m_market_desc: "Ставки на войну.",
                 m_financial_desc: "Нефть, Биткойн.", m_social_desc: "Мониторинг Twitter.",
-                m_traffic_desc: "Пробки в Тегеране.", m_pentagon_desc: "Отслеживание заказов пиццы в Пентагон (индикатор кризиса).",
+                m_traffic_desc: "Пробки в Тегеране.", m_pentagon_desc: "Отслеживание заказов пиццы в Пентагон.",
                 m_weather_desc: "Погодные условия."
             }
         };
@@ -366,6 +401,7 @@
             } catch(e){}
         }
 
+        // --- שאיבת חדשות כולל תמונות Thumbnail ---
         async function fetchLiveNews() {
             try {
                 const rssUrl = "https://news.google.com/rss/search?q=US+Iran+strike+escalation+OR+conflict+when:1d&hl=en-US&gl=US&ceid=US:en";
@@ -376,14 +412,30 @@
                 if(data && data.status === 'ok' && data.items && data.items.length > 0) {
                     let newsHtml = '';
                     const articles = data.items.slice(0, 5); 
+                    
                     articles.forEach(item => {
                         const d = new Date(item.pubDate);
                         const timeStr = d.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
                         const titleClean = item.title ? item.title.split(" - ")[0] : "Incoming Intel Update..."; 
+                        
+                        // חילוץ תמונה אם קיימת
+                        let imgSrc = item.thumbnail || (item.enclosure && item.enclosure.link);
+                        if(!imgSrc && item.description) {
+                            const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+                            if(imgMatch) imgSrc = imgMatch[1];
+                        }
+
+                        let imageElement = imgSrc 
+                            ? `<img src="${imgSrc}" class="news-thumb" onerror="this.style.display='none'">` 
+                            : `<div class="news-thumb-fallback">📰</div>`;
+
                         newsHtml += `
                             <a href="${item.link}" target="_blank" class="news-item">
-                                <div class="news-time">📡 UPDATE [${timeStr}]</div>
-                                <div class="news-title">${titleClean}</div>
+                                ${imageElement}
+                                <div class="news-content-box">
+                                    <div class="news-time">📡 UPDATE [${timeStr}]</div>
+                                    <div class="news-title">${titleClean}</div>
+                                </div>
                             </a>`;
                     });
                     const nl = document.getElementById('newsList');
@@ -402,10 +454,10 @@
             
             let storedData = null;
             try {
-                const storedString = localStorage.getItem('waradar_v18_1_data');
+                const storedString = localStorage.getItem('waradar_v19_data');
                 if(storedString) storedData = JSON.parse(storedString);
             } catch(e) {
-                localStorage.removeItem('waradar_v18_1_data');
+                localStorage.removeItem('waradar_v19_data');
             }
 
             if (storedData && storedData.timestamp && (now - storedData.timestamp < UPDATE_INTERVAL)) {
@@ -422,6 +474,7 @@
                 totalWeightedScore += (val * sig.weight);
             });
 
+            // Target Range Logic: ESCALATION MODE 2.0 (72%-83%)
             let calculatedScore = Math.floor(totalWeightedScore);
             let finalScore = Math.max(72, Math.min(83, calculatedScore));
             
@@ -436,7 +489,7 @@
             };
 
             try {
-                localStorage.setItem('waradar_v18_1_data', JSON.stringify({ timestamp: now, payload: payload }));
+                localStorage.setItem('waradar_v19_data', JSON.stringify({ timestamp: now, payload: payload }));
             } catch(e){}
 
             return payload;
@@ -595,7 +648,7 @@
                 const key = el.getAttribute('data-key');
                 if(content[lang] && content[lang][key]) {
                     if(el.tagName === 'SPAN' && el.innerHTML.includes('<svg')) {
-                        // Protect SVGs inside spans if any
+                        // Protect SVGs
                     } else {
                         el.innerText = content[lang][key];
                     }
