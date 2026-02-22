@@ -39,25 +39,26 @@
             z-index: 990;
         }
 
-        /* --- HEADER REFINED --- */
+        /* --- HEADER REFINED - TWO ROWS --- */
         header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
             padding: 12px 20px;
-            background: rgba(0, 20, 0, 0.95);
+            background: rgba(5, 8, 5, 0.98); /* צבע אטום יותר כדי למנוע שקיפות בגלילה */
             border-bottom: 1px solid var(--danger); 
-            backdrop-filter: blur(5px);
-            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            z-index: 9999; /* מונע מהחדשות לעלות על הכותרת */
             position: sticky; top: 0;
         }
 
-        .header-left {
+        .header-main {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 15px; 
+            width: 100%;
         }
 
+        .header-left { display: flex; align-items: center; }
         .brand { display: flex; align-items: center; gap: 10px; }
         .radar-logo {
             width: 35px; height: 35px; border: 2px solid var(--danger);
@@ -75,27 +76,26 @@
         .title-group h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
         .live-tag { font-size: 0.65rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; vertical-align: top;}
 
-        .action-buttons {
-            display: flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
+        .header-right { display: flex; align-items: center; gap: 15px; }
         .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; }
         .lang-flags { display: flex; gap: 5px; cursor: pointer; }
         .flag { font-size: 1.4rem; filter: grayscale(1); transition: 0.3s; }
         .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.1); }
 
+        /* שורת הכפתורים השנייה בכותרת - 33.3% */
+        .header-action-row {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
         .btn {
-            text-decoration: none; padding: 6px 10px; font-weight: bold; border-radius: 4px; 
-            display: flex; align-items: center; gap: 5px; font-size: 0.75rem; transition: 0.3s;
-            position: relative; z-index: 1001; white-space: nowrap;
+            flex: 1; /* לוקח 33% מהשורה */
+            text-decoration: none; padding: 8px 10px; font-weight: bold; border-radius: 4px; 
+            display: flex; justify-content: center; align-items: center; gap: 6px; font-size: 0.8rem; transition: 0.3s;
+            position: relative; white-space: nowrap;
         }
         .donate-btn { background: #FFDD00; color: #000; border: 1px solid #cca300; }
         .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
@@ -103,17 +103,13 @@
         .telegram-btn:hover { background: rgba(0, 136, 204, 0.2); box-shadow: 0 0 10px var(--telegram); }
         .whatsapp-btn { background: transparent; color: var(--whatsapp); border: 1px solid var(--whatsapp); }
         .whatsapp-btn:hover { background: rgba(37, 211, 102, 0.2); box-shadow: 0 0 10px var(--whatsapp); }
-
-        .btn-icon { width: 14px; height: 14px; fill: currentColor; }
+        .btn-icon { width: 16px; height: 16px; fill: currentColor; }
 
         @media (max-width: 900px) {
             header { padding: 10px; }
             .clock { display: none; }
-            .btn span.btn-text { display: none; } 
-            .btn { padding: 6px; }
-            .btn-icon { width: 18px; height: 18px; }
-            .header-left { gap: 10px; }
             .title-group h1 { font-size: 1.2rem; }
+            .btn span.btn-text { font-size: 0.75rem; } 
         }
 
         /* --- LAYOUT --- */
@@ -158,11 +154,39 @@
         .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
         .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--danger)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        /* --- LIVE NEWS FEED WITH IMAGES --- */
+        /* --- LIVE NEWS FEED WITH TICKER ANIMATION --- */
+        .news-window {
+            height: 380px; /* גובה חלון החדשות */
+            overflow: hidden; /* מסתיר את מה שחורג */
+            position: relative;
+            margin-top: 10px;
+            /* אפקט הדרגתיות למעלה ולמטה למראה חלק */
+            mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+        }
+        
+        .news-ticker {
+            display: flex;
+            flex-direction: column;
+            animation: scrollTicker 30s linear infinite; /* מהירות הגלילה הרציפה */
+        }
+        
+        /* עצירת האנימציה כשהמשתמש מרחף על החדשות */
+        .news-ticker:hover {
+            animation-play-state: paused;
+        }
+
+        @keyframes scrollTicker {
+            0% { transform: translateY(380px); } /* מתחיל מלמטה (מחוץ לחלון) */
+            100% { transform: translateY(-100%); } /* נגלל עד הסוף למעלה */
+        }
+
         .news-item {
             display: flex; flex-direction: row; align-items: center; gap: 15px;
-            text-decoration: none; color: #ccc; padding: 12px 10px; 
-            border-bottom: 1px dashed #222; transition: 0.2s; position: relative; z-index: 1001;
+            text-decoration: none; color: #ccc; padding: 15px 10px; 
+            border-bottom: 1px dashed #222; transition: 0.2s;
+            position: relative; z-index: 10;
+            background: rgba(0,0,0,0.3);
         }
         .news-item:hover { background: #111; border-left: 3px solid var(--warning); padding-left: 17px; }
         
@@ -182,19 +206,18 @@
         .news-time { color: var(--warning); font-size: 0.75rem; font-family: monospace; margin-bottom: 5px; }
         .news-title { font-size: 0.9rem; line-height: 1.4; font-weight: bold;}
 
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+        /* --- MODALS & FOOTER --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 10000; display: none; align-items: center; justify-content: center; }
         .modal-overlay.open { display: flex; }
         .modal-box { background: #111; border: 1px solid var(--primary); width: 90%; max-width: 500px; padding: 25px; box-shadow: 0 0 40px rgba(0, 255, 65, 0.15); position: relative; }
         .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; }
         .modal-title { font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
         .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ccc; }
 
-        /* --- FOOTER & 33% BUTTONS --- */
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; position: relative; z-index: 1001;}
         .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; font-weight: bold; transition: 0.3s;}
         .share-btn:hover { background: rgba(0, 255, 65, 0.1); }
         
-        /* עיצוב שורה שנייה - 33% */
         .footer-social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; width: 100%; }
         .footer-social-btn { 
             width: 33%; 
@@ -239,38 +262,40 @@
 <body>
 
     <header>
-        <div class="header-left">
-            <div class="brand">
-                <div class="radar-logo"><div class="radar-sweep"></div></div>
-                <div class="title-group">
-                    <h1>WARADAR <span class="live-tag">LIVE</span></h1>
+        <div class="header-main">
+            <div class="header-left">
+                <div class="brand">
+                    <div class="radar-logo"><div class="radar-sweep"></div></div>
+                    <div class="title-group">
+                        <h1>WARADAR <span class="live-tag">LIVE</span></h1>
+                    </div>
                 </div>
             </div>
             
-            <div class="action-buttons">
-                <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn" title="WhatsApp">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                    <span class="btn-text" data-key="whatsapp">WhatsApp</span>
-                </a>
-
-                <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn" title="Telegram">
-                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                    <span class="btn-text" data-key="telegram">Telegram</span>
-                </a>
-
-                <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn" title="Donate">
-                    <span>☕</span> <span class="btn-text" data-key="donate">Donate</span>
-                </a>
+            <div class="header-right">
+                <div class="clock" id="clock">00:00:00</div>
+                <div class="lang-flags">
+                    <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
+                    <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
+                    <span class="flag" onclick="setLang('ru')" title="Русский">🇷🇺</span>
+                </div>
             </div>
         </div>
-        
-        <div class="header-right">
-            <div class="clock" id="clock">00:00:00</div>
-            <div class="lang-flags">
-                <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
-                <span class="flag" onclick="setLang('he')" title="עברית">🇮🇱</span>
-                <span class="flag" onclick="setLang('ru')" title="Русский">🇷🇺</span>
-            </div>
+
+        <div class="header-action-row">
+            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn" title="WhatsApp">
+                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                <span class="btn-text" data-key="whatsapp">WhatsApp</span>
+            </a>
+
+            <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn" title="Telegram">
+                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                <span class="btn-text" data-key="telegram">Telegram</span>
+            </a>
+
+            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn" title="Donate">
+                <span>☕</span> <span class="btn-text" data-key="donate">Donate</span>
+            </a>
         </div>
     </header>
 
@@ -319,8 +344,11 @@
                 <span data-key="news_feed_title">LIVE INTEL FEED</span>
                 <span style="font-size:0.7rem; color:var(--primary); font-weight:normal;" class="blink">● RECIEVING</span>
             </h2>
-            <div id="newsList" style="margin-top: 10px;">
-                <span style="color:#666; font-size:0.9rem;">Connecting to global intel sources...</span>
+            
+            <div class="news-window" id="newsWindow">
+                <div id="newsList" style="margin-top: 10px;">
+                    <span style="color:#666; font-size:0.9rem;">Connecting to global intel sources...</span>
+                </div>
             </div>
         </div>
     </div>
@@ -444,14 +472,15 @@
 
         async function fetchLiveNews() {
             try {
+                // משיכת כמות גדולה יותר של פריטים (10 במקום 5) כדי שהטיקר יהיה מלא
                 const rssUrl = "https://news.google.com/rss/search?q=US+Iran+strike+escalation+OR+conflict+when:1d&hl=en-US&gl=US&ceid=US:en";
-                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+                const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=10`;
                 const response = await fetch(apiUrl);
                 const data = await response.json();
                 
                 if(data && data.status === 'ok' && data.items && data.items.length > 0) {
                     let newsHtml = '';
-                    const articles = data.items.slice(0, 5); 
+                    const articles = data.items.slice(0, 10); 
                     
                     articles.forEach(item => {
                         const d = new Date(item.pubDate);
@@ -460,12 +489,13 @@
                         
                         let imgSrc = item.thumbnail || (item.enclosure && item.enclosure.link);
                         if(!imgSrc && item.description) {
-                            const imgMatch = item.description.match(/<img[^>]+src="([^">]+)"/);
+                            const imgMatch = item.description.match(/<img[^>]+src=["']([^"']+)["']/);
                             if(imgMatch) imgSrc = imgMatch[1];
                         }
 
+                        // במידה והתמונה שבורה או חסומה, תוקפץ תמונת עיתון חלופית אוטומטית (onerror)
                         let imageElement = imgSrc 
-                            ? `<img src="${imgSrc}" class="news-thumb" onerror="this.style.display='none'">` 
+                            ? `<img src="${imgSrc}" class="news-thumb" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'70\\' height=\\'70\\' style=\\'background:%23111\\'><text x=\\'50%\\' y=\\'50%\\' font-size=\\'24\\' text-anchor=\\'middle\\' alignment-baseline=\\'middle\\' fill=\\'%23555\\'>📰</text></svg>';">` 
                             : `<div class="news-thumb-fallback">📰</div>`;
 
                         newsHtml += `
@@ -477,8 +507,10 @@
                                 </div>
                             </a>`;
                     });
+                    
                     const nl = document.getElementById('newsList');
-                    if(nl) nl.innerHTML = newsHtml;
+                    // הכנסת הפריטים לתוך אלמנט חדש עם קלאס של טיקר שרץ
+                    if(nl) nl.innerHTML = `<div class="news-ticker">${newsHtml}</div>`;
                 }
             } catch (error) {
                 console.log("News Feed Error:", error);
