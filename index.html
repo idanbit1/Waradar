@@ -203,49 +203,9 @@
             color: #888;
         }
 
-        /* --- FOOTER & 33% BUTTONS --- */
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; position: relative; z-index: 1001;}
-        .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; font-weight: bold; transition: 0.3s;}
-        .share-btn:hover { background: rgba(0, 255, 65, 0.1); }
-        
-        .footer-action-row {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 15px;
-            width: 100%;
-        }
-        
-        .footer-social-btn {
-            width: 33%;
-            max-width: 200px;
-            padding: 10px;
-            text-align: center;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: bold;
-            transition: 0.3s;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-wa-footer {
-            background: transparent; border: 1px solid var(--whatsapp); color: var(--whatsapp);
-        }
-        .btn-wa-footer:hover {
-            background: rgba(37, 211, 102, 0.15); box-shadow: 0 0 10px rgba(37, 211, 102, 0.3);
-        }
-
-        .btn-tg-footer {
-            background: transparent; border: 1px solid var(--telegram); color: var(--telegram);
-        }
-        .btn-tg-footer:hover {
-            background: rgba(0, 136, 204, 0.15); box-shadow: 0 0 10px rgba(0, 136, 204, 0.3);
-        }
-
+        .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px;}
+        .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; width: 100%; }
         .blink { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
         .rtl { direction: rtl; }
@@ -355,11 +315,11 @@
             <span data-key="share">Share Status</span>
         </button>
         
-        <div class="footer-action-row">
-            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="footer-social-btn btn-wa-footer">
+        <div class="social-links">
+            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" style="color: var(--whatsapp); text-decoration: none; font-size: 0.9rem; width: 33%; text-align: center; display: inline-block;">
                 📢 <span data-key="whatsapp">WhatsApp</span>
             </a>
-            <a href="https://t.me/waradarlive" target="_blank" class="footer-social-btn btn-tg-footer">
+            <a href="https://t.me/waradarlive" target="_blank" style="color: var(--telegram); text-decoration: none; font-size: 0.9rem; width: 33%; text-align: center; display: inline-block;">
                 📢 <span data-key="telegram">Telegram</span>
             </a>
         </div>
