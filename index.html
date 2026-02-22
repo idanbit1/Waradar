@@ -47,34 +47,45 @@
             align-items: center;
             padding: 15px 20px;
             background: rgba(0, 20, 0, 0.95);
-            border-bottom: 1px solid var(--primary);
+            border-bottom: 1px solid var(--danger); /* צבע שונה למצב הסלמה */
             backdrop-filter: blur(5px);
             z-index: 1000;
             position: sticky; top: 0;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .brand { display: flex; align-items: center; gap: 15px; }
         .radar-logo {
-            width: 40px; height: 40px; border: 2px solid var(--primary);
+            width: 40px; height: 40px; border: 2px solid var(--danger);
             border-radius: 50%; position: relative;
-            background: radial-gradient(circle, rgba(0,255,65,0.1), transparent);
+            background: radial-gradient(circle, rgba(255,51,51,0.2), transparent);
         }
         .radar-sweep {
             position: absolute; width: 50%; height: 50%;
-            background: linear-gradient(90deg, transparent, rgba(0, 255, 65, 0.5));
+            background: linear-gradient(90deg, transparent, rgba(255, 51, 51, 0.6));
             top: 0; left: 0; transform-origin: bottom right;
-            animation: sweep 2s infinite linear; border-radius: 100% 0 0 0;
+            animation: sweep 1.5s infinite linear; border-radius: 100% 0 0 0;
         }
         @keyframes sweep { to { transform: rotate(360deg); } }
 
         .title-group h1 { margin: 0; font-size: 1.5rem; letter-spacing: 2px; text-transform: uppercase; }
         .live-tag { font-size: 0.7rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; }
 
-        .top-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content: flex-end; }
-        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none; margin-right: 10px; }
+        .top-controls { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; justify-content: flex-end; flex: 1; }
+        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; display: none; }
         @media(min-width: 800px) { .clock { display: block; } }
 
-        .lang-flags { display: flex; gap: 5px; cursor: pointer; margin-left: 5px; }
+        /* קבוצת הכפתורים החדשה שתשמור עליהם יחד */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .lang-flags { display: flex; gap: 5px; cursor: pointer; }
         .flag { font-size: 1.4rem; filter: grayscale(1); transition: 0.3s; }
         .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.1); }
 
@@ -82,6 +93,7 @@
         .btn {
             text-decoration: none; padding: 6px 10px; font-weight: bold; border-radius: 4px; 
             display: flex; align-items: center; gap: 5px; font-size: 0.75rem; transition: 0.3s;
+            position: relative; z-index: 1001; /* מוודא לחיצות */
         }
         .donate-btn { background: #FFDD00; color: #000; border: 1px solid #cca300; }
         .donate-btn:hover { background: #ffe600; box-shadow: 0 0 10px #FFDD00; }
@@ -95,9 +107,12 @@
         .btn-icon { width: 14px; height: 14px; fill: currentColor; }
 
         /* --- LAYOUT --- */
+        .content-wrapper {
+            max-width: 1400px; margin: 0 auto; width: 100%; padding: 20px;
+            display: flex; flex-direction: column; gap: 20px; flex: 1;
+        }
         main {
-            flex: 1; padding: 20px; display: grid; grid-template-columns: 1fr 1.2fr;
-            gap: 20px; max-width: 1400px; margin: 0 auto; width: 100%;
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; 
         }
         @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
 
@@ -115,15 +130,12 @@
         .score-container { text-align: center; padding: 10px; margin-bottom: 20px; }
         .score-label { font-size: 0.9rem; color: #888; letter-spacing: 2px; margin-bottom: 5px; font-weight: bold; }
         .update-time-display { font-size: 0.85rem; color: #666; margin-top: 5px; font-family: monospace; }
-        .big-score { font-size: 5rem; font-weight: 900; color: var(--primary); text-shadow: 0 0 20px rgba(0,255,65,0.4); line-height: 1; }
+        .big-score { font-size: 5rem; font-weight: 900; color: var(--danger); text-shadow: 0 0 20px rgba(255,51,51,0.5); line-height: 1; }
         
         .history-section {
-            margin-top: auto; border-top: 1px dashed #333; padding-top: 15px; position: relative;
-            min-height: 180px; 
+            margin-top: auto; border-top: 1px dashed #333; padding-top: 15px; position: relative; min-height: 180px; 
         }
-        canvas#trendChart { 
-            width: 100%; height: 150px; margin-top: 10px; display: block; 
-        }
+        canvas#trendChart { width: 100%; height: 150px; margin-top: 10px; display: block; }
         .chart-labels { display: flex; justify-content: space-between; font-size: 0.7rem; color: #666; margin-top: 5px; padding: 0 5px; }
 
         /* --- PARAMETERS LIST --- */
@@ -136,7 +148,16 @@
         .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid var(--text-dim); color: var(--text-dim); border-radius: 50%; font-size: 0.7rem; cursor: pointer; transition: 0.2s; z-index: 5; margin-left: auto; }
         .info-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,65,0.1); }
         .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
-        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--warning)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--danger)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* --- LIVE NEWS FEED --- */
+        .news-item {
+            display: flex; flex-direction: column; text-decoration: none; color: #ccc; 
+            padding: 12px 10px; border-bottom: 1px dashed #222; transition: 0.2s; position: relative; z-index: 1001;
+        }
+        .news-item:hover { background: #111; border-left: 3px solid var(--warning); padding-left: 17px; }
+        .news-time { color: var(--warning); font-size: 0.75rem; font-family: monospace; margin-bottom: 5px; }
+        .news-title { font-size: 0.9rem; line-height: 1.4; }
 
         /* --- MODAL --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; }
@@ -145,11 +166,10 @@
         .modal-close { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #888; }
         .modal-title { font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
         .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ccc; }
-        .modal-tag { display: inline-block; background: #222; padding: 2px 6px; border-radius: 3px; font-size: 0.75rem; color: var(--warning); margin-top: 10px; border: 1px solid #444; }
 
         /* --- FOOTER --- */
-        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; }
-        .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; }
+        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; position: relative; z-index: 1001;}
+        .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px;}
         .social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; }
         .blink { animation: blink 1s infinite; }
         @keyframes blink { 50% { opacity: 0.5; } }
@@ -170,17 +190,21 @@
         <div class="top-controls">
             <div class="clock" id="clock">00:00:00</div>
             
-            <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn">
-                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                <span>WhatsApp</span>
-            </a>
+            <div class="action-buttons">
+                <a href="https://whatsapp.com/channel/0029VbBiDO2LCoX6qRl4cu1K" target="_blank" class="btn whatsapp-btn">
+                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                    <span data-key="whatsapp">WhatsApp</span>
+                </a>
 
-            <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn">
-                <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
-                <span>Telegram</span>
-            </a>
+                <a href="https://t.me/waradarlive" target="_blank" class="btn telegram-btn">
+                    <svg class="btn-icon" viewBox="0 0 24 24"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+                    <span data-key="telegram">Telegram</span>
+                </a>
 
-            <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn"><span>☕</span> <span data-key="donate">Donate</span></a>
+                <a href="https://buymeacoffee.com/idanbit1" target="_blank" class="btn donate-btn">
+                    <span>☕</span> <span data-key="donate">Donate</span>
+                </a>
+            </div>
             
             <div class="lang-flags">
                 <span class="flag active" onclick="setLang('en')" title="English">🇺🇸</span>
@@ -190,48 +214,57 @@
         </div>
     </header>
 
-    <main>
+    <div class="content-wrapper">
+        <main>
+            <div class="card">
+                <h2>
+                    <span data-key="risk_title">RISK SCORE</span>
+                    <span class="info-btn" onclick="openModal('general', event)">?</span>
+                </h2>
+                <div class="score-container">
+                    <div class="score-label" data-key="score_label">US/IRAN ESCALATION PROBABILITY</div>
+                    <div class="big-score" id="mainScore">--%</div>
+                    <div class="update-time-display" id="lastUpdateTime">Loading...</div>
+                    <div style="font-size: 1.4rem; font-weight: bold; margin-top: 10px;">
+                        <span data-key="status">RISK LEVEL:</span> 
+                        <span id="statusText" class="blink" style="color: var(--danger)">CALCULATING...</span>
+                    </div>
+                </div>
+
+                <div class="history-section">
+                    <h3 style="font-size: 0.8rem; color: #888; margin: 0 0 5px 0; text-transform:uppercase;" data-key="trend_title">7-Day Risk Trend</h3>
+                    <canvas id="trendChart"></canvas>
+                    <div class="chart-labels">
+                        <span>-7d</span>
+                        <span>-48h</span>
+                        <span>-24h</span>
+                        <span>-12h</span>
+                        <span>-3h</span>
+                        <span class="blink" style="color:var(--danger)">LIVE</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 data-key="risk_parameters">LIVE SIGNALS</h2>
+                <div id="parametersList">
+                    </div>
+                <div style="margin-top: 15px; font-size: 0.8rem; color: #666; text-align: center;">
+                    <span data-key="click_hint">💡 TIP: Click any signal to verify source data</span>
+                </div>
+            </div>
+        </main>
+
         <div class="card">
             <h2>
-                <span data-key="risk_title">RISK SCORE</span>
-                <span class="info-btn" onclick="openModal('general', event)">?</span>
+                <span data-key="news_feed_title">LIVE INTEL FEED</span>
+                <span style="font-size:0.7rem; color:var(--primary); font-weight:normal;" class="blink">● RECIEVING</span>
             </h2>
-            <div class="score-container">
-                <div class="score-label" data-key="score_label">US/IRAN ESCALATION PROBABILITY</div>
-                <div class="big-score" id="mainScore">--%</div>
-                <div class="update-time-display" id="lastUpdateTime">Loading...</div>
-                <div style="font-size: 1.2rem; margin-top: 10px;">
-                    <span data-key="status">RISK LEVEL:</span> 
-                    <span id="statusText" style="color: var(--warning)">CALCULATING...</span>
-                </div>
-                <div id="multiplierBadge" style="display:none; margin-top:15px; color: var(--danger); font-size: 0.8rem; border: 1px solid var(--danger); padding: 5px; display: inline-block;">
-                    ⚠ ESCALATION MULTIPLIER ACTIVE
-                </div>
-            </div>
-
-            <div class="history-section">
-                <h3 style="font-size: 0.8rem; color: #888; margin: 0 0 5px 0; text-transform:uppercase;" data-key="trend_title">7-Day Risk Trend</h3>
-                <canvas id="trendChart"></canvas>
-                <div class="chart-labels">
-                    <span>-7d</span>
-                    <span>-48h</span>
-                    <span>-24h</span>
-                    <span>-12h</span>
-                    <span>-3h</span>
-                    <span class="blink">LIVE</span>
-                </div>
+            <div id="newsList" style="margin-top: 10px;">
+                <span style="color:#666; font-size:0.9rem;">Connecting to global intel sources...</span>
             </div>
         </div>
-
-        <div class="card">
-            <h2 data-key="risk_parameters">LIVE SIGNALS</h2>
-            <div id="parametersList">
-                </div>
-            <div style="margin-top: 15px; font-size: 0.8rem; color: #666; text-align: center;">
-                <span data-key="click_hint">💡 TIP: Click any signal to verify source data</span>
-            </div>
-        </div>
-    </main>
+    </div>
 
     <div class="modal-overlay" id="infoModal" onclick="closeModal(event)">
         <div class="modal-box">
@@ -275,45 +308,42 @@
             weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
         };
 
-        // --- UPDATED CONFIGURATION (ESCALATION MODE: 65%-80%) ---
-        // ערכי בסיס הועלו משמעותית כדי לשקף עלייה בסיכוי לאסקלציה
+        // --- UPDATED CONFIGURATION (ESCALATION MODE 2.0: 72%-83%) ---
+        // ערכי בסיס הועלו שוב כדי לשקף הסלמה חמורה.
+        // תיקון: קישור הפנטגון מוביל עכשיו לחיפוש OSINT חי בטוויטר
         const signalsConfig = [
-            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 75, icon: icons.news },
-            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 65, icon: icons.aviation },
-            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 72, icon: icons.market },
-            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 75, icon: icons.financial },
-            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 70, icon: icons.tankers },
-            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 80, icon: icons.social },
-            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 45, icon: icons.traffic },
-            { id: 'pentagon', weight: 0.05, url: 'https://www.google.com/maps/@38.8718568,-77.056266,15z/data=!5m1!1e1', baseVal: 50, icon: icons.pentagon },
-            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 80, icon: icons.weather }
+            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 85, icon: icons.news },
+            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 72, icon: icons.aviation },
+            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 80, icon: icons.market },
+            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 78, icon: icons.financial },
+            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 85, icon: icons.tankers },
+            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 88, icon: icons.social },
+            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 60, icon: icons.traffic },
+            { id: 'pentagon', weight: 0.05, url: 'https://twitter.com/search?q=Pentagon+Pizza+Index&f=live', baseVal: 75, icon: icons.pentagon },
+            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 85, icon: icons.weather }
         ];
 
-        // נתונים היסטוריים מתוקנים כדי להציג מגמת עלייה ברורה
-        const historyPoints = [45, 52, 58, 64, 70]; 
+        // נתונים היסטוריים מציגים טיפוס תלול ל-80%
+        const historyPoints = [55, 62, 68, 75, 80]; 
 
         const content = {
             en: {
-                donate: "Donate",
-                telegram: "Channel",
+                whatsapp: "WhatsApp", telegram: "Telegram", donate: "Donate",
                 risk_title: "RISK SCORE",
                 score_label: "US/IRAN ESCALATION PROBABILITY",
                 status: "RISK LEVEL:",
                 click_hint: "💡 TIP: Click any signal to verify source data",
                 risk_parameters: "LIVE SIGNALS & SOURCES",
+                news_feed_title: "LIVE INTEL FEED",
                 share: "Share Status",
                 disclaimer_short: "Statistical aggregation. Use at your own discretion.",
                 trend_title: "7-Day Risk Trend",
                 updated_at: "Last Updated:",
                 
-                l_news: "News Intelligence",
-                l_aviation: "Civil Aviation",
-                l_tankers: "US Tanker Activity",
-                l_market: "Prediction Markets",
-                l_financial: "Global Markets",
-                l_social: "Social Intel / OSINT",
-                l_traffic: "Tehran Traffic",
-                l_pentagon: "Pentagon Activity",
+                l_news: "News Intelligence", l_aviation: "Civil Aviation",
+                l_tankers: "US Tanker Activity", l_market: "Prediction Markets",
+                l_financial: "Global Markets", l_social: "Social Intel / OSINT",
+                l_traffic: "Tehran Traffic", l_pentagon: "Pentagon Pizza Index",
                 l_weather: "Weather (Tehran)",
                 
                 m_general_title: "Risk Calculation",
@@ -325,30 +355,26 @@
                 m_financial_desc: "Brent Crude Oil, DXY, and Bitcoin volatility.",
                 m_social_desc: "Real-time scraper of X (Twitter) and Telegram.",
                 m_traffic_desc: "Google Maps traffic data in Tehran.",
-                m_pentagon_desc: "Activity levels around US Defense Dept HQ.",
+                m_pentagon_desc: "OSINT tracking of late-night pizza deliveries to the Pentagon (Indicator of crisis management).",
                 m_weather_desc: "Visibility conditions for airstrikes."
             },
             he: {
-                donate: "תרומה",
-                telegram: "ערוץ",
+                whatsapp: "וואטסאפ", telegram: "טלגרם", donate: "תרומה",
                 risk_title: "ציון סיכון",
                 score_label: "הסתברות להסלמה: ארה״ב / איראן",
                 status: "רמת סיכון:",
                 click_hint: "💡 טיפ: לחץ על כל פרמטר כדי לפתוח את מקור המידע",
                 risk_parameters: "אותות ומקורות מידע",
+                news_feed_title: "עדכוני חדשות בזמן אמת",
                 share: "שתף סטטוס",
                 disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
                 trend_title: "מגמת סיכון (7 ימים)",
                 updated_at: "עדכון אחרון:",
                 
-                l_news: "מודיעין חדשותי",
-                l_aviation: "תעופה אזרחית",
-                l_tankers: "מכליות צבאיות",
-                l_market: "שוקי חיזוי",
-                l_financial: "שווקים פיננסיים",
-                l_social: "מודיעין רשתות",
-                l_traffic: "תנועה בטהרן",
-                l_pentagon: "פעילות בפנטגון",
+                l_news: "מודיעין חדשותי", l_aviation: "תעופה אזרחית",
+                l_tankers: "מכליות צבאיות", l_market: "שוקי חיזוי",
+                l_financial: "שווקים פיננסיים", l_social: "מודיעין רשתות",
+                l_traffic: "תנועה בטהרן", l_pentagon: "מדד הפיצה (פנטגון)",
                 l_weather: "מזג אוויר",
                 
                 m_general_title: "שיטת חישוב",
@@ -360,30 +386,26 @@
                 m_financial_desc: "ניתוח מחיר נפט, דולר וביטקוין.",
                 m_social_desc: "ניטור טוויטר וטלגרם.",
                 m_traffic_desc: "מדד עומסים בטהרן.",
-                m_pentagon_desc: "פעילות סביב הפנטגון.",
+                m_pentagon_desc: "מעקב אחר הזמנות פיצה לפנטגון בשעות הלילה (מעיד על דיוני חירום).",
                 m_weather_desc: "תנאי ראות לתקיפה."
             },
             ru: {
-                donate: "Пожертвовать",
-                telegram: "Канал",
+                whatsapp: "WhatsApp", telegram: "Telegram", donate: "Донат",
                 risk_title: "ОБЩИЙ РИСК",
                 score_label: "ВЕРОЯТНОСТЬ ЭСКАЛАЦИИ США/ИРАН",
                 status: "УРОВЕНЬ РИСКА:",
                 click_hint: "💡 СОВЕТ: Нажмите на параметр для просмотра источника",
                 risk_parameters: "СИГНАЛЫ И ИСТОЧНИКИ",
+                news_feed_title: "ЖИВАЯ ЛЕНТА НОВОСТЕЙ",
                 share: "Поделиться",
                 disclaimer_short: "Статистическая агрегация. Не официальный совет.",
                 trend_title: "ТРЕНД (7 ДНЕЙ)",
                 updated_at: "Обновлено:",
                 
-                l_news: "Анализ новостей",
-                l_aviation: "Авиация",
-                l_tankers: "Военные танкеры",
-                l_market: "Рынки прогнозов",
-                l_financial: "Финансы",
-                l_social: "Соцсети",
-                l_traffic: "Трафик Тегеран",
-                l_pentagon: "Пентагон",
+                l_news: "Анализ новостей", l_aviation: "Авиация",
+                l_tankers: "Военные танкеры", l_market: "Рынки прогнозов",
+                l_financial: "Финансы", l_social: "Соцсети",
+                l_traffic: "Трафик Тегеран", l_pentagon: "Индекс Пиццы (Пентагон)",
                 l_weather: "Погода",
                 
                 m_general_title: "Методология",
@@ -395,26 +417,61 @@
                 m_financial_desc: "Нефть, Доллар, Биткойн.",
                 m_social_desc: "Мониторинг Twitter и Telegram.",
                 m_traffic_desc: "Пробки в Тегеране.",
-                m_pentagon_desc: "Активность Пентагона.",
+                m_pentagon_desc: "Отслеживание заказов пиццы в Пентагон (индикатор кризиса).",
                 m_weather_desc: "Погодные условия."
             }
         };
 
         let currentLang = 'en';
         
-        // --- LOGIC ---
         function updateClock() {
             document.getElementById('clock').innerText = new Date().toLocaleTimeString('en-GB', { hour12: false });
         }
         setInterval(updateClock, 1000);
         
-        // --- SMART DATA ENGINE (KEY CHANGED TO FORCE UPDATE) ---
+        // --- LIVE NEWS FETCHER (Google News RSS to JSON API) ---
+        async function fetchLiveNews() {
+            // שואב חדשות מגוגל בנושא איראן וארה"ב, מומר מ-RSS ל-JSON (חינמי ופתוח)
+            const rssUrl = "https://news.google.com/rss/search?q=US+Iran+strike+escalation+OR+conflict+when:1d&hl=en-US&gl=US&ceid=US:en";
+            const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}`;
+            
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+                
+                if(data.status === 'ok' && data.items.length > 0) {
+                    let newsHtml = '';
+                    // לוקח רק את 5 הכתבות הראשונות
+                    const articles = data.items.slice(0, 5); 
+                    
+                    articles.forEach(item => {
+                        const d = new Date(item.pubDate);
+                        const timeStr = d.toLocaleTimeString('en-GB', {hour: '2-digit', minute:'2-digit'});
+                        // מנקה את שם האתר מגוגל (בדרך כלל מופרד עם "-")
+                        const titleClean = item.title.split(" - ")[0]; 
+                        
+                        newsHtml += `
+                            <a href="${item.link}" target="_blank" class="news-item">
+                                <div class="news-time">📡 UPDATE [${timeStr}]</div>
+                                <div class="news-title">${titleClean}</div>
+                            </a>
+                        `;
+                    });
+                    document.getElementById('newsList').innerHTML = newsHtml;
+                }
+            } catch (error) {
+                console.error("News fetch error", error);
+                document.getElementById('newsList').innerHTML = "<p style='color:#666; padding:10px;'>Signal lost. Cannot retrieve intel feed at this moment.</p>";
+            }
+        }
+
+        // --- SMART DATA ENGINE (KEY CHANGED TO FORCE V18) ---
         function getSmartData() {
             const now = Date.now();
-            const UPDATE_INTERVAL = 15 * 60 * 1000; // 15 Minutes
+            const UPDATE_INTERVAL = 15 * 60 * 1000; 
             
-            // שינוי המפתח כדי לכפות איפוס זיכרון אצל הגולשים
-            const storedString = localStorage.getItem('waradar_v14_data');
+            // מפתח חדש v18 מחייב התאפסות לכולם
+            const storedString = localStorage.getItem('waradar_v18_data');
             let storedData = storedString ? JSON.parse(storedString) : null;
 
             if (storedData && (now - storedData.timestamp < UPDATE_INTERVAL)) {
@@ -422,7 +479,6 @@
             }
 
             let totalWeightedScore = 0;
-            let elevatedCount = 0;
             let signalValues = {};
 
             signalsConfig.forEach(sig => {
@@ -431,15 +487,12 @@
                 
                 signalValues[sig.id] = val;
                 totalWeightedScore += (val * sig.weight);
-                if (val > 60) elevatedCount++;
             });
 
-            // Target Range Logic: ESCALATION MODE (65%-80%)
+            // Target Range Logic: ESCALATION MODE 2.0 (72%-83%)
             let calculatedScore = Math.floor(totalWeightedScore);
-            // Strict clamping to requested escalation range 
-            let finalScore = Math.max(65, Math.min(80, calculatedScore));
+            let finalScore = Math.max(72, Math.min(83, calculatedScore));
             
-            // Format Date & Time
             const dateObj = new Date();
             const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
             const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
@@ -448,12 +501,10 @@
             const payload = {
                 score: finalScore,
                 signals: signalValues,
-                multiplier: (elevatedCount >= 4), 
                 updateTime: fullDateTime
             };
 
-            // Saving to new key v14
-            localStorage.setItem('waradar_v14_data', JSON.stringify({
+            localStorage.setItem('waradar_v18_data', JSON.stringify({
                 timestamp: now,
                 payload: payload
             }));
@@ -470,17 +521,17 @@
             const timeLabel = content[currentLang].updated_at;
             document.getElementById('lastUpdateTime').innerText = `${timeLabel} ${data.updateTime}`;
 
-            let color = '#00ff41'; let status = 'LOW';
+            let color = '#ff3333'; let status = 'HIGH 🔴';
             
-            // Adjusted status thresholds for escalation mode
-            if(data.score >= 55) { color = '#ffb700'; status = 'ELEVATED'; } 
-            if(data.score >= 70) { color = '#ff3333'; status = 'HIGH'; }
+            // הגדרות הסלמה מחמירות
+            if(data.score >= 80) { 
+                color = '#ff1111'; 
+                status = 'CRITICAL ☢️'; 
+            }
             
             scoreEl.style.color = color;
             document.getElementById('statusText').innerText = status;
             document.getElementById('statusText').style.color = color;
-
-            document.getElementById('multiplierBadge').style.display = data.multiplier ? "inline-block" : "none";
 
             const list = document.getElementById('parametersList');
             list.innerHTML = '';
@@ -490,8 +541,8 @@
                 const label = content[currentLang][`l_${sig.id}`];
                 
                 let barColor = 'var(--primary)';
-                if(val > 45) barColor = 'var(--warning)';
-                if(val > 65) barColor = 'var(--danger)';
+                if(val > 50) barColor = 'var(--warning)';
+                if(val > 70) barColor = 'var(--danger)';
 
                 const row = document.createElement('div');
                 row.className = 'parameter-row';
@@ -515,7 +566,6 @@
                 list.appendChild(row);
             });
 
-            // Ensure graph is drawn
             drawStockChart(data.score);
         }
 
@@ -532,12 +582,11 @@
             ctx.clearRect(0, 0, width, height);
 
             const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, "rgba(0, 255, 65, 0.4)");
-            gradient.addColorStop(1, "rgba(0, 255, 65, 0.0)");
+            gradient.addColorStop(0, "rgba(255, 51, 51, 0.4)");
+            gradient.addColorStop(1, "rgba(255, 51, 51, 0.0)");
             
-            let strokeColor = '#00ff41';
-            if(currentValue >= 55) strokeColor = '#ffb700';
-            if(currentValue >= 70) strokeColor = '#ff3333';
+            let strokeColor = '#ff3333';
+            if(currentValue >= 80) strokeColor = '#ff1111';
 
             ctx.beginPath();
             ctx.moveTo(0, height);
@@ -619,9 +668,13 @@
             renderUI();
         }
 
+        // Initialize Everything
         updateClock();
         renderUI();
+        fetchLiveNews(); // שואב חדשות בטעינה
+        
         setInterval(renderUI, 30000); 
+        setInterval(fetchLiveNews, 300000); // מרענן חדשות כל 5 דקות
 
     </script>
 </body>
