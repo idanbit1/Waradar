@@ -44,10 +44,10 @@
             display: flex;
             flex-direction: column;
             padding: 12px 20px;
-            background: rgba(5, 8, 5, 0.98); /* צבע אטום יותר כדי למנוע שקיפות בגלילה */
+            background: rgba(5, 8, 5, 0.98); 
             border-bottom: 1px solid var(--danger); 
             box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-            z-index: 9999; /* מונע מהחדשות לעלות על הכותרת */
+            z-index: 9999; 
             position: sticky; top: 0;
         }
 
@@ -156,11 +156,10 @@
 
         /* --- LIVE NEWS FEED WITH TICKER ANIMATION --- */
         .news-window {
-            height: 380px; /* גובה חלון החדשות */
-            overflow: hidden; /* מסתיר את מה שחורג */
+            height: 380px; 
+            overflow: hidden; 
             position: relative;
             margin-top: 10px;
-            /* אפקט הדרגתיות למעלה ולמטה למראה חלק */
             mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
         }
@@ -168,17 +167,16 @@
         .news-ticker {
             display: flex;
             flex-direction: column;
-            animation: scrollTicker 30s linear infinite; /* מהירות הגלילה הרציפה */
+            animation: scrollTicker 30s linear infinite; 
         }
         
-        /* עצירת האנימציה כשהמשתמש מרחף על החדשות */
         .news-ticker:hover {
             animation-play-state: paused;
         }
 
         @keyframes scrollTicker {
-            0% { transform: translateY(380px); } /* מתחיל מלמטה (מחוץ לחלון) */
-            100% { transform: translateY(-100%); } /* נגלל עד הסוף למעלה */
+            0% { transform: translateY(380px); } 
+            100% { transform: translateY(-100%); } 
         }
 
         .news-item {
@@ -472,7 +470,6 @@
 
         async function fetchLiveNews() {
             try {
-                // משיכת כמות גדולה יותר של פריטים (10 במקום 5) כדי שהטיקר יהיה מלא
                 const rssUrl = "https://news.google.com/rss/search?q=US+Iran+strike+escalation+OR+conflict+when:1d&hl=en-US&gl=US&ceid=US:en";
                 const apiUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssUrl)}&count=10`;
                 const response = await fetch(apiUrl);
@@ -493,7 +490,6 @@
                             if(imgMatch) imgSrc = imgMatch[1];
                         }
 
-                        // במידה והתמונה שבורה או חסומה, תוקפץ תמונת עיתון חלופית אוטומטית (onerror)
                         let imageElement = imgSrc 
                             ? `<img src="${imgSrc}" class="news-thumb" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'70\\' height=\\'70\\' style=\\'background:%23111\\'><text x=\\'50%\\' y=\\'50%\\' font-size=\\'24\\' text-anchor=\\'middle\\' alignment-baseline=\\'middle\\' fill=\\'%23555\\'>📰</text></svg>';">` 
                             : `<div class="news-thumb-fallback">📰</div>`;
@@ -509,7 +505,6 @@
                     });
                     
                     const nl = document.getElementById('newsList');
-                    // הכנסת הפריטים לתוך אלמנט חדש עם קלאס של טיקר שרץ
                     if(nl) nl.innerHTML = `<div class="news-ticker">${newsHtml}</div>`;
                 }
             } catch (error) {
@@ -519,18 +514,44 @@
             }
         }
 
+        // --- SMART COUNTER LOGIC (NEVER GOES DOWN) ---
         async function initGlobalCounter() {
             const counterEl = document.getElementById('visitorCount');
+            const BASE_COUNT = 15430; // בסיס הצפיות הקיים
+            const jumpAmount = Math.floor(Math.random() * 4) + 2; // קפיצה של 2 עד 5 צפיות
+            
+            // חילוץ המספר הגבוה ביותר שהמשתמש אי פעם ראה כדי למנוע חזרה אחורה
+            let localMaxViews = parseInt(localStorage.getItem('waradar_max_views') || BASE_COUNT);
+
             try {
-                const res = await fetch('https://api.counterapi.dev/v1/waradar_tracker_v20/visits/up');
-                const data = await res.json();
-                counterEl.innerText = data.count.toLocaleString();
+                let finalServerCount = 0;
+                // שליחת מספר בקשות ככמות הקפיצה המוגרלת כדי שזה יירשם בשרת העולמי
+                for(let i=0; i<jumpAmount; i++) {
+                    const res = await fetch('https://api.counterapi.dev/v1/waradar_app/global_visits_v1/up');
+                    const data = await res.json();
+                    if(i === jumpAmount - 1) {
+                        finalServerCount = data.count;
+                    }
+                }
+
+                // חישוב המספר שיוצג (המספר האמיתי מהשרת + בסיס ההתחלה)
+                let displayCount = finalServerCount + BASE_COUNT;
+
+                // שומר הסף: אם בגלל באג בשרת המספר נמוך ממה שהמשתמש כבר ראה, נשמור על המספר הגבוה + הקפיצה
+                if (displayCount < localMaxViews) {
+                    displayCount = localMaxViews + jumpAmount;
+                }
+
+                // שמירת המספר החדש כבסיס המקסימלי לביקור הבא
+                localStorage.setItem('waradar_max_views', displayCount);
+                counterEl.innerText = displayCount.toLocaleString();
+
             } catch(e) {
-                console.log("Global counter API error, using fallback.");
-                let count = localStorage.getItem('waradar_local_views') || 10452;
-                count = parseInt(count) + 1;
-                localStorage.setItem('waradar_local_views', count);
-                counterEl.innerText = count.toLocaleString();
+                console.log("Global counter API error, using smart fallback.");
+                // במקרה והשרת קורס, המונה ימשיך לעלות באופן מקומי ללא פגיעה בחוויית המשתמש
+                let fallbackCount = localMaxViews + jumpAmount;
+                localStorage.setItem('waradar_max_views', fallbackCount);
+                counterEl.innerText = fallbackCount.toLocaleString();
             }
         }
 
