@@ -1,65 +1,225 @@
-        function getSmartData() {
-            const now = Date.now();
-            const UPDATE_INTERVAL = 15 * 60 * 1000; 
-            
-            // קריאת הגדרות מהאדמין
-            let adminConfig = null;
-            try {
-                const adminStr = localStorage.getItem('waradar_admin_config');
-                if(adminStr) adminConfig = JSON.parse(adminStr);
-            } catch(e) {}
-
-            let storedData = null;
-            try {
-                const storedString = localStorage.getItem('waradar_v100_data');
-                if(storedString) storedData = JSON.parse(storedString);
-            } catch(e) {
-                localStorage.removeItem('waradar_v100_data');
-            }
-
-            // אם אין שינוי מהאדמין והקאש בתוקף
-            if (storedData && storedData.timestamp && (now - storedData.timestamp < UPDATE_INTERVAL)) {
-                return storedData.payload;
-            }
-
-            let totalWeightedScore = 0;
-            let signalValues = {};
-            
-            // בדיקה אם מצב OVERRIDE דולק מהאדמין
-            const isOverride = adminConfig && adminConfig.override;
-
-            signalsConfig.forEach(sig => {
-                // משיכת ערך הבסיס: מהאדמין, או ברירת המחדל
-                let base = adminConfig && adminConfig.baseValues && adminConfig.baseValues[sig.id] !== undefined ? adminConfig.baseValues[sig.id] : sig.baseVal;
-                
-                // אם ב-Override, אין תנודתיות. אם באוטומט, יש תנודתיות קלה
-                const flux = isOverride ? 0 : (Math.random() * 4) - 2; 
-                let val = Math.floor(Math.max(0, Math.min(100, base + flux)));
-                
-                signalValues[sig.id] = val;
-                totalWeightedScore += (val * sig.weight);
-            });
-
-            // קביעת ציון סופי
-            let finalScore = isOverride ? adminConfig.score : Math.floor(Math.max(10, Math.min(100, totalWeightedScore)));
-            
-            const dateObj = new Date();
-            const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
-            const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-            
-            const payload = {
-                score: finalScore,
-                signals: signalValues,
-                updateTime: `${dateStr} | ${timeStr}`,
-                statusText: isOverride && adminConfig.statusText ? adminConfig.statusText : (finalScore >= 80 ? 'CRITICAL ☢️' : 'HIGH 🔴'),
-                alertBanner: isOverride && adminConfig.alertBanner ? adminConfig.alertBanner : null
-            };
-
-            try {
-                localStorage.setItem('waradar_v100_data', JSON.stringify({ timestamp: now, payload: payload }));
-            } catch(e){}
-
-            return payload;
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WARADAR - Admin Control</title>
+    <style>
+        :root {
+            --primary: #00ff41; 
+            --warning: #ffb700; 
+            --danger: #ff3333;  
+            --telegram: #0088cc; 
+            --whatsapp: #25D366; 
+            --bg: #050505;      
+            --panel: #0f1215;
+            --border: #333;
         }
 
-כעת, כל שינוי שתעשה בעמוד האדמין ותלחץ על "עדכן אתר ראשי", ישפיע מידית על הצופים שלך בעמוד הראשי (לאחר רענון או עדכון אוטומטי).
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+        body {
+            margin: 0; padding: 20px;
+            background-color: var(--bg);
+            color: #eee;
+        }
+
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 2px solid var(--danger);
+            padding-bottom: 15px; margin-bottom: 20px;
+        }
+
+        h1 { margin: 0; color: var(--primary); letter-spacing: 2px; font-size: 1.5rem; }
+        .live-tag { background: var(--danger); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; animation: blink 1s infinite; }
+
+        .container {
+            max-width: 800px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr; gap: 20px;
+        }
+
+        .card {
+            background: var(--panel); border: 1px solid var(--border);
+            border-radius: 8px; padding: 20px;
+        }
+
+        .card h2 { margin-top: 0; border-bottom: 1px solid var(--border); padding-bottom: 10px; color: var(--primary); font-size: 1.2rem; }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: bold; color: #ccc;}
+        
+        input[type="text"], input[type="number"] {
+            width: 100%; padding: 12px; background: #111; border: 1px solid #444; color: var(--primary);
+            border-radius: 4px; font-size: 1.2rem; font-weight: bold; font-family: monospace;
+        }
+        input[type="text"]:focus, input[type="number"]:focus { outline: none; border-color: var(--primary); }
+
+        .signals-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+        }
+
+        @media(max-width: 600px) { .signals-grid { grid-template-columns: 1fr; } }
+
+        .signal-input { display: flex; align-items: center; gap: 10px; }
+        .signal-input label { width: 140px; font-size: 0.9rem; margin: 0; }
+        .signal-input input { padding: 8px; font-size: 1rem; width: 80px; text-align: center; }
+
+        textarea {
+            width: 100%; height: 250px; background: #111; border: 1px solid #444; color: #fff;
+            border-radius: 4px; font-size: 0.95rem; padding: 10px; font-family: monospace; resize: vertical;
+            direction: ltr; text-align: left;
+        }
+
+        .actions {
+            display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;
+        }
+        button {
+            flex: 1; min-width: 150px; padding: 12px; font-size: 1rem; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; transition: 0.2s;
+            display: flex; justify-content: center; align-items: center; gap: 8px;
+        }
+        
+        .btn-generate { background: var(--warning); color: #000; }
+        .btn-generate:hover { background: #e6a600; }
+
+        .btn-copy { background: #444; color: #fff; }
+        .btn-copy:hover { background: #555; }
+
+        .btn-tg { background: var(--telegram); color: #fff; }
+        .btn-tg:hover { filter: brightness(1.2); }
+
+        .btn-wa { background: var(--whatsapp); color: #000; }
+        .btn-wa:hover { filter: brightness(1.1); }
+
+        .btn-100 { background: var(--danger); color: #fff; width: 100%; margin-bottom: 15px; }
+        .btn-100:hover { box-shadow: 0 0 15px var(--danger); }
+
+        @keyframes blink { 50% { opacity: 0.5; } }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>WARADAR <span style="color:white; font-weight:normal;">ADMIN</span></h1>
+            <span class="live-tag">BROADCAST MODE</span>
+        </header>
+
+        <button class="btn-100" onclick="setEmergency()">🚨 לחץ כאן להקפצה אוטומטית למצב תקיפה (100%) 🚨</button>
+
+        <div class="card">
+            <h2>📊 נתונים ראשיים</h2>
+            <div class="form-group">
+                <label>אחוז סיכון (0-100):</label>
+                <input type="number" id="mainScore" value="78">
+            </div>
+            <div class="form-group">
+                <label>סטטוס (לדוגמה: HIGH / CRITICAL / ACTIVE CONFLICT):</label>
+                <input type="text" id="statusText" value="HIGH 🔴">
+            </div>
+            <div class="form-group">
+                <label>כתובת האתר שלך (לצירוף להודעה):</label>
+                <input type="text" id="siteUrl" value="https://waradar.live" style="font-size: 1rem; font-weight: normal;">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📡 מדדים (אחוזים)</h2>
+            <div class="signals-grid">
+                <div class="signal-input"><label>📰 News:</label><input type="number" id="sig_news" value="85"></div>
+                <div class="signal-input"><label>✈️ Aviation:</label><input type="number" id="sig_aviation" value="72"></div>
+                <div class="signal-input"><label>📈 Prediction Markets:</label><input type="number" id="sig_market" value="80"></div>
+                <div class="signal-input"><label>💰 Global Markets:</label><input type="number" id="sig_financial" value="78"></div>
+                <div class="signal-input"><label>⛽ US Tankers:</label><input type="number" id="sig_tankers" value="85"></div>
+                <div class="signal-input"><label>📱 Social / OSINT:</label><input type="number" id="sig_social" value="88"></div>
+                <div class="signal-input"><label>🚗 Tehran Traffic:</label><input type="number" id="sig_traffic" value="60"></div>
+                <div class="signal-input"><label>🍕 Pentagon Pizza:</label><input type="number" id="sig_pentagon" value="75"></div>
+                <div class="signal-input"><label>🌤️ Weather:</label><input type="number" id="sig_weather" value="85"></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📢 הפצת הודעה לערוצים</h2>
+            <button class="btn-generate" onclick="generateMessage()">🔄 צור הודעה מעודכנת</button>
+            
+            <div class="form-group" style="margin-top: 15px;">
+                <textarea id="broadcastMsg"></textarea>
+            </div>
+
+            <div class="actions">
+                <button class="btn-copy" onclick="copyToClipboard()">📋 העתק טקסט</button>
+                <button class="btn-tg" onclick="shareTelegram()">✈️ שלח לטלגרם</button>
+                <button class="btn-wa" onclick="shareWhatsapp()">💬 שלח לוואטסאפ</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function setEmergency() {
+            document.getElementById('mainScore').value = 100;
+            document.getElementById('statusText').value = "ACTIVE CONFLICT ⚔️";
+            
+            document.getElementById('sig_news').value = 100;
+            document.getElementById('sig_aviation').value = 99;
+            document.getElementById('sig_market').value = 98;
+            document.getElementById('sig_financial').value = 97;
+            document.getElementById('sig_tankers').value = 100;
+            document.getElementById('sig_social').value = 100;
+            document.getElementById('sig_traffic').value = 95;
+            document.getElementById('sig_pentagon').value = 100;
+            document.getElementById('sig_weather').value = 88;
+
+            generateMessage();
+        }
+
+        function generateMessage() {
+            const score = document.getElementById('mainScore').value;
+            const status = document.getElementById('statusText').value;
+            const url = document.getElementById('siteUrl').value;
+            
+            let alertPrefix = score >= 80 ? "🚨 *WARADAR LIVE ALERT* 🚨" : "📊 *WARADAR UPDATE* 📊";
+
+            let msg = `${alertPrefix}\n\n`;
+            msg += `US/IRAN ESCALATION PROBABILITY: *${score}%*\n`;
+            msg += `RISK LEVEL: *${status}*\n\n`;
+            msg += `📡 *LIVE SIGNALS:*\n`;
+            msg += `📰 News Intel: ${document.getElementById('sig_news').value}%\n`;
+            msg += `✈️ Civil Aviation: ${document.getElementById('sig_aviation').value}%\n`;
+            msg += `⛽ US Tankers: ${document.getElementById('sig_tankers').value}%\n`;
+            msg += `📈 Markets: ${document.getElementById('sig_market').value}%\n`;
+            msg += `📱 OSINT: ${document.getElementById('sig_social').value}%\n`;
+            msg += `🍕 Pentagon Pizza: ${document.getElementById('sig_pentagon').value}%\n\n`;
+            msg += `🔗 View Live Radar & Data:\n${url}`;
+
+            document.getElementById('broadcastMsg').value = msg;
+        }
+
+        function copyToClipboard() {
+            const msg = document.getElementById('broadcastMsg').value;
+            if(!msg) { alert("יש לייצר הודעה קודם!"); return; }
+            
+            navigator.clipboard.writeText(msg).then(() => {
+                alert("ההודעה הועתקה! כעת תוכל להדביק אותה בערוץ שלך.");
+            });
+        }
+
+        function shareTelegram() {
+            const msg = document.getElementById('broadcastMsg').value;
+            if(!msg) { alert("יש לייצר הודעה קודם!"); return; }
+            const tgUrl = `https://t.me/share/url?url=&text=${encodeURIComponent(msg)}`;
+            window.open(tgUrl, '_blank');
+        }
+
+        function shareWhatsapp() {
+            const msg = document.getElementById('broadcastMsg').value;
+            if(!msg) { alert("יש לייצר הודעה קודם!"); return; }
+            const waUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            window.open(waUrl, '_blank');
+        }
+
+        // צור הודעה ראשונית בטעינה
+        window.onload = generateMessage;
+    </script>
+</body>
+</html>
+
+
