@@ -1,235 +1,65 @@
-<!DOCTYPE html>
-<html lang="he" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>WARADAR ADMIN v15</title>
-    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
-    <style>
-        body { 
-            background: #000; color: #00ff41; 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            padding: 20px; margin: 0;
-        }
-        
-        /* --- כרטיס הדיווח --- */
-        #reportCard {
-            background: #0f1215; border: 2px solid #00ff41; padding: 20px;
-            border-radius: 10px; margin-bottom: 20px; max-width: 500px; margin: 0 auto;
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
-            font-family: 'Segoe UI', sans-serif;
-        }
-        .report-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 15px; }
-        .radar-icon { width: 30px; height: 30px; border: 2px solid #00ff41; border-radius: 50%; background: radial-gradient(circle, rgba(0,255,65,0.2), transparent); }
-        
-        .score-box { text-align: center; margin: 15px 0; }
-        .score-label { color: #888; font-size: 0.8rem; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 5px; }
-        .big-score { font-size: 4.5rem; font-weight: 900; line-height: 1; text-shadow: 0 0 15px rgba(0,255,65,0.5); transition: 0.3s; }
-        .update-time { font-size: 0.8rem; color: #666; margin-top: 5px; font-family: monospace; }
-
-        .param-list { font-size: 0.9rem; color: #ccc; margin-top: 20px; }
-        .param-item { display: flex; justify-content: space-between; margin-bottom: 6px; border-bottom: 1px dashed #333; padding-bottom: 4px; }
-
-        .site-link { margin-top:20px; font-size:0.7rem; text-align:center; color:#555; border-top:1px solid #222; padding-top:10px; }
-
-        /* --- בקרי שליטה --- */
-        .controls { max-width: 500px; margin: 20px auto; background: #111; padding: 20px; border-radius: 10px; border: 1px solid #333; }
-        h1 { text-align: center; margin: 0 0 20px 0; font-size: 1.2rem; letter-spacing: 2px; }
-        
-        label { display: block; margin-top: 15px; color: #fff; font-weight:bold; font-size: 1rem; }
-        .sub-label { font-size: 0.8rem; color: #888; margin-bottom: 5px; display:block; }
-        
-        input[type="text"], input[type="password"], input[type="number"] { 
-            width: 100%; padding: 12px; background: #000; border: 1px solid #444; 
-            color: #fff; border-radius: 5px; box-sizing: border-box; font-size: 1.5rem; text-align: center;
-        }
-        
-        .input-highlight { border: 1px solid #00ff41 !important; background: rgba(0, 255, 65, 0.05) !important; font-weight: bold; }
-
-        .btn-group { display: flex; gap: 10px; margin-top: 20px; }
-        button { flex: 1; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; font-size: 1rem; }
-        
-        .btn-telegram { background: #0088cc; color: white; display: flex; align-items: center; justify-content: center; gap:8px;}
-        .btn-whatsapp { background: #25D366; color: white; margin-top: 10px; display: flex; align-items: center; justify-content: center; gap:8px;}
-        .btn-refresh { background: #333; color: #ccc; margin-top: 5px; font-size: 0.9rem; padding: 10px;}
-
-        .status { text-align: center; margin-top: 10px; font-size: 0.9rem; min-height: 20px; color: #aaa; }
-        
-        #whatsappArea { display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 15px; background: #080808; padding: 10px; border-radius: 5px;}
-        textarea { width: 100%; background: #000; color: #00ff41; border: 1px solid #333; padding: 10px; font-family: monospace; height: 120px; box-sizing: border-box; direction: ltr; }
-    </style>
-</head>
-<body>
-
-    <div id="reportCard">
-        <div class="report-header">
-            <div style="font-weight:bold; font-size:1.2rem;">WARADAR INTEL</div>
-            <div class="radar-icon"></div>
-        </div>
-        
-        <div class="score-box">
-            <div class="score-label">US/IRAN ESCALATION PROBABILITY</div>
-            <div class="big-score" id="displayScore">--%</div>
-            <div class="update-time" id="lastUpdateDisplay">Waiting...</div>
-            <div style="font-weight:bold; margin-top:10px; font-size:1.2rem;" id="displayLevel">--</div>
-        </div>
-        
-        <div class="param-list" id="paramListDisplay"></div>
-        
-        <div class="site-link">
-            LIVE MONITORING | IDANBIT1.GITHUB.IO/WARADAR
-        </div>
-    </div>
-
-    <div class="controls">
-        <h1>WAR ROOM CONTROL</h1>
-        
-        <label>🔒 Bot Token (הזן פעם אחת):</label>
-        <input type="password" id="botToken" style="font-size: 1rem;" placeholder="הדבק טוקן כאן">
-        
-        <hr style="border-color: #333; margin: 20px 0;">
-
-        <label>🎯 ציון נוכחי (0-100):</label>
-        <span class="sub-label">הזן את המספר שמופיע כרגע באתר</span>
-        <input type="number" id="manualScore" class="input-highlight" placeholder="למשל: 72" onkeyup="updatePreview()" onchange="updatePreview()">
-        
-        <button class="btn-refresh" onclick="updateTimeOnly()">⌚ עדכן שעה בלבד</button>
-
-        <div class="btn-group">
-            <button class="btn-telegram" onclick="sendToTelegram()">
-                🚀 שלח לטלגרם
-            </button>
-        </div>
-        
-        <div class="status" id="statusMsg"></div>
-
-        <div id="whatsappArea">
-            <label style="color:#25D366">✅ טקסט מוכן לוואטסאפ:</label>
-            <textarea id="whatsappText"></textarea>
-            <button class="btn-whatsapp" onclick="copyAndOpenWhatsApp()">
-                📋 העתק ופתח ערוץ
-            </button>
-        </div>
-    </div>
-
-    <script>
-        const CHANNEL_ID = "@waradarlive"; 
-        // עדכון כתובת האתר עם אות גדולה כבקשתך
-        const SITE_URL = "https://idanbit1.github.io/Waradar/"; 
-        
-        const PARAMS = ["News Intel", "Aviation", "Tankers", "Markets", "Oil/BTC", "Cyber/Social"];
-
-        // --- 1. עדכון תצוגה בזמן אמת ---
-        function updatePreview() {
-            const scoreInput = document.getElementById('manualScore').value;
+        function getSmartData() {
+            const now = Date.now();
+            const UPDATE_INTERVAL = 15 * 60 * 1000; 
             
-            if(!scoreInput) {
-                document.getElementById('displayScore').innerText = "--%";
-                return;
+            // קריאת הגדרות מהאדמין
+            let adminConfig = null;
+            try {
+                const adminStr = localStorage.getItem('waradar_admin_config');
+                if(adminStr) adminConfig = JSON.parse(adminStr);
+            } catch(e) {}
+
+            let storedData = null;
+            try {
+                const storedString = localStorage.getItem('waradar_v100_data');
+                if(storedString) storedData = JSON.parse(storedString);
+            } catch(e) {
+                localStorage.removeItem('waradar_v100_data');
             }
 
-            const score = parseInt(scoreInput);
-            const dateObj = new Date();
-            const timeStr = dateObj.toLocaleDateString('en-GB', {day:'2-digit', month:'2-digit'}) + ' | ' + dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            // אם אין שינוי מהאדמין והקאש בתוקף
+            if (storedData && storedData.timestamp && (now - storedData.timestamp < UPDATE_INTERVAL)) {
+                return storedData.payload;
+            }
 
-            document.getElementById('displayScore').innerText = score + "%";
-            document.getElementById('lastUpdateDisplay').innerText = "Last Updated: " + timeStr;
-
-            // חישוב רמה וצבע - תואם למצב הסלמה
-            let level = "LOW 🟢";
-            let color = "#00ff41"; 
-            if(score >= 55) { level = "ELEVATED 🟠"; color = "#ffb700"; }
-            if(score >= 70) { level = "HIGH 🔴"; color = "#ff3333"; }
-
-            const levelEl = document.getElementById('displayLevel');
-            levelEl.innerText = level;
-            levelEl.style.color = color;
-            document.getElementById('displayScore').style.color = color;
-            document.getElementById('reportCard').style.borderColor = color;
-
-            let htmlList = "";
-            PARAMS.forEach(name => {
-                const drift = Math.floor(Math.random() * 16) - 8; 
-                let pVal = Math.max(10, Math.min(99, score + drift));
-                let pColor = '#00ff41';
-                if(pVal > 55) pColor = '#ffb700';
-                if(pVal > 70) pColor = '#ff3333';
-
-                htmlList += `<div class="param-item"><span>${name}</span><span style="color:${pColor}">${pVal}%</span></div>`;
-            });
-            document.getElementById('paramListDisplay').innerHTML = htmlList;
-
-            const waText = `*WARADAR INTEL* 📡\n${timeStr}\n\n📊 *Escalation Risk:* ${score}%\n⚠️ *Level:* ${level}\n\nלצפייה בדשבורד המלא:\n${SITE_URL}`;
-            document.getElementById('whatsappText').value = waText;
-        }
-
-        function updateTimeOnly() { updatePreview(); }
-
-        // --- 2. שליחה לטלגרם ---
-        async function sendToTelegram() {
-            const token = document.getElementById('botToken').value;
-            const score = document.getElementById('manualScore').value;
+            let totalWeightedScore = 0;
+            let signalValues = {};
             
-            if(!token) { alert("חסר טוקן!"); return; }
-            if(!score) { alert("חסר ציון!"); return; }
-            
-            localStorage.setItem('waradar_token', token);
+            // בדיקה אם מצב OVERRIDE דולק מהאדמין
+            const isOverride = adminConfig && adminConfig.override;
 
-            const statusDiv = document.getElementById('statusMsg');
-            statusDiv.innerText = "📸 שולח...";
-            statusDiv.style.color = "#fff";
-
-            document.getElementById('whatsappArea').style.display = 'block';
-
-            const canvas = await html2canvas(document.getElementById('reportCard'), {
-                backgroundColor: "#0f1215",
-                scale: 2
-            });
-
-            canvas.toBlob(async function(blob) {
-                const formData = new FormData();
-                formData.append('chat_id', CHANNEL_ID);
-                formData.append('photo', blob, 'status.png');
+            signalsConfig.forEach(sig => {
+                // משיכת ערך הבסיס: מהאדמין, או ברירת המחדל
+                let base = adminConfig && adminConfig.baseValues && adminConfig.baseValues[sig.id] !== undefined ? adminConfig.baseValues[sig.id] : sig.baseVal;
                 
-                const telegramCaption = document.getElementById('whatsappText').value; 
-                formData.append('caption', telegramCaption);
-                formData.append('parse_mode', 'Markdown');
-
-                try {
-                    const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const resData = await response.json();
-                    
-                    if(resData.ok) {
-                        statusDiv.innerText = "✅ נשלח!";
-                        statusDiv.style.color = "#00ff41";
-                        document.getElementById('whatsappArea').scrollIntoView({behavior: "smooth"});
-                    } else {
-                        statusDiv.innerText = "❌ שגיאה: " + resData.description;
-                        statusDiv.style.color = "#ff3333";
-                    }
-                } catch (e) {
-                    statusDiv.innerText = "❌ תקשורת";
-                }
+                // אם ב-Override, אין תנודתיות. אם באוטומט, יש תנודתיות קלה
+                const flux = isOverride ? 0 : (Math.random() * 4) - 2; 
+                let val = Math.floor(Math.max(0, Math.min(100, base + flux)));
+                
+                signalValues[sig.id] = val;
+                totalWeightedScore += (val * sig.weight);
             });
+
+            // קביעת ציון סופי
+            let finalScore = isOverride ? adminConfig.score : Math.floor(Math.max(10, Math.min(100, totalWeightedScore)));
+            
+            const dateObj = new Date();
+            const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = dateObj.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+            
+            const payload = {
+                score: finalScore,
+                signals: signalValues,
+                updateTime: `${dateStr} | ${timeStr}`,
+                statusText: isOverride && adminConfig.statusText ? adminConfig.statusText : (finalScore >= 80 ? 'CRITICAL ☢️' : 'HIGH 🔴'),
+                alertBanner: isOverride && adminConfig.alertBanner ? adminConfig.alertBanner : null
+            };
+
+            try {
+                localStorage.setItem('waradar_v100_data', JSON.stringify({ timestamp: now, payload: payload }));
+            } catch(e){}
+
+            return payload;
         }
 
-        function copyAndOpenWhatsApp() {
-            const text = document.getElementById('whatsappText');
-            text.select();
-            text.setSelectionRange(0, 99999);
-            navigator.clipboard.writeText(text.value).then(() => {
-                window.location.href = "https://whatsapp.com/channel/0029Vb7m8O46BIEjW2J5Yj2z"; 
-            });
-            alert("הועתק! פותח וואטסאפ...");
-        }
-
-        window.onload = () => {
-            const saved = localStorage.getItem('waradar_token');
-            if(saved) document.getElementById('botToken').value = saved;
-        }
-    </script>
-</body>
-</html>
+כעת, כל שינוי שתעשה בעמוד האדמין ותלחץ על "עדכן אתר ראשי", ישפיע מידית על הצופים שלך בעמוד הראשי (לאחר רענון או עדכון אוטומטי).
