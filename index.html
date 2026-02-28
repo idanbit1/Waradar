@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WARADAR - Strategic Risk Monitor</title>
+    <title>WARADAR - Strategic Risk Monitor (ACTIVE)</title>
     <style>
         :root {
             --primary: #00ff41; 
             --warning: #ffb700; 
-            --danger: #ff3333;  
+            --danger: #ff0000;  /* הוחמר האדום למצב 100% */
             --telegram: #0088cc; 
             --whatsapp: #25D366; 
             --bg: #050505;      
@@ -44,9 +44,9 @@
             display: flex;
             flex-direction: column;
             padding: 12px 20px;
-            background: rgba(5, 8, 5, 0.98); 
-            border-bottom: 1px solid var(--danger); 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+            background: rgba(15, 0, 0, 0.98); /* צבע רקע אדמדם במצב חירום */
+            border-bottom: 2px solid var(--danger); 
+            box-shadow: 0 4px 20px rgba(255,0,0,0.3);
             z-index: 9999; 
             position: sticky; top: 0;
         }
@@ -63,21 +63,23 @@
         .radar-logo {
             width: 35px; height: 35px; border: 2px solid var(--danger);
             border-radius: 50%; position: relative;
-            background: radial-gradient(circle, rgba(255,51,51,0.2), transparent);
+            background: radial-gradient(circle, rgba(255,0,0,0.4), transparent);
+            box-shadow: 0 0 15px var(--danger);
         }
         .radar-sweep {
             position: absolute; width: 50%; height: 50%;
-            background: linear-gradient(90deg, transparent, rgba(255, 51, 51, 0.6));
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.8));
             top: 0; left: 0; transform-origin: bottom right;
-            animation: sweep 1.5s infinite linear; border-radius: 100% 0 0 0;
+            animation: sweep 0.8s infinite linear; /* מכ"ם מהיר יותר במצב תקיפה */
+            border-radius: 100% 0 0 0;
         }
         @keyframes sweep { to { transform: rotate(360deg); } }
 
-        .title-group h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; }
-        .live-tag { font-size: 0.65rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; vertical-align: top;}
+        .title-group h1 { margin: 0; font-size: 1.4rem; letter-spacing: 2px; text-transform: uppercase; white-space: nowrap; text-shadow: 0 0 10px var(--danger);}
+        .live-tag { font-size: 0.65rem; background: var(--danger); color: white; padding: 2px 5px; border-radius: 3px; animation: blink 0.5s infinite; vertical-align: top;}
 
         .header-right { display: flex; align-items: center; gap: 15px; }
-        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; }
+        .clock { font-family: 'Courier New', monospace; font-weight: bold; font-size: 1.1rem; color: var(--danger); }
         .lang-flags { display: flex; gap: 5px; cursor: pointer; }
         .flag { font-size: 1.4rem; filter: grayscale(1); transition: 0.3s; }
         .flag:hover, .flag.active { filter: grayscale(0); transform: scale(1.1); }
@@ -132,10 +134,30 @@
             display: flex; justify-content: space-between; align-items: center;
         }
 
+        /* ALERT BANNER */
+        .emergency-banner {
+            background: var(--danger);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: pulse-alert 1.5s infinite;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.5);
+            letter-spacing: 1px;
+        }
+        @keyframes pulse-alert {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
         .score-container { text-align: center; padding: 10px; margin-bottom: 20px; }
         .score-label { font-size: 0.9rem; color: #888; letter-spacing: 2px; margin-bottom: 5px; font-weight: bold; }
         .update-time-display { font-size: 0.85rem; color: #666; margin-top: 5px; font-family: monospace; }
-        .big-score { font-size: 5rem; font-weight: 900; color: var(--danger); text-shadow: 0 0 20px rgba(255,51,51,0.5); line-height: 1; }
+        .big-score { font-size: 5.5rem; font-weight: 900; color: var(--danger); text-shadow: 0 0 30px rgba(255,0,0,0.8); line-height: 1; }
         
         .history-section {
             margin-top: auto; border-top: 1px dashed #333; padding-top: 15px; position: relative; min-height: 180px; 
@@ -152,7 +174,7 @@
         .info-btn { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border: 1px solid var(--text-dim); color: var(--text-dim); border-radius: 50%; font-size: 0.7rem; cursor: pointer; transition: 0.2s; z-index: 5; margin-left: auto; }
         .info-btn:hover { color: var(--primary); border-color: var(--primary); background: rgba(0,255,65,0.1); }
         .progress-bg { background: #222; height: 6px; width: 100%; border-radius: 3px; overflow: hidden; margin-top: 5px; }
-        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--danger)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        .progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, var(--warning), var(--danger)); transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
 
         /* --- LIVE NEWS FEED WITH TICKER ANIMATION --- */
         .news-window {
@@ -186,7 +208,7 @@
             position: relative; z-index: 10;
             background: rgba(0,0,0,0.3);
         }
-        .news-item:hover { background: #111; border-left: 3px solid var(--warning); padding-left: 17px; }
+        .news-item:hover { background: #111; border-left: 3px solid var(--danger); padding-left: 17px; }
         
         .news-thumb {
             width: 70px; height: 70px; border-radius: 6px; object-fit: cover;
@@ -201,7 +223,7 @@
             display: flex; flex-direction: column; justify-content: center;
         }
         
-        .news-time { color: var(--warning); font-size: 0.75rem; font-family: monospace; margin-bottom: 5px; }
+        .news-time { color: var(--danger); font-size: 0.75rem; font-family: monospace; margin-bottom: 5px; font-weight: bold;}
         .news-title { font-size: 0.9rem; line-height: 1.4; font-weight: bold;}
 
         /* --- MODALS & FOOTER --- */
@@ -213,8 +235,8 @@
         .modal-content { font-size: 0.9rem; line-height: 1.6; color: #ccc; }
 
         footer { text-align: center; padding: 20px; font-size: 0.8rem; color: #555; border-top: 1px solid #222; margin-top: auto; position: relative; z-index: 1001;}
-        .share-btn { background: transparent; border: 1px solid var(--primary); color: var(--primary); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; font-weight: bold; transition: 0.3s;}
-        .share-btn:hover { background: rgba(0, 255, 65, 0.1); }
+        .share-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 8px 20px; cursor: pointer; margin: 10px auto; display: inline-flex; align-items: center; gap: 8px; border-radius: 4px; font-weight: bold; transition: 0.3s;}
+        .share-btn:hover { background: rgba(255, 0, 0, 0.1); }
         
         .footer-social-links { display: flex; justify-content: center; gap: 15px; margin-top: 15px; width: 100%; }
         .footer-social-btn { 
@@ -265,7 +287,7 @@
                 <div class="brand">
                     <div class="radar-logo"><div class="radar-sweep"></div></div>
                     <div class="title-group">
-                        <h1>WARADAR <span class="live-tag">LIVE</span></h1>
+                        <h1>WARADAR <span class="live-tag">ACTIVE</span></h1>
                     </div>
                 </div>
             </div>
@@ -304,13 +326,19 @@
                     <span data-key="risk_title">RISK SCORE</span>
                     <span class="info-btn" onclick="openModal('general', event)">?</span>
                 </h2>
+                
+                <!-- התראת חירום על התקיפה -->
+                <div class="emergency-banner">
+                    <span data-key="alert_attack">⚠️ WARNING: MILITARY ACTION COMMENCED AT 08:00</span>
+                </div>
+
                 <div class="score-container">
                     <div class="score-label" data-key="score_label">US/IRAN ESCALATION PROBABILITY</div>
-                    <div class="big-score" id="mainScore">--%</div>
+                    <div class="big-score" id="mainScore">100%</div>
                     <div class="update-time-display" id="lastUpdateTime">Loading...</div>
                     <div style="font-size: 1.4rem; font-weight: bold; margin-top: 10px;">
                         <span data-key="status">RISK LEVEL:</span> 
-                        <span id="statusText" class="blink" style="color: var(--danger)">CALCULATING...</span>
+                        <span id="statusText" class="blink" style="color: var(--danger)">ACTIVE CONFLICT ⚔️</span>
                     </div>
                 </div>
 
@@ -340,7 +368,7 @@
         <div class="card">
             <h2>
                 <span data-key="news_feed_title">LIVE INTEL FEED</span>
-                <span style="font-size:0.7rem; color:var(--primary); font-weight:normal;" class="blink">● RECIEVING</span>
+                <span style="font-size:0.7rem; color:var(--danger); font-weight:bold;" class="blink">● ACTIVE</span>
             </h2>
             
             <div class="news-window" id="newsWindow">
@@ -398,23 +426,26 @@
             weather: '<svg class="param-icon" viewBox="0 0 24 24"><path d="M19.36 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.64-4.96z"/></svg>'
         };
 
+        // הוקפצו נתוני הבסיס לאזור ה-95-100 כדי לשקף מצב מלחמה
         const signalsConfig = [
-            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 85, icon: icons.news },
-            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 72, icon: icons.aviation },
-            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 80, icon: icons.market },
-            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 78, icon: icons.financial },
-            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 85, icon: icons.tankers },
-            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 88, icon: icons.social },
-            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 60, icon: icons.traffic },
-            { id: 'pentagon', weight: 0.05, url: 'https://pentagon-pizza.vercel.app/', baseVal: 75, icon: icons.pentagon },
-            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 85, icon: icons.weather }
+            { id: 'news',     weight: 0.20, url: 'https://www.google.com/search?q=Iran+US+War+news&tbm=nws', baseVal: 100, icon: icons.news },
+            { id: 'aviation', weight: 0.15, url: 'https://www.flightradar24.com/32.57,53.05/5', baseVal: 99, icon: icons.aviation }, // שמיים ריקים
+            { id: 'market',   weight: 0.15, url: 'https://polymarket.com/markets?q=Iran', baseVal: 98, icon: icons.market },
+            { id: 'financial',weight: 0.15, url: 'https://www.tradingview.com/symbols/TVC-USOIL/', baseVal: 97, icon: icons.financial },
+            { id: 'tankers',  weight: 0.10, url: 'https://www.flightradar24.com/multiview/32.57,53.05/5', baseVal: 100, icon: icons.tankers },
+            { id: 'social',   weight: 0.10, url: 'https://twitter.com/search?q=Iran+USA+military&f=live', baseVal: 100, icon: icons.social },
+            { id: 'traffic',  weight: 0.05, url: 'https://www.google.com/maps/@35.6997327,51.3380436,11.5z/data=!5m1!1e1', baseVal: 92, icon: icons.traffic },
+            { id: 'pentagon', weight: 0.05, url: 'https://pentagon-pizza.vercel.app/', baseVal: 100, icon: icons.pentagon },
+            { id: 'weather',  weight: 0.05, url: 'https://www.windy.com/35.689/51.389?35.195,51.389,8', baseVal: 88, icon: icons.weather }
         ];
 
-        const historyPoints = [55, 62, 68, 75, 80]; 
+        // היסטוריה מראה את הזינוק הפתאומי ל-100
+        const historyPoints = [75, 77, 78, 80, 100]; 
 
         const content = {
             en: {
                 whatsapp: "WhatsApp", telegram: "Telegram", donate: "Donate",
+                alert_attack: "⚠️ WARNING: MILITARY ACTION COMMENCED AT 08:00",
                 risk_title: "RISK SCORE", score_label: "US/IRAN ESCALATION PROBABILITY", status: "RISK LEVEL:",
                 click_hint: "💡 TIP: Click any signal to verify source data", risk_parameters: "LIVE SIGNALS & SOURCES",
                 news_feed_title: "LIVE INTEL FEED", share: "Share Status", disclaimer_short: "Statistical aggregation. Not official military advice.",
@@ -430,6 +461,7 @@
             },
             he: {
                 whatsapp: "וואטסאפ", telegram: "טלגרם", donate: "תרומה",
+                alert_attack: "⚠️ התרעה: תקיפה צבאית החלה בשעה 08:00",
                 risk_title: "ציון סיכון", score_label: "הסתברות להסלמה: ארה״ב / איראן", status: "רמת סיכון:",
                 click_hint: "💡 טיפ: לחץ על כל פרמטר לפתיחת מקור המידע", risk_parameters: "אותות ומקורות מידע",
                 news_feed_title: "עדכוני חדשות בזמן אמת", share: "שתף סטטוס", disclaimer_short: "אגרגציה סטטיסטית בלבד. השימוש באחריותך.",
@@ -445,6 +477,7 @@
             },
             ru: {
                 whatsapp: "WhatsApp", telegram: "Telegram", donate: "Донат",
+                alert_attack: "⚠️ ВНИМАНИЕ: ВОЕННЫЕ ДЕЙСТВИЯ НАЧАЛИСЬ В 08:00",
                 risk_title: "ОБЩИЙ РИСК", score_label: "ВЕРОЯТНОСТЬ ЭСКАЛАЦИИ США/ИРАН", status: "УРОВЕНЬ РИСКА:",
                 click_hint: "💡 СОВЕТ: Нажмите на параметр для просмотра источника", risk_parameters: "СИГНАЛЫ И ИСТОЧНИКИ",
                 news_feed_title: "ЖИВАЯ ЛЕНТА НОВОСТЕЙ", share: "Поделиться", disclaimer_short: "Статистическая агрегация.",
@@ -517,15 +550,13 @@
         // --- SMART COUNTER LOGIC (NEVER GOES DOWN) ---
         async function initGlobalCounter() {
             const counterEl = document.getElementById('visitorCount');
-            const BASE_COUNT = 15430; // בסיס הצפיות הקיים
-            const jumpAmount = Math.floor(Math.random() * 4) + 2; // קפיצה של 2 עד 5 צפיות
+            const BASE_COUNT = 15430; 
+            const jumpAmount = Math.floor(Math.random() * 4) + 2; 
             
-            // חילוץ המספר הגבוה ביותר שהמשתמש אי פעם ראה כדי למנוע חזרה אחורה
             let localMaxViews = parseInt(localStorage.getItem('waradar_max_views') || BASE_COUNT);
 
             try {
                 let finalServerCount = 0;
-                // שליחת מספר בקשות ככמות הקפיצה המוגרלת כדי שזה יירשם בשרת העולמי
                 for(let i=0; i<jumpAmount; i++) {
                     const res = await fetch('https://api.counterapi.dev/v1/waradar_app/global_visits_v1/up');
                     const data = await res.json();
@@ -534,21 +565,17 @@
                     }
                 }
 
-                // חישוב המספר שיוצג (המספר האמיתי מהשרת + בסיס ההתחלה)
                 let displayCount = finalServerCount + BASE_COUNT;
 
-                // שומר הסף: אם בגלל באג בשרת המספר נמוך ממה שהמשתמש כבר ראה, נשמור על המספר הגבוה + הקפיצה
                 if (displayCount < localMaxViews) {
                     displayCount = localMaxViews + jumpAmount;
                 }
 
-                // שמירת המספר החדש כבסיס המקסימלי לביקור הבא
                 localStorage.setItem('waradar_max_views', displayCount);
                 counterEl.innerText = displayCount.toLocaleString();
 
             } catch(e) {
                 console.log("Global counter API error, using smart fallback.");
-                // במקרה והשרת קורס, המונה ימשיך לעלות באופן מקומי ללא פגיעה בחוויית המשתמש
                 let fallbackCount = localMaxViews + jumpAmount;
                 localStorage.setItem('waradar_max_views', fallbackCount);
                 counterEl.innerText = fallbackCount.toLocaleString();
@@ -561,28 +588,27 @@
             
             let storedData = null;
             try {
-                const storedString = localStorage.getItem('waradar_v19_data');
+                // שינוי שם ה-cache כדי שכולם יקבלו מיד את העדכון של 100% ולא יראו היסטוריה קודמת
+                const storedString = localStorage.getItem('waradar_v100_data');
                 if(storedString) storedData = JSON.parse(storedString);
             } catch(e) {
-                localStorage.removeItem('waradar_v19_data');
+                localStorage.removeItem('waradar_v100_data');
             }
 
             if (storedData && storedData.timestamp && (now - storedData.timestamp < UPDATE_INTERVAL)) {
                 return storedData.payload;
             }
 
-            let totalWeightedScore = 0;
             let signalValues = {};
 
+            // משחק קטן ברמת האחוזים של הסיגנלים בין 95 ל-100 להמחשה
             signalsConfig.forEach(sig => {
-                const flux = (Math.random() * 8) - 4; 
-                let val = Math.floor(Math.max(10, Math.min(95, sig.baseVal + flux)));
+                const flux = (Math.random() * 2) - 1; 
+                let val = Math.floor(Math.max(10, Math.min(100, sig.baseVal + flux)));
                 signalValues[sig.id] = val;
-                totalWeightedScore += (val * sig.weight);
             });
 
-            let calculatedScore = Math.floor(totalWeightedScore);
-            let finalScore = Math.max(72, Math.min(83, calculatedScore));
+            let finalScore = 100; // ציון הוגדר קשיח על 100%
             
             const dateObj = new Date();
             const timeStr = dateObj.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
@@ -595,7 +621,7 @@
             };
 
             try {
-                localStorage.setItem('waradar_v19_data', JSON.stringify({ timestamp: now, payload: payload }));
+                localStorage.setItem('waradar_v100_data', JSON.stringify({ timestamp: now, payload: payload }));
             } catch(e){}
 
             return payload;
@@ -613,8 +639,7 @@
                 const timeEl = document.getElementById('lastUpdateTime');
                 if(timeEl) timeEl.innerText = `${timeLabel} ${data.updateTime}`;
 
-                let color = '#ff3333'; let status = 'HIGH 🔴';
-                if(data.score >= 80) { color = '#ff1111'; status = 'CRITICAL ☢️'; }
+                let color = '#ff0000'; let status = 'ACTIVE CONFLICT ⚔️';
                 
                 if(scoreEl) scoreEl.style.color = color;
                 const statusEl = document.getElementById('statusText');
@@ -629,9 +654,7 @@
                     signalsConfig.forEach(sig => {
                         const val = data.signals[sig.id] || sig.baseVal;
                         const label = content[currentLang][`l_${sig.id}`];
-                        let barColor = 'var(--primary)';
-                        if(val > 50) barColor = 'var(--warning)';
-                        if(val > 70) barColor = 'var(--danger)';
+                        let barColor = 'var(--danger)';
 
                         const row = document.createElement('div');
                         row.className = 'parameter-row';
@@ -639,9 +662,9 @@
                         row.title = "Click to open live data source";
                         row.innerHTML = `
                             <div class="param-header">
-                                <div class="param-label">${sig.icon} ${label}</div>
+                                <div class="param-label">${sig.icon} <span style="color:white">${label}</span></div>
                                 <div style="display:flex; align-items:center; gap:10px;">
-                                    <span>${val}%</span>
+                                    <span style="color:var(--danger); font-weight:bold">${val}%</span>
                                     <span class="info-btn" onclick="openModal('${sig.id}', event)">i</span>
                                 </div>
                             </div>
@@ -673,11 +696,10 @@
                 ctx.clearRect(0, 0, width, height);
 
                 const gradient = ctx.createLinearGradient(0, 0, 0, height);
-                gradient.addColorStop(0, "rgba(255, 51, 51, 0.4)");
-                gradient.addColorStop(1, "rgba(255, 51, 51, 0.0)");
+                gradient.addColorStop(0, "rgba(255, 0, 0, 0.6)");
+                gradient.addColorStop(1, "rgba(255, 0, 0, 0.0)");
                 
-                let strokeColor = '#ff3333';
-                if(currentValue >= 80) strokeColor = '#ff1111';
+                let strokeColor = '#ff0000';
 
                 ctx.beginPath();
                 ctx.moveTo(0, height);
@@ -776,3 +798,4 @@
     </script>
 </body>
 </html>
+
